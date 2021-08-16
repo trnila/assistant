@@ -1,0 +1,22 @@
+<style>
+  ul {
+    padding: 0;
+  }
+</style>
+
+{% for restaurant in restaurants %}
+  <h1>{{ restaurant.name }}</h1>
+  {{ restaurant.soup }} {{ restaurant.soup_price }}
+
+  <ul>
+    {% for lunch in restaurant.lunches %}
+    <li>
+      {{ lunch.num }}
+      <strong>{{ lunch.name }}</strong>
+      {{ lunch.price }} Kč
+      <div>{{ lunch.ingredients }}</div>
+    </li>
+    {% endfor %}
+  </ul>
+
+{% endfor %}
