@@ -71,16 +71,22 @@ async def gather_restaurants():
 
         async def u_jarosu():
             async with session.get("https://www.ujarosu.cz/cz/denni-menu/") as r:
+                result = {
+                    'name': 'U Jarošů',
+                    'soup': None,
+                    'lunches': [],
+                }
+
                 text = await r.text()
                 dom = BeautifulSoup(text, 'html.parser')
 
                 days = dom.findAll('tr', {'height': 29})
                 nth_day = datetime.datetime.today().weekday()
                 if len(days) <= nth_day:
-                    return []
+                    return result
 
                 day = days[nth_day]
-                soup = day.select('td')[1].get_text()
+                result['soup'] = day.select('td')[1].get_text()
 
                 node = day.find_next_sibling('tr')
                 counter = 0
@@ -96,7 +102,6 @@ async def gather_restaurants():
                         if food:
                             foods.append(food)
                         food = {
-                            'soup': soup,
                             'name': node.select('td')[1].get_text(),
                             'price': node.select('td')[2].get_text(),
                             'num': str(num),
@@ -109,11 +114,8 @@ async def gather_restaurants():
                 if food:
                     foods.append(food)
 
-                return {
-                    'name': 'U Jarošů',
-                    'soup': soup,
-                    'lunches': foods,
-                }
+                result['foods'] = foods
+                return result
 
         async def u_zlateho_lva():
             day_nth = datetime.datetime.today().weekday()
