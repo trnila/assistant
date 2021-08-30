@@ -1,22 +1,38 @@
 <style>
+  h1 {
+    margin: 0px;
+  }
   ul {
     padding: 0;
+  }
+  div.restaurant {
+    margin-bottom: 10px;
   }
 </style>
 
 {% for restaurant in restaurants %}
-  <h1>{{ restaurant.name }}</h1>
-  {{ restaurant.soup }} {{ restaurant.soup_price }}
+  <div class="restaurant">
+    <h1>{{ restaurant.name }}</h1>
+    {% if not restaurant.soup and not restaurant.lunches %}
+    No lunch found.
+    {% else %}
+      {% if restaurant.soup %}
+      <strong>{{ restaurant.soup }}</strong>
+      {% if restaurant.soup_price %}
+        {{ restaurant.soup_price }} Kč
+      {% endif %}
+      {% endif %}
 
-  <ul>
-    {% for lunch in restaurant.lunches %}
-    <li>
-      {{ lunch.num }}
-      <strong>{{ lunch.name }}</strong>
-      {{ lunch.price }} Kč
-      <div>{{ lunch.ingredients }}</div>
-    </li>
-    {% endfor %}
-  </ul>
-
+      <ul>
+        {% for lunch in restaurant.lunches %}
+        <li>
+          {{ lunch.num }}
+          <strong>{{ lunch.name }}</strong>
+          {{ lunch.price }} Kč
+          <div>{{ lunch.ingredients }}</div>
+        </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
 {% endfor %}
