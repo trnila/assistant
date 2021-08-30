@@ -6,6 +6,10 @@ import datetime
 import asyncio
 import itertools
 
+
+days = ['Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek']
+
+
 async def gather_restaurants():
     async with aiohttp.ClientSession() as session:
         async def bistroin():
@@ -80,41 +84,41 @@ async def gather_restaurants():
                 text = await r.text()
                 dom = BeautifulSoup(text, 'html.parser')
 
-                days = dom.findAll('tr', {'height': 29})
                 nth_day = datetime.datetime.today().weekday()
-                if len(days) <= nth_day:
-                    return result
+                #result['soup'] = day.select('td')[1].get_text()
 
-                day = days[nth_day]
-                result['soup'] = day.select('td')[1].get_text()
-
-                node = day.find_next_sibling('tr')
                 counter = 0
                 food = {}
                 foods = []
-                while node and int(node.get('height')) != 29:
-                    try:
-                        num = int(node.select('td')[0].get_text().strip().split('.')[0])
-                    except ValueError:
-                        num = -1
-                    if num == counter + 1:
-                        counter += 1
-                        if food:
-                            foods.append(food)
-                        food = {
-                            'name': node.select('td')[1].get_text(),
-                            'price': node.select('td')[2].get_text(),
-                            'num': str(num),
-                        }
-                    else:
-                        food['name'] += ' ' + node.select('td')[1].get_text()
+                capturing = False
+                for row in dom.findAll('tr'):
+                    if capturing:
+                        try:
+                            num = int(row.select('td')[0].get_text().strip().split('.')[0])
+                        except ValueError:
+                            num = -1
+                        if num == counter + 1:
+                            counter += 1
+                            if food:
+                                foods.append(food)
+                            food = {
+                                'name': row.select('td')[1].get_text(),
+                                'price': row.select('td')[2].get_text(),
+                                'num': str(num),
+                            }
+                        else:
+                            food['name'] += ' ' + row.select('td')[1].get_text()
 
-                    node = node.find_next_sibling('tr')
+                    if row.select('td')[0].get_text().strip(' :') in days:
+                        if capturing:
+                            break
+                        capturing = True
+                        result['soup'] = row.select('td')[1].get_text()
 
                 if food:
                     foods.append(food)
 
-                result['foods'] = foods
+                result['lunches'] = foods
                 return result
 
         async def u_zlateho_lva():
@@ -135,7 +139,6 @@ async def gather_restaurants():
                 def remove_alergens(s):
                     return re.sub('\(A-\d.+', '', s)
 
-                days = ['Ponděl', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek']
                 capturing = False
                 counter = 0
                 food = {}
@@ -143,7 +146,6 @@ async def gather_restaurants():
                 for line in text.splitlines():
                     line = line.strip()
 
-                    print(line)
                     if line.startswith(days[day_nth]):
                         capturing = True
                     elif capturing:
