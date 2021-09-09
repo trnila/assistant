@@ -150,7 +150,7 @@ async def gather_restaurants():
                     if line.startswith(days[day_nth]):
                         capturing = True
                     elif capturing:
-                        if day_nth < 5 and line.startswith(days[day_nth + 1]):
+                        if day_nth < 4 and line.startswith(days[day_nth + 1]):
                             break
                         print(line, state)
                         if line.startswith('Polévka:'):
