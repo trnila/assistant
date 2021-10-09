@@ -54,15 +54,26 @@ async def gather_restaurants():
                 text = await r.text()
                 dom = BeautifulSoup(text, 'html.parser')
 
-                nth_day = datetime.datetime.today().weekday()
-                #result['soup'] = day.select('td')[1].get_text()
+                day_nth = datetime.datetime.today().weekday()
+                day_nth = 3
 
                 counter = 0
                 food = {}
                 foods = []
                 capturing = False
                 for row in dom.findAll('tr'):
-                    if capturing:
+                    day = row.select('td')[0].get_text().strip(' \n\t\xa0:')
+                    if day in days:
+                        if capturing:
+                            break
+                        if day == days[day_nth]:
+                            capturing = True
+                            result['soup'] = row.select('td')[1].get_text()
+                    elif capturing:
+                        spaces = all(not td.get_text().strip() for td in row.select('td'))
+                        if spaces:
+                            break
+
                         try:
                             num = int(row.select('td')[0].get_text().strip().split('.')[0])
                         except ValueError:
@@ -79,11 +90,6 @@ async def gather_restaurants():
                         else:
                             food['name'] += ' ' + row.select('td')[1].get_text()
 
-                    if row.select('td')[0].get_text().strip(' :') in days:
-                        if capturing:
-                            break
-                        capturing = True
-                        result['soup'] = row.select('td')[1].get_text()
 
                 if food:
                     foods.append(food)
