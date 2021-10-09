@@ -7,7 +7,7 @@ import asyncio
 import itertools
 
 
-days = ['Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek']
+days = ['Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota', 'Neděle']
 
 
 async def gather_restaurants():
@@ -99,13 +99,6 @@ async def gather_restaurants():
 
         async def u_zlateho_lva():
             day_nth = datetime.datetime.today().weekday()
-            if day_nth >= 5:
-                return {
-                    'name': 'U Zlatého Lva',
-                    'soup': '',
-                    'lunches': [],
-                }
-
             async with session.get("http://www.zlatylev.com/menu_zlaty_lev.html") as r:
                 text = await r.text()
                 dom = BeautifulSoup(text, 'html.parser')
