@@ -43,36 +43,6 @@ async def gather_restaurants():
                     'lunches': foods,
                 }
 
-        async def pustkovecka_basta():
-            async with session.get("https://www.pustkoveckabasta.cz/pustkovecka-basta") as r:
-                text = await r.text()
-                dom = BeautifulSoup(text, 'html.parser')
-                soup = None
-                foods = []
-                for node in dom.select('.food-item'):
-                    name = node.select('h4')[0].get_text()
-                    if 'Polévka' in name:
-                        continue
-
-                    date = node.find_parent('div', {'class': 'daily-item'}).get('data-date')
-                    if date and date != datetime.datetime.now().strftime("%Y-%m-%d"):
-                        continue
-
-                    parts = name.split('.', 1)
-                    if len(parts) == 2:
-                        soup = node.select('.menu-detail')[0].get_text().replace('Polévka:', '')
-
-                        foods.append({
-                            'num': parts[0],
-                            'name': re.sub('\d+g', '', parts[1]),
-                            'price': node.select('.price')[0].get('data-price'),
-                        })
-                return {
-                    'name': 'Pustkovecká bašta',
-                    'soup': soup,
-                    'lunches': foods,
-                }
-
         async def u_jarosu():
             async with session.get("https://www.ujarosu.cz/cz/denni-menu/") as r:
                 result = {
@@ -180,7 +150,6 @@ async def gather_restaurants():
 
         restaurants = [
             bistroin,
-            pustkovecka_basta,
             u_jarosu,
             u_zlateho_lva
         ]
