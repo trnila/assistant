@@ -55,7 +55,6 @@ async def gather_restaurants():
                 dom = BeautifulSoup(text, 'html.parser')
 
                 day_nth = datetime.datetime.today().weekday()
-                day_nth = 3
 
                 counter = 0
                 food = {}
@@ -106,13 +105,13 @@ async def gather_restaurants():
                 text = dom.select('.xr_txt.xr_s0')[0].get_text()
 
                 def remove_alergens(s):
-                    return re.sub('\(A-\d.+', '', s)
+                    return re.sub('\(A(-|:).*?\)', '', s)
 
                 capturing = False
                 counter = 0
                 food = {}
                 soup = None
-                state = 'num'
+                state = 'name'
                 for line in text.splitlines():
                     line = line.strip()
 
@@ -123,23 +122,21 @@ async def gather_restaurants():
                             break
                         print(line, state)
                         if line.startswith('Polévka:'):
-                            soup = remove_alergens(line.split(':')[1])
+                            soup = remove_alergens(line)
                         else:
-                            if state == 'num':
-                                if re.match('^[0-9]+\.$', line):
+                            if state == 'name':
+                                if re.match('^[0-9]+\.', line):
+                                    line, name = line.split('.', 2)
                                     food = {
-                                        'num': line.split('.')[0],
+                                        'num': line,
+                                        'name': remove_alergens(name),
                                     }
-                                    state = 'name'
-                            elif state == 'name':
-                                if line:
-                                    food['name'] = remove_alergens(line)
                                     state = 'price'
                             elif state == 'price':
-                                if re.match('^[0-9]+ Kč$', line):
+                                if re.match('^[0-9]+\s*(,-|Kč)$', line):
                                     food['price'] = line.split(' ')[0]
                                     foods.append(food)
-                                    state = 'num'
+                                    state = 'name'
 
                 return {
                     'name': 'U Zlatého Lva',
