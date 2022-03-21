@@ -39,10 +39,12 @@
           <ul>
             {% for lunch in restaurant.lunches %}
             <li>
-              {{ lunch.num }}
+              {% if lunch.num %}{{ lunch.num }}{% endif %}
               <strong>{{ lunch.name }}</strong>
               {{ lunch.price }} Kč
+              {% if lunch.ingredients %}
               <div>{{ lunch.ingredients }}</div>
+              {% endif %}
             </li>
             {% endfor %}
           </ul>
