@@ -10,7 +10,7 @@ app = Flask(__name__)
 @app.route("/public_transport")
 async def public_transport():
     srcs = ["Václava Jiřikovského"]
-    dsts = ["Hlavní třída", "Pustkovecká", "Krásnopolská", "Poruba,Studentské koleje"]
+    dsts = ["Hlavní třída", "Rektorát VŠB", "Pustkovecká", "Krásnopolská", "Poruba,Studentské koleje"]
     if datetime.datetime.now().hour >= 12:
         srcs, dsts = dsts, srcs
 
