@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import datetime
 from flask import Flask, render_template
 from lunches import gather_restaurants
@@ -24,3 +25,7 @@ async def lunch():
             'lunch.html',
             restaurants=await gather_restaurants()
     )
+
+from waitress import serve
+serve(app, port=5000, host="127.0.0.1")
+
