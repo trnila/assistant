@@ -37,8 +37,7 @@ async def gather_restaurants():
                             })
                 return {
                     'name': 'Bistro IN',
-                    'soup': soup,
-                    'soup_price': soup_price,
+                    'soups': [{"name": soup, "price": soup_price}],
                     'lunches': foods,
                 }
 
@@ -46,7 +45,6 @@ async def gather_restaurants():
             async with session.get("https://www.ujarosu.cz/cz/denni-menu/") as r:
                 result = {
                     'name': 'U Jarošů',
-                    'soup': None,
                     'lunches': [],
                 }
 
@@ -66,7 +64,7 @@ async def gather_restaurants():
                             break
                         if day == days[day_nth]:
                             capturing = True
-                            result['soup'] = row.select('td')[1].get_text()
+                            result['soups'] = {"name": row.select('td')[1].get_text()}
                     elif capturing:
                         spaces = all(not td.get_text().strip() for td in row.select('td'))
                         if spaces:
@@ -109,7 +107,7 @@ async def gather_restaurants():
                 capturing = False
                 counter = 0
                 food = {}
-                soup = None
+                soups = None
                 state = 'name'
                 for line in text.splitlines():
                     line = line.strip()
@@ -139,14 +137,38 @@ async def gather_restaurants():
 
                 return {
                     'name': 'U Zlatého Lva',
-                    'soup': soup,
+                    'soups': {"name": soup} if soup else [],
                     'lunches': foods,
                 }
+
+        async def globus():
+            async with session.get("https://www.globus.cz/ostrava/nabidka/restaurace.html") as r:
+                text = await r.text()
+                dom = BeautifulSoup(text, 'html.parser')
+                lunches = []
+                soups = []
+                for row in dom.select('.restaurant__menu-food-table')[0].select('tr'):
+                    tds = row.select('td')
+                    name = tds[1].text
+                    price = tds[2].text.replace(',–', '')
+
+                    (lunches if int(price) > 50 else soups).append({
+                        'name': name,
+                        'price': price,
+                    })
+
+                return {
+                    'name': 'Globus',
+                    'soups': soups,
+                    'lunches': lunches,
+                }
+
 
         restaurants = [
             bistroin,
             u_jarosu,
-            u_zlateho_lva
+            u_zlateho_lva,
+            globus,
         ]
 
         async def c(f):

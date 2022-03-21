@@ -25,12 +25,16 @@
         {% if not restaurant.soup and not restaurant.lunches %}
         No lunch found.
         {% else %}
-          {% if restaurant.soup %}
-          <strong>{{ restaurant.soup }}</strong>
-          {% if restaurant.soup_price %}
-            {{ restaurant.soup_price }} Kč
-          {% endif %}
-          {% endif %}
+          <ul>
+          {% for soup in restaurant.soups %}
+          <li>
+            <strong>{{ soup.name }}</strong>
+            {% if soup.price %}
+              {{ soup.price }} Kč
+            {% endif %}
+          </li>
+          {% endfor %}
+          </ul>
 
           <ul>
             {% for lunch in restaurant.lunches %}
