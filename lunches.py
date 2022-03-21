@@ -126,7 +126,7 @@ async def gather_restaurants():
                         else:
                             if state == 'name':
                                 if re.match('^[0-9]+\.', line):
-                                    line, name = line.split('.', 2)
+                                    line, name = line.split('.', 1)
                                     food = {
                                         'num': line,
                                         'name': remove_alergens(name),
