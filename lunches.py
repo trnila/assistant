@@ -127,12 +127,31 @@ async def gather_restaurants():
                     price = tds[2].text.replace(',–', '')
                     yield (Lunch if int(price) > 50 else Soup)(name=name, price=price)
 
+        async def jacks_burger():
+            async with session.get("https://www.menicka.cz/1534-jacks-burger-bar.html") as r:
+                day_nth = datetime.datetime.today().weekday()
+
+                dom = BeautifulSoup(await r.text(), 'html.parser')
+                for day_menu in dom.select('.menicka'):
+                    day = day_menu.select('.nadpis')[0].text.split(' ')[0]
+                    if day != days[day_nth]:
+                        continue
+                    yield Soup(name=day_menu.select('.polevka div')[0].text)
+
+                    for food_li in day_menu.select('li.jidlo'):
+                        txt = food_li.select('.polozka')[0].text
+                        num, name = txt.split('.', 1)
+                        price = food_li.select('.cena')[0].text.replace('Kč', '')
+                        yield Lunch(num=num, name=name, price=price)
+
         restaurants = [
             Restaurant("Bistro IN", bistroin),
             Restaurant("U jarosu", u_jarosu),
             Restaurant("U zlateho lva", u_zlateho_lva),
             Restaurant("Globus", globus),
+            Restaurant("Jacks Burger", jacks_burger),
         ]
+
 
         async def collect(restaurant):
             try:
@@ -161,8 +180,9 @@ async def gather_restaurants():
                 if uppers > len(name) / 2:
                     name = name.lower()
                     name = name.capitalize()
-                name = re.sub('\d+g', '', name)
-                return re.sub('\([^)]+\)', '', name)
+                name = re.sub('\d+\s*(g|ml|ks) ', '', name)
+                name = re.sub('\([^)]+\)', '', name)
+                return name.strip(' \n\r\t-/')
 
             for t in ['lunches', 'soups']:
                 for food in restaurant.get(t, []):
