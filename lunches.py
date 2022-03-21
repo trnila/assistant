@@ -5,10 +5,9 @@ import json
 import datetime
 import asyncio
 import itertools
-
+import traceback
 
 days = ['Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota', 'Neděle']
-
 
 async def gather_restaurants():
     async with aiohttp.ClientSession() as session:
@@ -150,7 +149,13 @@ async def gather_restaurants():
             u_zlateho_lva
         ]
 
-        foods = await asyncio.gather(*[f() for f in restaurants])
+        async def c(f):
+            try:
+                return await f()
+            except:
+                return {"error": traceback.format_exc()}
+
+        foods = await asyncio.gather(*[c(f) for f in restaurants])
         names = [r.__name__ for r in restaurants]
 
         def cleanup_foods(foods):
@@ -161,7 +166,7 @@ async def gather_restaurants():
                     name = name.capitalize()
                 return name
 
-            for food in foods['lunches']:
+            for food in foods.get('lunches', []):
                 for k, v in food.items():
                     food[k] = v.strip()
                     if k == 'price':
@@ -170,7 +175,7 @@ async def gather_restaurants():
                         except ValueError:
                             pass
                 food['name'] = fix_name(food['name'])
-            if foods['soup']:
+            if 'soup' in foods:
                 foods['soup'] = fix_name(foods['soup'])
             return foods
 
