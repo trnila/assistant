@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 import datetime
+import pickle
 from flask import Flask, render_template
+from flask_redis import FlaskRedis
 from lunches import gather_restaurants
 from public_transport import public_transport_connections
 
 
+
 app = Flask(__name__)
+redis_client = FlaskRedis(app)
 
 @app.route("/public_transport")
 async def public_transport():
@@ -21,9 +25,17 @@ async def public_transport():
 
 @app.route("/lunch")
 async def lunch():
+    key = f'restaurants-{datetime.datetime.today().weekday()}'
+    restaurants = redis_client.get(key)
+    if not restaurants:
+        restaurants = list(await gather_restaurants())
+        redis_client.set(key, pickle.dumps(restaurants), ex=60 * 60 * 24)
+    else:
+        restaurants = pickle.loads(restaurants)
+
     return render_template(
             'lunch.html',
-            restaurants=await gather_restaurants()
+            restaurants=restaurants
     )
 
 from waitress import serve
