@@ -141,7 +141,9 @@ async def gather_restaurants():
                     for food_li in day_menu.select('li.jidlo'):
                         txt = food_li.select('.polozka')[0].text
                         num, name = txt.split('.', 1)
-                        price = food_li.select('.cena')[0].text.replace('Kč', '')
+
+                        price_tag = food_li.select('.cena')
+                        price = price_tag[0].text if price_tag else None
                         yield Lunch(num=num, name=name, price=price)
 
         restaurants = [
@@ -187,7 +189,7 @@ async def gather_restaurants():
             for t in ['lunches', 'soups']:
                 for food in restaurant.get(t, []):
                     if food.price and isinstance(food.price, str):
-                        food.price = int(food.price.replace(',-', ''))
+                        food.price = int(food.price.replace(',-', '').replace('Kč', ''))
                     food.name = fix_name(food.name)
             return restaurant
 
