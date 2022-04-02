@@ -172,7 +172,10 @@ async def gather_restaurants():
                     'soups': soups,
                 }
             except:
-                return {"error": traceback.format_exc()}
+                return {
+                    'name': restaurant.name,
+                    'error': traceback.format_exc()
+                }
 
         foods = await asyncio.gather(*[collect(r) for r in restaurants])
 
