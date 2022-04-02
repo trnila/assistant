@@ -37,13 +37,13 @@ async def gather_restaurants():
                     ingredients = node.select('.ingredients')[0].get_text()
                     ingredients = re.sub('Al\. \(.+', '', ingredients)
                     name = node.select('.name')[0].get_text()
-                    price = node.select('.priceValue')[0].get_text().split()[0]
+                    price = int(node.select('.priceValue')[0].get_text().split()[0])
                     if 'Polévka' in name:
                         yield Soup(name=name.split(':')[1], price=price)
                     else:
                         parts = name.split('.', 1)
                         if len(parts) == 2:
-                            yield Lunch(num=parts[0], name=parts[1], price=price, ingredients=ingredients)
+                            yield Lunch(num=parts[0], name=parts[1], price=price - 5, ingredients=ingredients)
 
         async def u_jarosu():
             async with session.get("https://www.ujarosu.cz/cz/denni-menu/") as r:
@@ -186,7 +186,7 @@ async def gather_restaurants():
 
             for t in ['lunches', 'soups']:
                 for food in restaurant.get(t, []):
-                    if food.price:
+                    if food.price and isinstance(food.price, str):
                         food.price = int(food.price.replace(',-', ''))
                     food.name = fix_name(food.name)
             return restaurant
