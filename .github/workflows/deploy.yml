@@ -1,0 +1,11 @@
+name: Deploy
+concurrency: deploy
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master ]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'curl --fail -s -H"Authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}" https://trnila.eu/hooks/flask_deploy'
