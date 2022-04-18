@@ -124,8 +124,8 @@ async def gather_restaurants():
                 for row in dom.select('.restaurant__menu-food-table')[0].select('tr'):
                     tds = row.select('td')
                     name = tds[1].text
-                    price = tds[2].text.replace(',–', '')
-                    yield (Lunch if int(price) > 50 else Soup)(name=name, price=price)
+                    price = tds[2].text.replace(',–', '') if len(tds) >= 3 else None
+                    yield (Lunch if price and int(price) > 50 else Soup)(name=name, price=price)
 
         async def jacks_burger():
             async with session.get("https://www.menicka.cz/1534-jacks-burger-bar.html") as r:
@@ -136,7 +136,10 @@ async def gather_restaurants():
                     day = day_menu.select('.nadpis')[0].text.split(' ')[0]
                     if day != days[day_nth]:
                         continue
-                    yield Soup(name=day_menu.select('.polevka div')[0].text)
+
+                    soup_el = day_menu.select('.polevka div')
+                    if soup_el:
+                        yield Soup(name=soup_el.text)
 
                     for food_li in day_menu.select('li.jidlo'):
                         txt = food_li.select('.polozka')[0].text
