@@ -35,7 +35,8 @@ async def lunch():
 
     return render_template(
             'lunch.html',
-            restaurants=restaurants
+            restaurants=restaurants,
+            date=datetime.datetime.now(),
     )
 
 from waitress import serve

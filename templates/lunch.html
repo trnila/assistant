@@ -8,20 +8,23 @@
   </head>
   <body>
     <style>
-      h1 {
+      h1, h2 {
         margin: 0px;
       }
       ul {
         padding: 0;
+	margin: 0;
       }
       div.restaurant {
         margin-bottom: 10px;
       }
     </style>
 
+    <h1>{{date.strftime('%A %d.%m.')}}</h1>
+
     {% for restaurant in restaurants %}
       <div class="restaurant">
-        <h1>{{ restaurant.name }}</h1>
+        <h2>{{ restaurant.name }}</h2>
         {% if not restaurant.soup and not restaurant.lunches %}
         No lunch found.
         {% else %}
