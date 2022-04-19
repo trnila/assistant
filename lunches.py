@@ -139,7 +139,7 @@ async def gather_restaurants():
 
                     soup_el = day_menu.select('.polevka div')
                     if soup_el:
-                        yield Soup(name=soup_el.text)
+                        yield Soup(name=soup_el[0].text)
 
                     for food_li in day_menu.select('li.jidlo'):
                         txt = food_li.select('.polozka')[0].text
