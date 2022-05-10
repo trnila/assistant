@@ -157,7 +157,8 @@ async def gather_restaurants():
                     with open("/tmp/a.jpg", "wb") as f:
                         f.write(await r.read())
 
-                    txt = subprocess.check_output(['tesseract', '-l', 'ces', '/tmp/a.jpg', '-'], text=True)
+                    proc = await asyncio.create_subprocess_exec('tesseract', '-l', 'ces', '/tmp/a.jpg', '-', stdout=asyncio.subprocess.PIPE)
+                    txt = (await proc.communicate())[0].decode('utf-8')
 
                     in_common = True
                     in_day = False
