@@ -176,7 +176,6 @@ async def gather_restaurants():
                                 price = re.search('([0-9]{3}) kč', line.lower())
                                 m = re.search('^(?P<num>[0-9]+)\s*\.?\s*[0-9]+\s*(g|ks|)\s*[\|—]?\s*(?P<name>.+).*?(?P<price>[12][0-9]{2})', line)
                                 values = m.groupdict() if m else {'name': line}
-                #                values['name'] = re.sub('A[0-9]+(,[0-9]+)*,?', '', values['name'])
                                 yield Lunch(**values)
                         elif in_day_soup:
                             in_day_soup = False
@@ -226,7 +225,8 @@ async def gather_restaurants():
                     name = name.capitalize()
                 name = re.sub('\d+\s*(g|ml|ks) ', '', name)
                 name = re.sub('\([^)]+\)', '', name)
-                return name.strip(' \n\r\t-/')
+                name = re.sub('A[0-9]+(,[0-9]+)*,?', '', name)
+                return name.strip(' \n\r\t-/©*01234567890')
 
             for t in ['lunches', 'soups']:
                 for food in restaurant.get(t, []):
