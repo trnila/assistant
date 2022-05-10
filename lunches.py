@@ -7,6 +7,7 @@ import datetime
 import asyncio
 import itertools
 import traceback
+import tempfile
 from dataclasses import dataclass
 
 @dataclass
@@ -154,11 +155,12 @@ async def gather_restaurants():
             async with session.get("https://dkpoklad.cz/restaurace/poledni-menu-4-8-6-8/") as r:
                 img = re.search('srcset="([^"]+)"', await r.text()).group(0).split(',')[-1].strip().split(' ')[0]
                 async with session.get(img) as r:
-                    with open("/tmp/a.jpg", "wb") as f:
-                        f.write(await r.read())
+                    with tempfile.NamedTemporaryFile() as tmp:
+                        tmp.write(await r.read())
+                        tmp.flush()
 
-                    proc = await asyncio.create_subprocess_exec('tesseract', '-l', 'ces', '/tmp/a.jpg', '-', stdout=asyncio.subprocess.PIPE)
-                    txt = (await proc.communicate())[0].decode('utf-8')
+                        proc = await asyncio.create_subprocess_exec('tesseract', '-l', 'ces', tmp.name, '-', stdout=asyncio.subprocess.PIPE)
+                        txt = (await proc.communicate())[0].decode('utf-8')
 
                     in_common = True
                     in_day = False
