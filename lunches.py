@@ -239,3 +239,8 @@ async def gather_restaurants():
             return restaurant
 
         return map(cleanup, foods)
+
+if __name__ == '__main__':
+    from pprint import pprint
+    res = asyncio.new_event_loop().run_until_complete(gather_restaurants())
+    pprint(list(res))
