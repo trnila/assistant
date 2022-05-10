@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+import subprocess
 import aiohttp
 import re
 import json
@@ -149,12 +150,47 @@ async def gather_restaurants():
                         price = price_tag[0].text if price_tag else None
                         yield Lunch(num=num, name=name, price=price)
 
+        async def poklad():
+            async with session.get("https://dkpoklad.cz/restaurace/poledni-menu-4-8-6-8/") as r:
+                img = re.search('srcset="([^"]+)"', await r.text()).group(0).split(',')[-1].strip().split(' ')[0]
+                async with session.get(img) as r:
+                    with open("/tmp/a.jpg", "wb") as f:
+                        f.write(await r.read())
+
+                    txt = subprocess.check_output(['tesseract', '-l', 'ces', '/tmp/a.jpg', '-'], text=True)
+
+                    in_common = True
+                    in_day = False
+                    in_day_soup = False
+                    for line in txt.splitlines():
+                        m = re.match('([0-9]{1,2})\s*\.*\s*([0-9]{1,2})\s*\.*\s*([0-9]{4})', line)
+                        if m:
+                            c = [int(i) for i in m.groups()]
+                            day = datetime.date(day=c[0], month=c[1], year=c[2]).weekday()
+                            day_nth = datetime.datetime.today().weekday()
+                            in_day = day == day_nth
+                            in_day_soup = in_day
+                            in_common = False
+                        elif re.match('^[0-9]+', line):
+                            if in_common or in_day:
+                                price = re.search('([0-9]{3}) kč', line.lower())
+                                m = re.search('^(?P<num>[0-9]+)\s*\.?\s*[0-9]+\s*(g|ks|)\s*[\|—]?\s*(?P<name>.+).*?(?P<price>[12][0-9]{2})', line)
+                                values = m.groupdict() if m else {'name': line}
+                #                values['name'] = re.sub('A[0-9]+(,[0-9]+)*,?', '', values['name'])
+                                yield Lunch(**values)
+                        elif in_day_soup:
+                            in_day_soup = False
+                            for soup in line.split('/'):
+                                yield Soup(name=soup)
+
+
         restaurants = [
             Restaurant("Bistro IN", bistroin),
             Restaurant("U jarosu", u_jarosu),
             Restaurant("U zlateho lva", u_zlateho_lva),
             Restaurant("Globus", globus),
             Restaurant("Jacks Burger", jacks_burger),
+            Restaurant("Poklad", poklad),
         ]
 
 
