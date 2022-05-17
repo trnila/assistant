@@ -25,7 +25,7 @@ async def public_transport():
 
 @app.route("/lunch")
 async def lunch():
-    key = f'restaurants-{datetime.datetime.today().weekday()}'
+    key = f'restaurants.{datetime.date.today().strftime("%d-%m-%Y")}'
     restaurants = redis_client.get(key)
     if not restaurants:
         restaurants = list(await gather_restaurants())
