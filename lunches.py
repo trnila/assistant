@@ -229,8 +229,8 @@ async def gather_restaurants():
                     name = name.capitalize()
                 name = re.sub('\d+\s*(g|ml|ks) ', '', name)
                 name = re.sub('\([^)]+\)', '', name)
-                name = re.sub('A[0-9]+(,[0-9]+)*,?', '', name)
-                return name.strip(' \n\r\t-/©*01234567890')
+                name = re.sub('A?[0-9]+(,[0-9]+){1,},?', '', name)
+                return name.strip(' \n\r\t-/©*01234567890—.|"')
 
             for t in ['lunches', 'soups']:
                 for food in restaurant.get(t, []):
