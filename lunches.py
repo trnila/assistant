@@ -179,7 +179,8 @@ async def gather_restaurants():
                                 price = re.search('([0-9]{3}) kč', line.lower())
                                 m = re.search('^(?P<num>[0-9]+)\s*\.?\s*[0-9]+\s*(g|ks|)\s*[\|—]?\s*(?P<name>.+).*?(?P<price>[12][0-9]{2})', line)
                                 values = m.groupdict() if m else {'name': line}
-                                yield Lunch(**values)
+                                if len(values['name']) > 8:
+                                    yield Lunch(**values)
                         elif in_day_soup:
                             in_day_soup = False
                             for soup in line.split('/'):
