@@ -79,7 +79,7 @@ async def gather_restaurants():
                                 yield food
                             food = Lunch(
                                 name=row.select('td')[1].get_text(),
-                                price=row.select('td')[2].get_text(),
+                                price=row.select('td')[2].get_text() if len(row.select('td')) >= 3 else None,
                                 num=num,
                             )
                         else:
