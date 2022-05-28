@@ -153,12 +153,12 @@ async def gather_restaurants():
 
         async def poklad():
             async with session.get("https://dkpoklad.cz/restaurace/poledni-menu-4-8-6-8/") as r:
-                img = re.search('srcset="([^"]+)"', await r.text()).group(0).split(',')[-1].strip().split(' ')[0]
+                images = [r.strip().split(' ') for r in re.search('srcset="([^"]+)"', await r.text()).group(1).split(',')]
+                img = sorted(images, key=lambda r: int(r[1].replace('w', '')))[-1][0]
                 async with session.get(img) as r:
                     with tempfile.NamedTemporaryFile() as tmp:
                         tmp.write(await r.read())
                         tmp.flush()
-
                         proc = await asyncio.create_subprocess_exec('tesseract', '-l', 'ces', tmp.name, '-', stdout=asyncio.subprocess.PIPE)
                         txt = (await proc.communicate())[0].decode('utf-8')
 
