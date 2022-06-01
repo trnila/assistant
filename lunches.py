@@ -30,7 +30,7 @@ class Lunch:
 
 days = ['Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota', 'Neděle']
 
-async def gather_restaurants():
+async def gather_restaurants(allowed_restaurants=None):
     async with aiohttp.ClientSession() as session:
         async def bistroin():
             async with session.get("https://onemenu.cz/menu/Bistro-In") as r:
@@ -219,7 +219,9 @@ async def gather_restaurants():
                     'error': traceback.format_exc()
                 }
 
-        foods = await asyncio.gather(*[collect(r) for r in restaurants])
+        if not allowed_restaurants:
+            allowed_restaurants = [r.parser.__name__ for r in restaurants]
+        foods = await asyncio.gather(*[collect(r) for r in restaurants if r.parser.__name__ in allowed_restaurants])
 
         def cleanup(restaurant):
             def fix_name(name):
@@ -243,5 +245,10 @@ async def gather_restaurants():
 
 if __name__ == '__main__':
     from pprint import pprint
-    res = asyncio.new_event_loop().run_until_complete(gather_restaurants())
+    import sys
+
+    allowed_restaurants = None
+    if len(sys.argv) > 1:
+        allowed_restaurants = sys.argv[1].split(',')
+    res = asyncio.new_event_loop().run_until_complete(gather_restaurants(allowed_restaurants))
     pprint(list(res), width=180)
