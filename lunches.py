@@ -40,7 +40,7 @@ async def gather_restaurants(allowed_restaurants=None):
                     ingredients = re.sub('Al\. \(.+', '', ingredients)
                     name = node.select('.name')[0].get_text()
                     price = int(node.select('.priceValue')[0].get_text().split()[0])
-                    if 'Polévka' in name:
+                    if 'Polévka k menu:' in name:
                         yield Soup(name=name.split(':')[1], price=price)
                     else:
                         parts = name.split('.', 1)
