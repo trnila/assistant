@@ -159,7 +159,7 @@ async def gather_restaurants(allowed_restaurants=None):
                     with tempfile.NamedTemporaryFile() as tmp:
                         tmp.write(await r.read())
                         tmp.flush()
-                        proc = await asyncio.create_subprocess_exec('tesseract', '-l', 'ces', tmp.name, '-', stdout=asyncio.subprocess.PIPE)
+                        proc = await asyncio.create_subprocess_exec('tesseract', '--psm', '6', '-l', 'ces', tmp.name, '-', stdout=asyncio.subprocess.PIPE)
                         txt = (await proc.communicate())[0].decode('utf-8')
 
                     in_common = True
