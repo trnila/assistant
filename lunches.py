@@ -192,6 +192,10 @@ async def gather_restaurants(allowed_restaurants=None):
 
 
         async def collect(restaurant):
+            res = {
+                'name': restaurant.name,
+                'url': restaurant.url,
+            }
             try:
                 lunches = []
                 soups = []
@@ -204,13 +208,13 @@ async def gather_restaurants(allowed_restaurants=None):
                         else:
                             raise "Unsupported item"
                     return {
-                        'name': restaurant.name,
+                        **res,
                         'lunches': lunches,
                         'soups': soups,
                     }
             except:
                 return {
-                    'name': restaurant.name,
+                    **res,
                     'error': traceback.format_exc()
                 }
 

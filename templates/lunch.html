@@ -11,6 +11,9 @@
       h1, h2 {
         margin: 0px;
       }
+      h2 a {
+	text-decoration: none;
+      }
       ul {
         padding: 0;
 	margin: 0;
@@ -24,7 +27,11 @@
 
     {% for restaurant in restaurants %}
       <div class="restaurant">
-        <h2>{{ restaurant.name }}</h2>
+        <h2>
+		<a href="{{ restaurant.url }}" target="_blank">
+			{{ restaurant.name }}
+		</a>
+	</h2>
         {% if not restaurant.soup and not restaurant.lunches %}
         No lunch found.
         {% else %}
