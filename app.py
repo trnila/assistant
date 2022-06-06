@@ -23,8 +23,9 @@ async def public_transport():
             connections=await public_transport_connections(srcs, dsts)
     )
 
-@app.route("/lunch")
-async def lunch():
+@app.route("/lunch", defaults={'format': 'html'})
+@app.route("/lunch.json", defaults={'format': 'json'})
+async def lunch(format):
     key = f'restaurants.{datetime.date.today().strftime("%d-%m-%Y")}'
     restaurants = redis_client.get(key)
     if not restaurants:
@@ -33,11 +34,14 @@ async def lunch():
     else:
         restaurants = pickle.loads(restaurants)
 
-    return render_template(
-            'lunch.html',
-            restaurants=restaurants,
-            date=datetime.datetime.now(),
-    )
+    if format == 'json':
+        return {'restaurants': restaurants}
+    else:
+        return render_template(
+                'lunch.html',
+                restaurants=restaurants,
+                date=datetime.datetime.now(),
+        )
 
 from waitress import serve
 serve(app, port=5000, host="127.0.0.1")
