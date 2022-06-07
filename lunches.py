@@ -180,6 +180,14 @@ async def gather_restaurants(allowed_restaurants=None):
                         for soup in line.split('/'):
                             yield Soup(name=soup)
 
+        async def trebovicky_mlyn(res):
+            dom = BeautifulSoup(res, 'html.parser')
+            yield Soup(dom.select('.soup h2')[0].text)
+
+            for lunch in dom.select('.owl-carousel')[0].select('.menu-post'):
+                parts = lunch.select('h2')[0].text.split(')')
+                if len(parts) == 2:
+                    yield Lunch(num=parts[0], name=parts[1], ingredients=lunch.select('h2 + div')[0].text, price=lunch.select('span')[0].text.split(',')[0])
 
         restaurants = [
             Restaurant("Bistro IN", bistroin, "https://onemenu.cz/menu/Bistro-In"),
@@ -187,6 +195,7 @@ async def gather_restaurants(allowed_restaurants=None):
             Restaurant("U zlateho lva", u_zlateho_lva, "http://www.zlatylev.com/menu_zlaty_lev.html"),
             Restaurant("Jacks Burger", jacks_burger, "https://www.menicka.cz/1534-jacks-burger-bar.html"),
             Restaurant("Poklad", poklad, "https://dkpoklad.cz/restaurace/poledni-menu-4-8-6-8/"),
+            Restaurant("Trebovicky mlyn", trebovicky_mlyn, "https://www.trebovickymlyn.cz/"),
             Restaurant("Globus", globus, "https://www.globus.cz/ostrava/nabidka/restaurace.html"),
         ]
 
