@@ -14,7 +14,7 @@ redis_client = FlaskRedis(app)
 @app.route("/public_transport")
 async def public_transport():
     srcs = ["Václava Jiřikovského"]
-    dsts = ["Hlavní třída", "Rektorát VŠB", "Pustkovecká", "Krásnopolská", "Poruba,Studentské koleje"]
+    dsts = ["Hlavní třída", "Rektorát VŠB", "Pustkovecká", "Poruba,Studentské koleje"]
     if datetime.datetime.now().hour >= 12:
         srcs, dsts = dsts, srcs
 
