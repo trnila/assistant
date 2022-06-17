@@ -236,7 +236,10 @@ async def gather_restaurants(allowed_restaurants=None):
             for t in ['lunches', 'soups']:
                 for food in restaurant.get(t, []):
                     if food.price and isinstance(food.price, str):
-                        food.price = int(food.price.replace(',-', '').replace('Kč', ''))
+                        try:
+                            food.price = int(food.price.replace(',-', '').replace('Kč', ''))
+                        except ValueError:
+                            pass
                     food.name = fix_name(food.name)
             return restaurant
 
