@@ -23,7 +23,7 @@
       }
     </style>
 
-    <h1>{{date.strftime('%A %d.%m.')}}</h1>
+    <h1>{{date.strftime('%A %d.%m.')}} <span id="remaining"></span></h1>
     <div>Bajks: <span id="bikes">Loading...</span></div>
     <script>
     async function load() {
@@ -86,5 +86,27 @@
         <pre>{{restaurant.error}}</pre>
       </div>
     {% endfor %}
+
+    <script>
+	const remainingEl = document.getElementById('remaining');
+	setInterval(() => {
+	  const target = new Date();
+	  target.setHours(11, 0, 0, 0);
+	  
+	  let diff = target - new Date();
+	  if(diff > 0) {
+	    const hours = parseInt(diff / 3600000);
+	    diff -= hours * 3600000;
+	    const minutes = parseInt(diff / 60000)
+	    diff -= minutes * 60000;
+	    const secs = parseInt(diff / 1000);
+	    diff -= secs * 1000;
+	    remainingEl.innerText = ` - ${hours}:${('00' + minutes).substr(-2)}:${('00' + secs).substr(-2)}.${('000' + diff).substr(-3)}`;
+	  } else {
+	    remainingEl.innerText = '';
+	  }
+	}, 21);
+    </script>
+
   </body>
 </html>
