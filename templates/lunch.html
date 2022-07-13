@@ -24,6 +24,9 @@
     </style>
 
     <h1>{{date.strftime('%A %d.%m.')}} <span id="remaining"></span></h1>
+    <div>
+	    <button id='tts'></button>
+    </div>
     <div>Bajks: <span id="bikes">Loading...</span></div>
     <script>
     async function load() {
@@ -89,23 +92,51 @@
 
     <script>
 	const remainingEl = document.getElementById('remaining');
-	setInterval(() => {
+	function remaining() {
 	  const target = new Date();
 	  target.setHours(11, 0, 0, 0);
+	  //target.setHours(23, 59, 0, 0);
 	  
 	  let diff = target - new Date();
-	  if(diff > 0) {
-	    const hours = parseInt(diff / 3600000);
-	    diff -= hours * 3600000;
-	    const minutes = parseInt(diff / 60000)
-	    diff -= minutes * 60000;
-	    const secs = parseInt(diff / 1000);
-	    diff -= secs * 1000;
-	    remainingEl.innerText = ` - ${hours}:${('00' + minutes).substr(-2)}:${('00' + secs).substr(-2)}.${('000' + diff).substr(-3)}`;
+	  if(diff <= 0) {
+	    return null;
+	  }
+	  const hours = parseInt(diff / 3600000);
+	  diff -= hours * 3600000;
+	  const minutes = parseInt(diff / 60000)
+	  diff -= minutes * 60000;
+	  const secs = parseInt(diff / 1000);
+	  diff -= secs * 1000;
+	  return {
+             hours, minutes, secs, milliseconds: diff,
+	  }
+	}
+
+	setInterval(() => {
+	  const r = remaining();
+	  if(r) {
+	    remainingEl.innerText = `- ${r.hours}:${('00' + r.minutes).substr(-2)}:${('00' + r.secs).substr(-2)}.${('000' + r.milliseconds).substr(-3)}`;
 	  } else {
 	    remainingEl.innerText = '';
 	  }
 	}, 21);
+
+	let tts = false;
+	const btn = document.querySelector('#tts');
+        const updateLabel = () => btn.innerText = `announcer ${tts ? 'enabled' : 'disabled'}`;
+        updateLabel();
+	btn.onclick = () => {
+          tts = !tts;
+	  updateLabel();
+	};
+	setInterval(() => {
+          const r = remaining();
+	  if(!r || !tts) {
+            return;
+          }
+          const utterance = new SpeechSynthesisUtterance(`${r.hours} hours, ${r.minutes} minutes, ${r.secs} seconds and ${r.milliseconds * 1000 * 1000} nanoseconds left`);
+          speechSynthesis.speak(utterance);
+	}, 1000);
     </script>
 
   </body>
