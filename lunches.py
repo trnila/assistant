@@ -35,15 +35,15 @@ async def gather_restaurants(allowed_restaurants=None):
     async with aiohttp.ClientSession() as session:
         async def bistroin(res):
             dom = BeautifulSoup(res, 'html.parser')
-            for node in dom.select('.orderitem-right'):
-                ingredients = node.select('.ingredients')[0].get_text()
-                ingredients = re.sub('Al\. \(.+', '', ingredients)
-                name = node.select('.name')[0].get_text()
-                price = int(node.select('.priceValue')[0].get_text().split()[0])
-                if 'Polévka k menu:' in name:
-                    yield Soup(name=name.split(':')[1], price=price)
+            data = json.loads(dom.select('#__NEXT_DATA__')[0].get_text())
+
+            for item in data["props"]["app"]["menu"]:
+                ingredients = re.sub('Al\. \(.+', '', item['description'])
+                price = item['price'] // 100
+                if 'Polévka k menu:' in item['name']:
+                    yield Soup(name=item['name'].split(':')[1], price=price)
                 else:
-                    parts = name.split('.', 1)
+                    parts = item['name'].split('.', 1)
                     if len(parts) == 2:
                         yield Lunch(num=parts[0], name=parts[1], price=price - 5, ingredients=ingredients)
 
@@ -190,7 +190,7 @@ async def gather_restaurants(allowed_restaurants=None):
                     yield Lunch(num=parts[0], name=parts[1], ingredients=lunch.select('h2 + div')[0].text, price=lunch.select('span')[0].text.split(',')[0])
 
         restaurants = [
-            Restaurant("Bistro IN", bistroin, "https://onemenu.cz/menu/Bistro-In"),
+            Restaurant("Bistro IN", bistroin, "https://bistroin.choiceqr.com/delivery"),
             Restaurant("U jarosu", u_jarosu, "https://www.ujarosu.cz/cz/denni-menu/"),
             Restaurant("U zlateho lva", u_zlateho_lva, "http://www.zlatylev.com/menu_zlaty_lev.html"),
             Restaurant("Jacks Burger", jacks_burger, "https://www.menicka.cz/1534-jacks-burger-bar.html"),
