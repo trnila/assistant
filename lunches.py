@@ -10,6 +10,9 @@ import logging
 import requests
 from dataclasses import dataclass
 
+days = ['Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota', 'Neděle']
+USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36'
+
 logging.basicConfig(level=logging.DEBUG)
 
 @dataclass
@@ -30,8 +33,6 @@ class Lunch:
     price: int = None
     ingredients: str = None
 
-
-days = ['Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota', 'Neděle']
 
 def bistroin(res):
     dom = BeautifulSoup(res, 'html.parser')
@@ -129,22 +130,30 @@ def globus(res):
 def jacks_burger(res):
     day_nth = datetime.datetime.today().weekday()
     dom = BeautifulSoup(res, 'html.parser')
-    for day_menu in dom.select('.menicka'):
-        day = day_menu.select('.nadpis')[0].text.split(' ')[0]
-        if day != days[day_nth]:
-            continue
 
-        soup_el = day_menu.select('.polevka div')
-        if soup_el:
-            yield Soup(name=soup_el[0].text)
+    started = False
+    prev_line = ""
+    for el in dom.select('.main-body > div'):
+        if 'line-wider' in el['class']:
+            break
+        name = el.select_one('.item-name')
+        if name:
+            name = name.text.strip()
+            num = None
+            if re.match('^[0-9]+\..+', name):
+                num = name.split('.')[0]
 
-        for food_li in day_menu.select('li.jidlo'):
-            txt = food_li.select('.polozka')[0].text
-            num, name = txt.split('.', 1)
+            if num:
+                if not started:
+                    yield Soup(name=prev_line)
+                    started = True
 
-            price_tag = food_li.select('.cena')
-            price = price_tag[0].text if price_tag else None
-            yield Lunch(num=num, name=name, price=price)
+                price = el.select_one('.item-price')
+                if price:
+                    price = price.text.strip()
+                    yield Lunch(name=name, price=price, num=num)
+            else:
+                prev_line = name
 
 def poklad(res):
     images = [r.strip().split(' ') for r in re.search('srcset="([^"]+)"', res).group(1).split(',')]
@@ -192,7 +201,7 @@ restaurants = [
     Restaurant("Bistro IN", bistroin, "https://bistroin.choiceqr.com/delivery"),
     Restaurant("U jarosu", u_jarosu, "https://www.ujarosu.cz/cz/denni-menu/"),
     Restaurant("U zlateho lva", u_zlateho_lva, "http://www.zlatylev.com/menu_zlaty_lev.html"),
-    Restaurant("Jacks Burger", jacks_burger, "https://www.menicka.cz/1534-jacks-burger-bar.html"),
+    Restaurant("Jacks Burger", jacks_burger, "https://www.zomato.com/cs/widgets/daily_menu.php?entity_id=16525845"),
     Restaurant("Poklad", poklad, "https://dkpoklad.cz/restaurace/poledni-menu-4-8-6-8/"),
     Restaurant("Trebovicky mlyn", trebovicky_mlyn, "https://www.trebovickymlyn.cz/"),
     Restaurant("Globus", globus, "https://www.globus.cz/ostrava/nabidka/restaurace.html"),
@@ -208,7 +217,7 @@ def gather_restaurants(allowed_restaurants=None):
             lunches = []
             soups = []
 
-            response = requests.get(restaurant.url)
+            response = requests.get(restaurant.url, headers={'User-Agent': USER_AGENT})
             response.encoding = 'utf-8'
             for item in restaurant.parser(response.text):
                 if isinstance(item, Soup):
