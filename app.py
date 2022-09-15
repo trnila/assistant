@@ -29,7 +29,7 @@ async def lunch(format):
     key = f'restaurants.{datetime.date.today().strftime("%d-%m-%Y")}'
     restaurants = redis_client.get(key)
     if not restaurants:
-        restaurants = list(await gather_restaurants())
+        restaurants = list(gather_restaurants())
         redis_client.set(key, pickle.dumps(restaurants), ex=60 * 60 * 24)
     else:
         restaurants = pickle.loads(restaurants)
