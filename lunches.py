@@ -207,7 +207,7 @@ def arrows():
         res = requests.get(f"https://restaurace.arrows.cz/api/menu/{t}/{week}")
         for item in res.json():
             date = datetime.datetime.fromisoformat(item['validDateTime']).date()
-            if date != tday:
+            if date != tday or item['deletedDate']:
                 continue
 
             if item['isSoup']:
