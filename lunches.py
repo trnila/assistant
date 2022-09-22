@@ -197,6 +197,22 @@ def trebovicky_mlyn(res):
         if len(parts) == 2:
             yield Lunch(num=parts[0], name=parts[1], ingredients=lunch.select('h2 + div')[0].text, price=lunch.select('span')[0].text.split(',')[0])
 
+def arrows(res):
+    tday = datetime.datetime.now().date()
+    week = tday.isocalendar().week
+
+    for t in ['GetSoupsByActualWeekNumber', 'GetMenusByActualWeekNumber']:
+        res = requests.get(f"https://restaurace.arrows.cz/api/menu/{t}/{week}")
+        for item in res.json():
+            date = datetime.datetime.fromisoformat(item['validDateTime']).date()
+            if date != tday:
+                continue
+
+            if item['isSoup']:
+                yield Soup(name=item['text'])
+            else:
+                yield Lunch(num=item['menuItemOrder'], name=item['text'], price=item['price'])
+
 restaurants = [
     Restaurant("Bistro IN", bistroin, "https://bistroin.choiceqr.com/delivery"),
     Restaurant("U jarosu", u_jarosu, "https://www.ujarosu.cz/cz/denni-menu/"),
@@ -205,9 +221,11 @@ restaurants = [
     Restaurant("Poklad", poklad, "https://dkpoklad.cz/restaurace/poledni-menu-4-8-6-8/"),
     Restaurant("Trebovicky mlyn", trebovicky_mlyn, "https://www.trebovickymlyn.cz/"),
     Restaurant("Globus", globus, "https://www.globus.cz/ostrava/nabidka/restaurace.html"),
+    Restaurant("Arrows", arrows, "https://restaurace.arrows.cz/"),
 ]
 
 def gather_restaurants(allowed_restaurants=None):
+    requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += ':HIGH:!DH:!aNULL'
     def collect(restaurant):
         res = {
             'name': restaurant.name,
