@@ -213,7 +213,7 @@ def arrows(res):
             if item['isSoup']:
                 yield Soup(name=item['text'])
             else:
-                yield Lunch(num=item['menuItemOrder'], name=item['text'], price=item['price'])
+                yield Lunch(num=item['menuItemOrder'] + 1, name=item['text'], price=item['price'])
 
 restaurants = [
     Restaurant("Bistro IN", bistroin, "https://bistroin.choiceqr.com/delivery"),
