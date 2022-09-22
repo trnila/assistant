@@ -9,6 +9,8 @@ import tempfile
 import logging
 import requests
 from dataclasses import dataclass
+from concurrent.futures import ThreadPoolExecutor
+import time
 
 days = ['Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota', 'Neděle']
 USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36'
@@ -226,38 +228,6 @@ restaurants = [
 
 def gather_restaurants(allowed_restaurants=None):
     requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += ':HIGH:!DH:!aNULL'
-    def collect(restaurant):
-        res = {
-            'name': restaurant.name,
-            'url': restaurant.url,
-        }
-        try:
-            lunches = []
-            soups = []
-
-            response = requests.get(restaurant.url, headers={'User-Agent': USER_AGENT})
-            response.encoding = 'utf-8'
-            for item in restaurant.parser(response.text):
-                if isinstance(item, Soup):
-                    soups.append(item)
-                elif isinstance(item, Lunch):
-                    lunches.append(item)
-                else:
-                    raise "Unsupported item"
-            return {
-                **res,
-                'lunches': lunches,
-                'soups': soups,
-            }
-        except:
-            return {
-                **res,
-                'error': traceback.format_exc()
-            }
-
-    if not allowed_restaurants:
-        allowed_restaurants = [r.parser.__name__ for r in restaurants]
-    foods = [collect(r) for r in restaurants if r.parser.__name__ in allowed_restaurants]
 
     def cleanup(restaurant):
         def fix_name(name):
@@ -280,7 +250,42 @@ def gather_restaurants(allowed_restaurants=None):
                 food.name = fix_name(food.name)
         return restaurant
 
-    return map(cleanup, foods)
+    def collect(restaurant):
+        start = time.time()
+        res = {
+            'name': restaurant.name,
+            'url': restaurant.url,
+        }
+        try:
+            lunches = []
+            soups = []
+
+            response = requests.get(restaurant.url, headers={'User-Agent': USER_AGENT})
+            response.encoding = 'utf-8'
+            for item in restaurant.parser(response.text):
+                if isinstance(item, Soup):
+                    soups.append(item)
+                elif isinstance(item, Lunch):
+                    lunches.append(item)
+                else:
+                    raise "Unsupported item"
+            return cleanup({
+                **res,
+                'lunches': lunches,
+                'soups': soups,
+                'elapsed': time.time() - start,
+            })
+        except:
+            return {
+                **res,
+                'error': traceback.format_exc()
+            }
+
+    if not allowed_restaurants:
+        allowed_restaurants = [r.parser.__name__ for r in restaurants]
+
+    with ThreadPoolExecutor(max_workers=len(allowed_restaurants)) as pool:
+        return pool.map(collect, [r for r in restaurants if r.parser.__name__ in allowed_restaurants])
 
 if __name__ == '__main__':
     from pprint import pprint
