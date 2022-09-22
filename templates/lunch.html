@@ -24,9 +24,6 @@
     </style>
 
     <h1>{{date.strftime('%A %d.%m.')}} <span id="remaining"></span></h1>
-    <div>
-	    <button id='tts'></button>
-    </div>
     <div>Bajks: <span id="bikes">Loading...</span></div>
     <script>
     async function load() {
@@ -121,23 +118,6 @@
 	    remainingEl.innerText = '';
 	  }
 	}, 21);
-
-	let tts = false;
-	const btn = document.querySelector('#tts');
-        const updateLabel = () => btn.innerText = `announcer ${tts ? 'enabled' : 'disabled'}`;
-        updateLabel();
-	btn.onclick = () => {
-          tts = !tts;
-	  updateLabel();
-	};
-	setInterval(() => {
-          const r = remaining();
-	  if(!r || !tts) {
-            return;
-          }
-          const utterance = new SpeechSynthesisUtterance(`${r.hours} hours, ${r.minutes} minutes, ${r.secs} seconds and ${r.milliseconds * 1000 * 1000} nanoseconds left`);
-          speechSynthesis.speak(utterance);
-	}, 1000);
     </script>
 
   </body>
