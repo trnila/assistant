@@ -199,7 +199,7 @@ def trebovicky_mlyn(res):
         if len(parts) == 2:
             yield Lunch(num=parts[0], name=parts[1], ingredients=lunch.select('h2 + div')[0].text, price=lunch.select('span')[0].text.split(',')[0])
 
-def arrows(res):
+def arrows():
     tday = datetime.datetime.now().date()
     week = tday.isocalendar().week
 
@@ -263,9 +263,14 @@ def gather_restaurants(allowed_restaurants=None):
             lunches = []
             soups = []
 
-            response = requests.get(restaurant.url, headers={'User-Agent': USER_AGENT})
-            response.encoding = 'utf-8'
-            for item in restaurant.parser(response.text):
+            args = {}
+            arg_names = restaurant.parser.__code__.co_varnames[:restaurant.parser.__code__.co_argcount]
+            if 'res' in arg_names:
+                response = requests.get(restaurant.url, headers={'User-Agent': USER_AGENT})
+                response.encoding = 'utf-8'
+                args['res'] = response.text
+
+            for item in restaurant.parser(**args):
                 if isinstance(item, Soup):
                     soups.append(item)
                 elif isinstance(item, Lunch):
