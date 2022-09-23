@@ -215,6 +215,20 @@ def arrows():
             else:
                 yield Lunch(num=item['menuItemOrder'] + 1, name=item['text'], price=item['price'])
 
+def lastrada(res):
+    dom = BeautifulSoup(res, 'html.parser')
+    day_nth = datetime.datetime.today().weekday()
+
+    capturing = False
+    for tr in dom.select('tr'):
+        if 'day' in tr.get('class', []):
+            capturing = False
+            if days[day_nth] in tr.text or 'Menu na celý týden' in tr.text:
+                capturing = True
+        elif capturing:
+            if 'highlight' in tr.get('class', []):
+                yield Lunch(name=tr.select_one('td').text, price=tr.select_one('.price').text)
+
 restaurants = [
     Restaurant("Bistro IN", bistroin, "https://bistroin.choiceqr.com/delivery"),
     Restaurant("U jarosu", u_jarosu, "https://www.ujarosu.cz/cz/denni-menu/"),
@@ -224,6 +238,7 @@ restaurants = [
     Restaurant("Trebovicky mlyn", trebovicky_mlyn, "https://www.trebovickymlyn.cz/"),
     Restaurant("Globus", globus, "https://www.globus.cz/ostrava/nabidka/restaurace.html"),
     Restaurant("Arrows", arrows, "https://restaurace.arrows.cz/"),
+    Restaurant("La Strada", lastrada, "http://www.lastrada.cz/cz/?tpl=plugins/DailyMenu/print&week_shift="),
 ]
 
 def gather_restaurants(allowed_restaurants=None):
@@ -245,7 +260,7 @@ def gather_restaurants(allowed_restaurants=None):
                 if food.price:
                     if isinstance(food.price, str):
                         try:
-                            food.price = int(food.price.replace(',-', '').replace('Kč', ''))
+                            food.price = int(food.price.replace(',-', '').replace('Kč', '').replace('.00', ''))
                         except ValueError:
                             pass
                     else:
