@@ -293,7 +293,7 @@ def gather_restaurants(allowed_restaurants=None):
                 response.encoding = 'utf-8'
                 args['res'] = response.text
 
-            for item in restaurant.parser(**args):
+            for item in restaurant.parser(**args) or []:
                 if isinstance(item, Soup):
                     soups.append(item)
                 elif isinstance(item, Lunch):
