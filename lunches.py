@@ -193,7 +193,10 @@ def poklad(res):
 
 def trebovicky_mlyn(res):
     dom = BeautifulSoup(res, 'html.parser')
-    yield Soup(dom.select('.soup h2')[0].text)
+    el = dom.select('.soup h2')
+    if not el:
+        return
+    yield Soup(el.text)
 
     for lunch in dom.select('.owl-carousel')[0].select('.menu-post'):
         parts = lunch.select('h2')[0].text.split(')')
