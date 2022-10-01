@@ -230,6 +230,22 @@ def lastrada(res):
             if 'highlight' in tr.get('class', []):
                 yield Lunch(name=tr.select_one('td').text, price=tr.select_one('.price').text)
 
+def ellas(res):
+    dom = BeautifulSoup(res, 'html.parser')
+    day_nth = datetime.datetime.today().weekday()
+
+    for div in dom.select('.moduletable .custom'):
+        if div.find('h3').text.strip() != days[day_nth]:
+            continue
+        foods = div.select('p')
+        yield Soup(name=foods[0].text)
+
+        for food in foods[1:]:
+            parts = food.decode_contents().split('<br')
+            num, name = parts[0].split('.')
+
+            yield Lunch(num=num, name=name, ingredients=parts[1], price=parts[2])
+
 restaurants = [
     Restaurant("Bistro IN", bistroin, "https://bistroin.choiceqr.com/delivery"),
     Restaurant("U jarosu", u_jarosu, "https://www.ujarosu.cz/cz/denni-menu/"),
@@ -240,6 +256,7 @@ restaurants = [
     Restaurant("Globus", globus, "https://www.globus.cz/ostrava/nabidka/restaurace.html"),
     Restaurant("Arrows", arrows, "https://restaurace.arrows.cz/"),
     Restaurant("La Strada", lastrada, "http://www.lastrada.cz/cz/?tpl=plugins/DailyMenu/print&week_shift="),
+    Restaurant("Ellas", ellas, "https://www.restauraceellas.cz/"),
 ]
 
 def gather_restaurants(allowed_restaurants=None):
