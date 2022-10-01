@@ -18,11 +18,18 @@ USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Ge
 
 logging.basicConfig(level=logging.DEBUG)
 
-@dataclass
-class Restaurant:
-    name: str
-    parser: int
-    url: str
+def restaurant(title, url=None):
+    def wrapper(fn):
+        def wrap(*args, **kwargs):
+            return fn(*args, **kwargs)
+        wrap.parser = {
+            'name': fn.__name__,
+            'title': title,
+            'url': url,
+            'args': fn.__code__.co_varnames[:fn.__code__.co_argcount],
+        }
+        return wrap
+    return wrapper
 
 @dataclass
 class Soup:
@@ -36,7 +43,7 @@ class Lunch:
     price: int = None
     ingredients: str = None
 
-
+@restaurant("Bistro IN", "https://bistroin.choiceqr.com/delivery")
 def bistroin(dom):
     data = json.loads(dom.select('#__NEXT_DATA__')[0].get_text())
 
@@ -50,6 +57,7 @@ def bistroin(dom):
             if len(parts) == 2:
                 yield Lunch(num=parts[0], name=parts[1], price=price - 5, ingredients=ingredients)
 
+@restaurant("U jarosu", "https://www.ujarosu.cz/cz/denni-menu/")
 def u_jarosu(dom):
     day_nth = datetime.datetime.today().weekday()
 
@@ -88,6 +96,7 @@ def u_jarosu(dom):
     if food:
         yield food
 
+@restaurant("U zlateho lva", "http://www.zlatylev.com/menu_zlaty_lev.html")
 def u_zlateho_lva(dom):
     day_nth = datetime.datetime.today().weekday()
     text = dom.select('.xr_txt.xr_s0')[0].get_text()
@@ -118,6 +127,7 @@ def u_zlateho_lva(dom):
                         yield food
                         state = 'name'
 
+@restaurant("Globus", "https://www.globus.cz/ostrava/nabidka/restaurace.html")
 def globus(dom):
     for row in dom.select('.restaurant__menu-food-table')[0].select('tr'):
         tds = row.select('td')
@@ -125,6 +135,7 @@ def globus(dom):
         price = tds[2].text.replace(',–', '') if len(tds) >= 3 else None
         yield (Lunch if price and int(price) > 50 else Soup)(name=name, price=price)
 
+@restaurant("Jacks Burger", "https://www.zomato.com/cs/widgets/daily_menu.php?entity_id=16525845")
 def jacks_burger(dom):
     day_nth = datetime.datetime.today().weekday()
 
@@ -152,6 +163,7 @@ def jacks_burger(dom):
             else:
                 prev_line = name
 
+@restaurant("Poklad", "https://dkpoklad.cz/restaurace/poledni-menu-4-8-6-8/")
 def poklad(res):
     images = [r.strip().split(' ') for r in re.search('srcset="([^"]+)"', res).group(1).split(',')]
     img = sorted(images, key=lambda r: int(r[1].replace('w', '')))[-1][0]
@@ -185,6 +197,7 @@ def poklad(res):
                 for soup in line.split('/'):
                     yield Soup(name=soup)
 
+@restaurant("Trebovicky mlyn", "https://www.trebovickymlyn.cz/")
 def trebovicky_mlyn(dom):
     el = dom.select('.soup h2')
     if not el:
@@ -196,6 +209,7 @@ def trebovicky_mlyn(dom):
         if len(parts) == 2:
             yield Lunch(num=parts[0], name=parts[1], ingredients=lunch.select('h2 + div')[0].text, price=lunch.select('span')[0].text.split(',')[0])
 
+@restaurant("Arrows", "https://restaurace.arrows.cz/")
 def arrows():
     tday = datetime.datetime.now().date()
     week = tday.isocalendar().week
@@ -212,6 +226,7 @@ def arrows():
             else:
                 yield Lunch(num=item['menuItemOrder'] + 1, name=item['text'], price=item['price'])
 
+@restaurant("La Strada", "http://www.lastrada.cz/cz/?tpl=plugins/DailyMenu/print&week_shift=")
 def lastrada(dom):
     day_nth = datetime.datetime.today().weekday()
 
@@ -225,6 +240,7 @@ def lastrada(dom):
             if 'highlight' in tr.get('class', []):
                 yield Lunch(name=tr.select_one('td').text, price=tr.select_one('.price').text)
 
+@restaurant("Ellas", "https://www.restauraceellas.cz/")
 def ellas(dom):
     day_nth = datetime.datetime.today().weekday()
 
@@ -239,19 +255,6 @@ def ellas(dom):
             num, name = parts[0].split('.')
 
             yield Lunch(num=num, name=name, ingredients=parts[1], price=parts[2])
-
-restaurants = [
-    Restaurant("Bistro IN", bistroin, "https://bistroin.choiceqr.com/delivery"),
-    Restaurant("U jarosu", u_jarosu, "https://www.ujarosu.cz/cz/denni-menu/"),
-    Restaurant("U zlateho lva", u_zlateho_lva, "http://www.zlatylev.com/menu_zlaty_lev.html"),
-    Restaurant("Jacks Burger", jacks_burger, "https://www.zomato.com/cs/widgets/daily_menu.php?entity_id=16525845"),
-    Restaurant("Poklad", poklad, "https://dkpoklad.cz/restaurace/poledni-menu-4-8-6-8/"),
-    Restaurant("Trebovicky mlyn", trebovicky_mlyn, "https://www.trebovickymlyn.cz/"),
-    Restaurant("Globus", globus, "https://www.globus.cz/ostrava/nabidka/restaurace.html"),
-    Restaurant("Arrows", arrows, "https://restaurace.arrows.cz/"),
-    Restaurant("La Strada", lastrada, "http://www.lastrada.cz/cz/?tpl=plugins/DailyMenu/print&week_shift="),
-    Restaurant("Ellas", ellas, "https://www.restauraceellas.cz/"),
-]
 
 def gather_restaurants(allowed_restaurants=None):
     requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += ':HIGH:!DH:!aNULL'
@@ -287,27 +290,27 @@ def gather_restaurants(allowed_restaurants=None):
                         food.num = int(food.num)
         return restaurant
 
-    def collect(restaurant):
+    def collect(parser):
         start = time.time()
         res = {
-            'name': restaurant.name,
-            'url': restaurant.url,
+            'name': parser.parser['title'],
+            'url': parser.parser['url'],
         }
         try:
             lunches = []
             soups = []
 
             args = {}
-            arg_names = restaurant.parser.__code__.co_varnames[:restaurant.parser.__code__.co_argcount]
+            arg_names = parser.parser['args']
             if 'res' in arg_names or 'dom' in arg_names:
-                response = requests.get(restaurant.url, headers={'User-Agent': USER_AGENT})
+                response = requests.get(parser.parser['url'], headers={'User-Agent': USER_AGENT})
                 response.encoding = 'utf-8'
                 if 'res' in arg_names:
                     args['res'] = response.text
                 else:
                     args['dom'] = BeautifulSoup(response.text, 'html.parser')
 
-            for item in restaurant.parser(**args) or []:
+            for item in parser(**args) or []:
                 if isinstance(item, Soup):
                     soups.append(item)
                 elif isinstance(item, Lunch):
@@ -326,11 +329,12 @@ def gather_restaurants(allowed_restaurants=None):
                 'error': traceback.format_exc()
             }
 
+    restaurants = [obj for _, obj in globals().items() if hasattr(obj, 'parser')]
     if not allowed_restaurants:
-        allowed_restaurants = [r.parser.__name__ for r in restaurants]
+        allowed_restaurants = [r.parser['name'] for r in restaurants]
 
     with ThreadPoolExecutor(max_workers=len(allowed_restaurants)) as pool:
-        return pool.map(collect, [r for r in restaurants if r.parser.__name__ in allowed_restaurants])
+        return pool.map(collect, [r for r in restaurants if r.parser['name'] in allowed_restaurants])
 
 if __name__ == '__main__':
     from pprint import pprint
