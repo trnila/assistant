@@ -8,6 +8,7 @@ import traceback
 import tempfile
 import logging
 import requests
+import string
 from dataclasses import dataclass
 from concurrent.futures import ThreadPoolExecutor
 import time
@@ -252,20 +253,27 @@ def gather_restaurants(allowed_restaurants=None):
                 name = name.capitalize()
             name = re.sub('\d+\s*(g|ml|ks) ', '', name)
             name = re.sub('\([^)]+\)', '', name)
+            name = re.sub('(\s*[0-9]+\s*,)+\s*$', '', name)
             name = re.sub('A?[0-9]+(,[0-9]+){1,},?', '', name)
-            return name.strip(' \n\r\t-/©*01234567890—.|"')
+            return name.strip(string.punctuation + string.whitespace + string.digits + '–')
 
         for t in ['lunches', 'soups']:
             for food in restaurant.get(t, []):
                 if food.price:
                     if isinstance(food.price, str):
                         try:
-                            food.price = int(food.price.replace(',-', '').replace('Kč', '').replace('.00', ''))
-                        except ValueError:
+                            food.price = int(food.price.replace('Kč', '').replace('.00', '').strip(string.punctuation + string.whitespace))
+                        except ValueError as e:
+                            print(e)
                             pass
                     else:
                         food.price = int(food.price)
                 food.name = fix_name(food.name)
+                if t == 'lunches':
+                    if food.ingredients:
+                        food.ingredients = fix_name(food.ingredients)
+                    if food.num:
+                        food.num = int(food.num)
         return restaurant
 
     def collect(restaurant):
