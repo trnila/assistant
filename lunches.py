@@ -37,8 +37,7 @@ class Lunch:
     ingredients: str = None
 
 
-def bistroin(res):
-    dom = BeautifulSoup(res, 'html.parser')
+def bistroin(dom):
     data = json.loads(dom.select('#__NEXT_DATA__')[0].get_text())
 
     for item in data["props"]["app"]["menu"]:
@@ -51,9 +50,7 @@ def bistroin(res):
             if len(parts) == 2:
                 yield Lunch(num=parts[0], name=parts[1], price=price - 5, ingredients=ingredients)
 
-def u_jarosu(res):
-    dom = BeautifulSoup(res, 'html.parser')
-
+def u_jarosu(dom):
     day_nth = datetime.datetime.today().weekday()
 
     counter = 0
@@ -91,9 +88,8 @@ def u_jarosu(res):
     if food:
         yield food
 
-def u_zlateho_lva(res):
+def u_zlateho_lva(dom):
     day_nth = datetime.datetime.today().weekday()
-    dom = BeautifulSoup(res, 'html.parser')
     text = dom.select('.xr_txt.xr_s0')[0].get_text()
 
     capturing = False
@@ -122,17 +118,15 @@ def u_zlateho_lva(res):
                         yield food
                         state = 'name'
 
-def globus(res):
-    dom = BeautifulSoup(res, 'html.parser')
+def globus(dom):
     for row in dom.select('.restaurant__menu-food-table')[0].select('tr'):
         tds = row.select('td')
         name = tds[1].text
         price = tds[2].text.replace(',–', '') if len(tds) >= 3 else None
         yield (Lunch if price and int(price) > 50 else Soup)(name=name, price=price)
 
-def jacks_burger(res):
+def jacks_burger(dom):
     day_nth = datetime.datetime.today().weekday()
-    dom = BeautifulSoup(res, 'html.parser')
 
     started = False
     prev_line = ""
@@ -191,8 +185,7 @@ def poklad(res):
                 for soup in line.split('/'):
                     yield Soup(name=soup)
 
-def trebovicky_mlyn(res):
-    dom = BeautifulSoup(res, 'html.parser')
+def trebovicky_mlyn(dom):
     el = dom.select('.soup h2')
     if not el:
         return
@@ -219,8 +212,7 @@ def arrows():
             else:
                 yield Lunch(num=item['menuItemOrder'] + 1, name=item['text'], price=item['price'])
 
-def lastrada(res):
-    dom = BeautifulSoup(res, 'html.parser')
+def lastrada(dom):
     day_nth = datetime.datetime.today().weekday()
 
     capturing = False
@@ -233,8 +225,7 @@ def lastrada(res):
             if 'highlight' in tr.get('class', []):
                 yield Lunch(name=tr.select_one('td').text, price=tr.select_one('.price').text)
 
-def ellas(res):
-    dom = BeautifulSoup(res, 'html.parser')
+def ellas(dom):
     day_nth = datetime.datetime.today().weekday()
 
     for div in dom.select('.moduletable .custom'):
@@ -308,10 +299,13 @@ def gather_restaurants(allowed_restaurants=None):
 
             args = {}
             arg_names = restaurant.parser.__code__.co_varnames[:restaurant.parser.__code__.co_argcount]
-            if 'res' in arg_names:
+            if 'res' in arg_names or 'dom' in arg_names:
                 response = requests.get(restaurant.url, headers={'User-Agent': USER_AGENT})
                 response.encoding = 'utf-8'
-                args['res'] = response.text
+                if 'res' in arg_names:
+                    args['res'] = response.text
+                else:
+                    args['dom'] = BeautifulSoup(response.text, 'html.parser')
 
             for item in restaurant.parser(**args) or []:
                 if isinstance(item, Soup):
