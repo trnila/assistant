@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import datetime
 import pickle
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_redis import FlaskRedis
 from lunches import gather_restaurants
 from public_transport import public_transport_connections
@@ -23,12 +23,13 @@ async def public_transport():
             connections=await public_transport_connections(srcs, dsts)
     )
 
-@app.route("/lunch", defaults={'format': 'html'})
+@app.route('/lunch_stats.html')
+@app.route("/lunch", defaults={'format': 'html'}, methods=['GET', 'POST'])
 @app.route("/lunch.json", defaults={'format': 'json'})
 async def lunch(format):
     key = f'restaurants.{datetime.date.today().strftime("%d-%m-%Y")}'
     restaurants = redis_client.get(key)
-    if not restaurants:
+    if not restaurants or request.method == 'POST':
         restaurants = list(gather_restaurants())
         redis_client.set(key, pickle.dumps(restaurants), ex=60 * 60 * 24)
     else:
