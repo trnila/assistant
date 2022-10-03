@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import datetime
 import pickle
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 from flask_redis import FlaskRedis
 from lunches import gather_restaurants
 from public_transport import public_transport_connections
@@ -32,6 +32,9 @@ async def lunch(format):
     if not restaurants or request.method == 'POST':
         restaurants = list(gather_restaurants())
         redis_client.set(key, pickle.dumps(restaurants), ex=60 * 60 * 24)
+
+        if request.method == 'POST':
+            return redirect(request.url)
     else:
         restaurants = pickle.loads(restaurants)
 
