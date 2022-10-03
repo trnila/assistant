@@ -203,7 +203,7 @@ def trebovicky_mlyn(dom):
     el = dom.select('.soup h2')
     if not el:
         return
-    yield Soup(el.text)
+    yield Soup(el[0].text)
 
     for lunch in dom.select('.owl-carousel')[0].select('.menu-post'):
         parts = lunch.select('h2')[0].text.split(')')
