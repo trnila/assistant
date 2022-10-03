@@ -143,7 +143,7 @@ def jacks_burger(dom):
     started = False
     prev_line = ""
     for el in dom.select('.main-body > div'):
-        if 'line-wider' in el['class']:
+        if 'line-wider' in el.get('class', []):
             break
         name = el.select_one('.item-name')
         if name:
