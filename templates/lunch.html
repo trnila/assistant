@@ -21,6 +21,13 @@
       div.restaurant {
         margin-bottom: 10px;
       }
+
+    @media (prefers-color-scheme: dark) {
+      body, h2 a {
+        background-color: black;
+        color: white;
+      }
+    }
     </style>
 
     <h1>{{date.strftime('%A %d.%m.')}} <span id="remaining"></span></h1>
