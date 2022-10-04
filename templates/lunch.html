@@ -7,6 +7,14 @@
 
   </head>
   <body>
+    <script>
+      const parts = document.location.href.split('?');
+      if(parts.length >= 2) {
+        if(parts[1] == 'dark') {
+          document.body.classList.add('dark');
+        }
+      }
+    </script>
     <style>
       h1, h2 {
         margin: 0px;
@@ -28,6 +36,10 @@
         color: white;
       }
     }
+      body.dark, body.dark h2 a {
+        background-color: black;
+        color: white;
+      }
     </style>
 
     <h1>{{date.strftime('%A %d.%m.')}} <span id="remaining"></span></h1>
