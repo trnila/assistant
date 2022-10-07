@@ -12,7 +12,7 @@ app = Flask(__name__)
 redis_client = FlaskRedis(app)
 
 @app.route("/public_transport")
-async def public_transport():
+def public_transport():
     srcs = ["Václava Jiřikovského"]
     dsts = ["Hlavní třída", "Rektorát VŠB", "Pustkovecká", "Poruba,Studentské koleje"]
     if datetime.datetime.now().hour >= 12:
@@ -20,13 +20,13 @@ async def public_transport():
 
     return render_template(
             'public_transport.html',
-            connections=await public_transport_connections(srcs, dsts)
+            connections=public_transport_connections(srcs, dsts)
     )
 
 @app.route('/lunch_stats.html')
 @app.route("/lunch", defaults={'format': 'html'}, methods=['GET', 'POST'])
 @app.route("/lunch.json", defaults={'format': 'json'})
-async def lunch(format):
+def lunch(format):
     key = f'restaurants.{datetime.date.today().strftime("%d-%m-%Y")}'
     restaurants = redis_client.get(key)
     if not restaurants or request.method == 'POST':
