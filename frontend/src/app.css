@@ -1,0 +1,16 @@
+@media (prefers-color-scheme: dark) {
+
+    body,
+    h2 a,
+    .iconify {
+        background-color: black;
+        color: white !important;
+    }
+}
+
+body.dark,
+body.dark h2 a,
+body.dark .iconify {
+    background-color: black;
+    color: white !important;
+}
