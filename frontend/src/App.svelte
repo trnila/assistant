@@ -61,6 +61,10 @@
           {/each}
         </ul>
 
+        {#if !restaurant.lunches.length}
+        No lunch found.
+        {/if}
+
         {#if restaurant.error}
           <pre>{restaurant.error}</pre>
         {/if}
