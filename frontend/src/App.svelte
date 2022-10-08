@@ -41,7 +41,7 @@
           {#each restaurant.soups || [] as soup}
             <li>
               <strong>{soup.name}</strong>
-              {#if soup.price}{soup.price} kč{/if}
+              {#if soup.price}{soup.price} Kč{/if}
             </li>
           {/each}
         </ul>
@@ -53,7 +53,7 @@
                 {#if lunch.num}{lunch.num}.{/if}
                 {lunch.name}
               </strong>
-              {#if lunch.price}{lunch.price} kč{/if}
+              {#if lunch.price}{lunch.price} Kč{/if}
               {#if lunch.ingredients}
                 <div>{lunch.ingredients}</div>
               {/if}
