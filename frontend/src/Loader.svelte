@@ -1,12 +1,17 @@
 <script>
   import Icon from "@iconify/svelte";
+
+  let show = false;
+  setTimeout(() => (show = true), 300);
 </script>
 
-<div class="outer">
-  <div class="inner">
-    <Icon icon="game-icons:knife-fork" width="150" />
+{#if show}
+  <div class="outer">
+    <div class="inner">
+      <Icon icon="game-icons:knife-fork" width="150" />
+    </div>
   </div>
-</div>
+{/if}
 
 <style>
   div.outer {
