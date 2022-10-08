@@ -3,6 +3,9 @@
   import Loader from "./Loader.svelte";
   import Nextbikes from "./Nextbikes.svelte";
   import Icon from "@iconify/svelte";
+  import Timeline from "./Timeline.svelte";
+
+  let showStats = false;
 
   async function load(args) {
     //await new Promise((r) => setTimeout(r, 2000000));
@@ -22,13 +25,22 @@
 <Nextbikes />
 
 <div>
-  <button on:click={refresh}>
-    <Icon icon="zondicons:reload" width="20" height="20" />
-  </button>
+  <div class="buttons">
+    <button on:click={() => (showStats = !showStats)}>
+      <Icon icon="bi:bar-chart-line-fill" width="20" height="20" />
+    </button>
+    <button on:click={refresh}>
+      <Icon icon="zondicons:reload" width="20" height="20" />
+    </button>
+  </div>
 
   {#await promise}
     <Loader />
   {:then restaurants}
+    {#if showStats}
+      <Timeline data={restaurants} />
+    {/if}
+
     {#each restaurants as restaurant}
       <div class="restaurant">
         <h2>
@@ -62,7 +74,7 @@
         </ul>
 
         {#if !restaurant.lunches.length}
-        No lunch found.
+          No lunch found.
         {/if}
 
         {#if restaurant.error}
@@ -91,13 +103,16 @@
     margin-bottom: 10px;
   }
 
+  .buttons {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+  }
+
   button {
     padding: 0;
     background: transparent;
     border: 0;
     cursor: pointer;
-    position: absolute;
-    top: 5px;
-    right: 5px;
   }
 </style>
