@@ -70,12 +70,10 @@
                 <div>{lunch.ingredients}</div>
               {/if}
             </li>
+          {:else}
+            No lunch found.
           {/each}
         </ul>
-
-        {#if !restaurant.lunches.length}
-          No lunch found.
-        {/if}
 
         {#if restaurant.error}
           <pre>{restaurant.error}</pre>
