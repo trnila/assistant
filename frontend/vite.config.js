@@ -8,8 +8,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/lunch.json': {
-        target: 'https://trnila.eu/',
-        changeOrigin: true,
+        target: 'http://localhost:5000',
       }
     }
   }
