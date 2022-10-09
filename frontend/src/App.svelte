@@ -11,7 +11,7 @@
     //await new Promise((r) => setTimeout(r, 2000000));
 
     const res = await fetch("/lunch.json", args);
-    return (await res.json()).restaurants;
+    return await res.json();
   }
 
   function refresh() {
@@ -36,9 +36,9 @@
 
   {#await promise}
     <Loader />
-  {:then restaurants}
+  {:then { restaurants, last_fetch, fetch_count }}
     {#if showStats}
-      <Timeline data={restaurants} />
+      <Timeline data={restaurants} {last_fetch} {fetch_count} />
     {/if}
 
     {#each restaurants as restaurant}

@@ -24,26 +24,30 @@ def public_transport():
     )
 
 @app.route('/lunch_stats.html')
-@app.route("/lunch", defaults={'format': 'html'}, methods=['GET', 'POST'])
-@app.route("/lunch.json", defaults={'format': 'json'})
+@app.route("/lunch", defaults={'format': 'html'})
+@app.route("/lunch.json", defaults={'format': 'json'}, methods=['GET', 'POST'])
 def lunch(format):
     key = f'restaurants.{datetime.date.today().strftime("%d-%m-%Y")}'
-    restaurants = redis_client.get(key)
-    if not restaurants or request.method == 'POST':
-        restaurants = list(gather_restaurants())
-        redis_client.set(key, pickle.dumps(restaurants), ex=60 * 60 * 24)
+    result = redis_client.get(key)
+    if not result or request.method == 'POST':
+        result = {
+            'last_fetch': int(datetime.datetime.now().timestamp()),
+            'fetch_count': redis_client.incr(f'{key}.fetch_count'),
+            'restaurants': list(gather_restaurants()),
+        }
+        redis_client.set(key, pickle.dumps(result), ex=60 * 60 * 24)
 
         if request.method == 'POST':
             return redirect(request.url)
     else:
-        restaurants = pickle.loads(restaurants)
+        result = pickle.loads(result)
 
     if format == 'json':
-        return {'restaurants': restaurants}
+        return result
     else:
         return render_template(
                 'lunch.html',
-                restaurants=restaurants,
+                restaurants=result.restaurants,
                 date=datetime.datetime.now(),
         )
 
