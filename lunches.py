@@ -327,7 +327,8 @@ def gather_restaurants(allowed_restaurants=None):
         except:
             return {
                 **res,
-                'error': traceback.format_exc()
+                'error': traceback.format_exc(),
+                'elapsed': time.time() - start,
             }
 
     restaurants = [obj for _, obj in globals().items() if hasattr(obj, 'parser')]
