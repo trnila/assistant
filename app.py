@@ -24,9 +24,8 @@ def public_transport():
     )
 
 @app.route('/lunch_stats.html')
-@app.route("/lunch", defaults={'format': 'html'})
-@app.route("/lunch.json", defaults={'format': 'json'}, methods=['GET', 'POST'])
-def lunch(format):
+@app.route("/lunch.json", methods=['GET', 'POST'])
+def lunch():
     key = f'restaurants.{datetime.date.today().strftime("%d-%m-%Y")}'
     result = redis_client.get(key)
     if not result or request.method == 'POST':
@@ -37,19 +36,8 @@ def lunch(format):
         }
         redis_client.set(key, pickle.dumps(result), ex=60 * 60 * 24)
 
-        if request.method == 'POST':
-            return redirect(request.url)
-    else:
-        result = pickle.loads(result)
-
-    if format == 'json':
         return result
-    else:
-        return render_template(
-                'lunch.html',
-                restaurants=result.restaurants,
-                date=datetime.datetime.now(),
-        )
+    return pickle.loads(result)
 
 from waitress import serve
 serve(app, port=5000, host="127.0.0.1")
