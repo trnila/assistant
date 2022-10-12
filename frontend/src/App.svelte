@@ -4,6 +4,7 @@
   import Nextbikes from "./Nextbikes.svelte";
   import Icon from "@iconify/svelte";
   import Timeline from "./Timeline.svelte";
+  import Fireworks from "./Fireworks.svelte";
 
   let showStats = false;
 
@@ -46,6 +47,10 @@
   {#await promise}
     <Loader />
   {:then { restaurants, last_fetch, fetch_count, first_access, access_count }}
+    {#if access_count === 1}
+      <Fireworks />
+    {/if}
+
     {#if showStats}
       <Timeline
         data={restaurants}
