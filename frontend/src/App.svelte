@@ -95,6 +95,8 @@
         {/if}
       </div>
     {/each}
+  {:catch}
+    <p>Load failed :(</p>
   {/await}
 </div>
 
