@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import datetime
 import pickle
+import ipaddress
 from flask import Flask, render_template, request, redirect
 from flask_redis import FlaskRedis
 from lunches import gather_restaurants
@@ -38,12 +39,28 @@ def lunch():
     else:
         result = pickle.loads(result_str)
 
-    result['access_count'] = redis_client.incr(f'{key}.access_count');
+    disallow_nets = [ipaddress.ip_network(net) for net in [
+        '127.0.0.0/8',
+        '::1/128',
+        '192.168.1.0/24',
+        '89.103.137.232/32',
+        '2001:470:5816::/48'
+    ]]
 
-    first_key = f'{key}.first_access'
-    redis_client.setnx(first_key, now)
-    result['first_access'] = int(redis_client.get(first_key).decode('utf-8'))
+    visitor_addr = ipaddress.ip_address(request.remote_addr)
+    if not any([net for net in disallow_nets if visitor_addr in net]):
+        redis_client.incr(f'{key}.access_count');
+        redis_client.setnx(f'{key}.first_access', now)
+    
+    def get(k):
+        val = redis_client.get(f'{key}.{k}')
+        if val:
+            result[k] = int(val)
+        else:
+            result[k] = 0
 
+    get('access_count')
+    get('first_access')
     return result
 
 
