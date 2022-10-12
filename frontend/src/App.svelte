@@ -71,7 +71,7 @@
           {#each restaurant.lunches || [] as lunch}
             <li>
               <strong>
-                {#if lunch.num}{lunch.num}.{/if}
+                {lunch.num}.
                 {lunch.name}
               </strong>
               {#if lunch.price}<span class="price">{lunch.price} Kč</span>{/if}

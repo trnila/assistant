@@ -273,6 +273,7 @@ def gather_restaurants(allowed_restaurants=None):
             return name.strip(string.punctuation + string.whitespace + string.digits + '–')
 
         for t in ['lunches', 'soups']:
+            num = 0
             for food in restaurant.get(t, []):
                 if food.price:
                     if isinstance(food.price, str):
@@ -283,6 +284,12 @@ def gather_restaurants(allowed_restaurants=None):
                             pass
                     else:
                         food.price = int(food.price)
+
+                if t == 'lunches': 
+                    if not food.num:
+                        food.num = num + 1
+                    num = food.num
+
                 food.name = fix_name(food.name)
                 if t == 'lunches':
                     if food.ingredients:
