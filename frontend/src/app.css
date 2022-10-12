@@ -1,16 +1,41 @@
-@media (prefers-color-scheme: dark) {
+body {
+    font-family: sans-serif;
+}
 
-    body,
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #2B2B2B;
+        color: #A9B7C6 !important
+    }
+
+    h1 {
+        color: #CC7832 !important
+    }
+
     h2 a,
     .iconify {
-        background-color: black;
-        color: white !important;
+        color: #FFC66D !important
+    }
+
+    strong {
+        color: #BBBBBB !important
     }
 }
 
-body.dark,
+body.dark {
+    background-color: #2B2B2B;
+    color: #A9B7C6 !important
+}
+
+body.dark h1 {
+    color: #CC7832 !important
+}
+
 body.dark h2 a,
 body.dark .iconify {
-    background-color: black;
-    color: white !important;
+    color: #FFC66D !important
+}
+
+body.dark strong {
+    color: #BBBBBB !important
 }
