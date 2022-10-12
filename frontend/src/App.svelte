@@ -18,6 +18,12 @@
     promise = load({ method: "POST" });
   }
 
+  function toggleDarkMode() {
+    const darkmode = +!parseInt(localStorage.getItem("darkmode"));
+    localStorage.setItem("darkmode", darkmode.toString());
+    document.body.classList[darkmode ? "add" : "remove"]("dark");
+  }
+
   let promise = load();
 </script>
 
@@ -26,6 +32,9 @@
 
 <div>
   <div class="buttons">
+    <button on:click={toggleDarkMode}>
+      <Icon icon="ic:baseline-dark-mode" width="20" height="20" />
+    </button>
     <button on:click={() => (showStats = !showStats)}>
       <Icon icon="bi:bar-chart-line-fill" width="20" height="20" />
     </button>

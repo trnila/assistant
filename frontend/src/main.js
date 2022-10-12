@@ -6,10 +6,8 @@ const app = new App({
 })
 
 const parts = document.location.href.split('?');
-if(parts.length >= 2) {
-  if(parts[1] == 'dark') {
-    document.body.classList.add('dark');
-  }
+if ((parts.length >= 2 && parts[1] == 'dark') || localStorage.getItem('darkmode') === '1') {
+  document.body.classList.add('dark');
 }
 
 export default app
