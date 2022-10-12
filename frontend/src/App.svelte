@@ -45,9 +45,15 @@
 
   {#await promise}
     <Loader />
-  {:then { restaurants, last_fetch, fetch_count }}
+  {:then { restaurants, last_fetch, fetch_count, first_access, access_count }}
     {#if showStats}
-      <Timeline data={restaurants} {last_fetch} {fetch_count} />
+      <Timeline
+        data={restaurants}
+        {last_fetch}
+        {fetch_count}
+        {first_access}
+        {access_count}
+      />
     {/if}
 
     {#each restaurants as restaurant}

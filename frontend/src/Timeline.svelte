@@ -2,16 +2,25 @@
     export let data;
     export let last_fetch;
     export let fetch_count;
+    export let first_access;
+    export let access_count;
 
     let max = Math.max(...data.map((r) => r.elapsed));
 </script>
 
 <div class="container">
-    <h2>Processing time</h2>
+    <h2>Stats for nerds</h2>
     <dl>
+        <dt>First access</dt>
+        <dd>{new window.Date(first_access * 1000).toLocaleString("cs")}</dd>
+
+        <dt>Access count</dt>
+        <dd>{access_count}</dd>
+
         <dt>Last fetch</dt>
         <dd>{new window.Date(last_fetch * 1000).toLocaleString("cs")}</dd>
-        <dt>Count</dt>
+
+        <dt>Fetch count</dt>
         <dd>{fetch_count}</dd>
     </dl>
     {#each data as restaurant}
@@ -25,6 +34,7 @@
 <style>
     dl {
         margin: 0;
+        margin-bottom: 2px;
     }
 
     dt:after {

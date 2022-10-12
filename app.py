@@ -23,21 +23,29 @@ def public_transport():
             connections=public_transport_connections(srcs, dsts)
     )
 
-@app.route('/lunch_stats.html')
 @app.route("/lunch.json", methods=['GET', 'POST'])
 def lunch():
+    now = int(datetime.datetime.now().timestamp())
     key = f'restaurants.{datetime.date.today().strftime("%d-%m-%Y")}'
-    result = redis_client.get(key)
-    if not result or request.method == 'POST':
+    result_str = redis_client.get(key)
+    if not result_str or request.method == 'POST':
         result = {
-            'last_fetch': int(datetime.datetime.now().timestamp()),
+            'last_fetch': now,
             'fetch_count': redis_client.incr(f'{key}.fetch_count'),
             'restaurants': list(gather_restaurants()),
         }
         redis_client.set(key, pickle.dumps(result), ex=60 * 60 * 24)
+    else:
+        result = pickle.loads(result_str)
 
-        return result
-    return pickle.loads(result)
+    result['access_count'] = redis_client.incr(f'{key}.access_count');
+
+    first_key = f'{key}.first_access'
+    redis_client.setnx(first_key, now)
+    result['first_access'] = int(redis_client.get(first_key).decode('utf-8'))
+
+    return result
+
 
 from waitress import serve
 serve(app, port=5000, host="127.0.0.1")
