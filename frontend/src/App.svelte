@@ -62,7 +62,7 @@
           {#each restaurant.soups || [] as soup}
             <li>
               <strong>{soup.name}</strong>
-              {#if soup.price}{soup.price} Kč{/if}
+              {#if soup.price}<span class="price">{soup.price} Kč</span>{/if}
             </li>
           {/each}
         </ul>
@@ -74,7 +74,7 @@
                 {#if lunch.num}{lunch.num}.{/if}
                 {lunch.name}
               </strong>
-              {#if lunch.price}{lunch.price} Kč{/if}
+              {#if lunch.price}<span class="price">{lunch.price} Kč</span>{/if}
               {#if lunch.ingredients}
                 <div>{lunch.ingredients}</div>
               {/if}
@@ -108,6 +108,10 @@
 
   div.restaurant {
     margin-bottom: 10px;
+  }
+
+  .price {
+    white-space: nowrap;
   }
 
   .buttons {
