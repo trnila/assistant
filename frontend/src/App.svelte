@@ -19,8 +19,8 @@
   }
 
   function toggleDarkMode() {
-    const darkmode = +!parseInt(localStorage.getItem("darkmode"));
-    localStorage.setItem("darkmode", darkmode.toString());
+    const darkmode = +!document.body.classList.contains("dark");
+    localStorage.setItem("darkmode", +darkmode.toString());
     document.body.classList[darkmode ? "add" : "remove"]("dark");
   }
 

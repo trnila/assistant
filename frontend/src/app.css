@@ -2,26 +2,6 @@ body {
     font-family: sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-    body {
-        background-color: #2B2B2B;
-        color: #A9B7C6 !important
-    }
-
-    h1 {
-        color: #CC7832 !important
-    }
-
-    h2 a,
-    .iconify {
-        color: #FFC66D !important
-    }
-
-    strong {
-        color: #BBBBBB !important
-    }
-}
-
 body.dark {
     background-color: #2B2B2B;
     color: #A9B7C6 !important
