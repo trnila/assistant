@@ -54,9 +54,9 @@ def bistroin(dom):
         if 'Polévka k menu:' in item['name']:
             yield Soup(name=item['name'].split(':')[1], price=price)
         else:
-            parts = item['name'].split('.', 1)
-            if len(parts) == 2:
-                yield Lunch(num=parts[0], name=parts[1], price=price - 5, ingredients=ingredients)
+            match = re.match('^\s*(?P<num>[0-9]+)\s*\.\s*(?P<name>.+)', item['name'])
+            if match:
+                yield Lunch(**match.groupdict(), price=price - 5, ingredients=ingredients)
 
 @restaurant("U jarosu", "https://www.ujarosu.cz/cz/denni-menu/")
 def u_jarosu(dom):
