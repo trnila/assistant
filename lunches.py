@@ -257,6 +257,12 @@ def ellas(dom):
 
             yield Lunch(num=num, name=name, ingredients=parts[1], price=parts[2])
 
+@restaurant("La Futura", "http://www.lafuturaostrava.cz/menu/")
+def lafutura(dom):
+    yield Soup(name=dom.select('.denni-menu:first-of-type strong')[0].text)
+    for div in dom.select('.denni-menu')[1:]:
+        yield Lunch(name=div.find('strong').text, price=div.select('.denni-menu-cena')[0].text, num=div.find('b').text)
+
 def gather_restaurants(allowed_restaurants=None):
     requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += ':HIGH:!DH:!aNULL'
 
@@ -292,7 +298,7 @@ def gather_restaurants(allowed_restaurants=None):
 
                     if food.num:
                         try:
-                            food.num = int(food.num)
+                            food.num = int(food.num.replace('.', ''))
                         except ValueError as e:
                             logging.exception(e)
                             food.num = None
