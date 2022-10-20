@@ -296,7 +296,7 @@ def gather_restaurants(allowed_restaurants=None):
                     if food.ingredients:
                         food.ingredients = fix_name(food.ingredients)
 
-                    if food.num:
+                    if isinstance(food.num, str):
                         try:
                             food.num = int(food.num.replace('.', ''))
                         except ValueError as e:
