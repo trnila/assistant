@@ -285,17 +285,20 @@ def gather_restaurants(allowed_restaurants=None):
                     else:
                         food.price = int(food.price)
 
-                if t == 'lunches': 
-                    if not food.num:
-                        food.num = num + 1
-                    num = food.num
-
                 food.name = fix_name(food.name)
                 if t == 'lunches':
                     if food.ingredients:
                         food.ingredients = fix_name(food.ingredients)
+
                     if food.num:
-                        food.num = int(food.num)
+                        try:
+                            food.num = int(food.num)
+                        except ValueError as e:
+                            logging.exception(e)
+                            food.num = None
+                    if not food.num:
+                        food.num = num + 1
+                    num = food.num
         return restaurant
 
     def collect(parser):
