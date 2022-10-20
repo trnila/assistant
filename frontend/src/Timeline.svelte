@@ -24,7 +24,7 @@
         <dd>{fetch_count}</dd>
     </dl>
     {#each data as restaurant}
-        <div style="width: {(restaurant.elapsed / max) * 100}%;">
+        <div style="width: {(restaurant.elapsed / max) * 100}%;" class="timeline">
             ({restaurant.elapsed.toFixed(3)} s)
             <strong>{restaurant.name}</strong>
         </div>
@@ -65,10 +65,15 @@
         max-width: 600px;
         margin-bottom: 5px;
     }
-    div div {
+    .timeline {
         background: lightblue;
         white-space: nowrap;
     }
+ 
+    :global(body.dark .timeline) {
+      background: #add8e636;
+    }
+
     h2 {
         margin: 0;
     }
