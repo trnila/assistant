@@ -30,6 +30,11 @@ def lunch():
     key = f'restaurants.{datetime.date.today().strftime("%d-%m-%Y")}'
     result_str = redis_client.get(key)
     if not result_str or request.method == 'POST':
+        throttle_key = f'{key}.throttle'
+        if redis_client.incr(throttle_key) != 1:
+            return {'error': 'Fetch limit reached. Try again later.'}
+        redis_client.expire(throttle_key, 60 * 3)
+
         result = {
             'last_fetch': now,
             'fetch_count': redis_client.incr(f'{key}.fetch_count'),

@@ -12,7 +12,11 @@
     //await new Promise((r) => setTimeout(r, 2000000));
 
     const res = await fetch("/lunch.json", args);
-    return await res.json();
+    const json = await res.json();
+    if(json['error']) {
+      throw json['error']
+    }
+    return json;
   }
 
   function refresh() {
@@ -100,8 +104,9 @@
         {/if}
       </div>
     {/each}
-  {:catch}
+  {:catch error}
     <p>Load failed :(</p>
+    <p>{error}</p>
   {/await}
 </div>
 
