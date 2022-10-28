@@ -8,7 +8,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/lunch.json': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:5001',
       }
     }
   }
