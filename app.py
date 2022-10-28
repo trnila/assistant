@@ -3,6 +3,7 @@ import datetime
 import pickle
 import ipaddress
 from flask import Flask, render_template, request, redirect
+from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_redis import FlaskRedis
 from lunches import gather_restaurants
 from public_transport import public_transport_connections
@@ -10,6 +11,7 @@ from public_transport import public_transport_connections
 
 
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
 redis_client = FlaskRedis(app)
 
 @app.route("/public_transport")
