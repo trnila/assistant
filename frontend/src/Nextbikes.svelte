@@ -43,6 +43,8 @@ async function load() {
     <ul>
     {#each stations as station}
         <li>{station.name} ({station.count})</li>
+    {:else}
+        <li>No bike available :(</li>
     {/each}
     </ul>
 {:catch}
