@@ -53,6 +53,9 @@ def lunch():
         '89.103.137.232/32',
         '2001:470:5816::/48'
     ]]
+    for net in disallow_nets:
+        if net.version == 4:
+            disallow_nets.append(ipaddress.ip_network(f'::ffff:{net.network_address}/{96 + net.prefixlen}'))
 
     visitor_addr = ipaddress.ip_address(request.remote_addr)
     if not any([net for net in disallow_nets if visitor_addr in net]):
