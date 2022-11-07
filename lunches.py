@@ -87,12 +87,16 @@ def u_jarosu(dom):
                 if food:
                     yield food
                 food = Lunch(
-                    name=row.select('td')[1].get_text(),
+                    name=row.select('td')[1].get_text().strip(),
                     price=row.select('td')[2].get_text() if len(row.select('td')) >= 3 else None,
                     num=num,
                 )
             else:
-                food.name += ' ' + row.select('td')[1].get_text()
+                if food.name[-1] == '-':
+                    food.name = food.name[:-1]
+                else:
+                    food.name += ' '
+                food.name += row.select('td')[1].get_text().strip()
 
     if food:
         yield food
