@@ -62,7 +62,6 @@ def bistroin(dom):
 def u_jarosu(dom):
     day_nth = datetime.datetime.today().weekday()
 
-    counter = 0
     food = {}
     capturing = False
     for row in dom.findAll('tr'):
@@ -80,10 +79,6 @@ def u_jarosu(dom):
 
             try:
                 num = int(row.select('td')[0].get_text().strip().split('.')[0])
-            except ValueError:
-                num = -1
-            if num == counter + 1:
-                counter += 1
                 if food:
                     yield food
                 food = Lunch(
@@ -91,7 +86,7 @@ def u_jarosu(dom):
                     price=row.select('td')[2].get_text() if len(row.select('td')) >= 3 else None,
                     num=num,
                 )
-            else:
+            except ValueError:
                 if food.name[-1] == '-':
                     food.name = food.name[:-1]
                 else:
