@@ -258,7 +258,9 @@ def ellas(dom):
 
 @restaurant("La Futura", "http://www.lafuturaostrava.cz/menu/")
 def lafutura(dom):
-    yield Soup(name=dom.select('.denni-menu:first-of-type strong')[0].text)
+    el = dom.select_one('.denni-menu:first-of-type strong')
+    if el:
+        yield Soup(name=el.text)
     for div in dom.select('.denni-menu')[1:]:
         yield Lunch(name=div.find('strong').text, price=div.select('.denni-menu-cena')[0].text, num=div.find('b').text)
 
