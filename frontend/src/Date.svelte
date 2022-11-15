@@ -19,12 +19,15 @@
     let day = days[date.getDay()];
     let counter = null;
 
-    function remaining() {
+    function remainingMillis() {
         const target = new Date();
         target.setHours(11, 0, 0, 0);
-        //target.setHours(23, 59, 0, 0);
+        //target.setHours(19, 44, 0, 0);
+        return target - new Date();
+    }
 
-        let diff = target - new Date();
+    function remaining() {
+        let diff = remainingMillis();
         if (diff <= 0) {
             return null;
         }
@@ -54,6 +57,15 @@
             counter = null;
         }
     }, 21);
+
+
+    let alarm;
+    if(remainingMillis() > 0) {
+        setTimeout(function() {
+            alarm.volume = 0.3;
+            alarm.play();
+        }, remainingMillis())
+    }
 </script>
 
 <h1>
@@ -63,3 +75,6 @@
     - {counter}
     {/if}
 </h1>
+
+<audio bind:this={alarm} src="https://trnila.eu/rooster.mp3"></audio>
+
