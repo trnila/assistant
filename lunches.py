@@ -60,41 +60,18 @@ def bistroin(dom):
 
 @restaurant("U jarosu", "https://www.ujarosu.cz/cz/denni-menu/")
 def u_jarosu(dom):
-    day_nth = datetime.datetime.today().weekday()
-
-    food = {}
-    capturing = False
-    for row in dom.findAll('tr'):
-        day = row.select('td')[0].get_text().strip(' \n\t\xa0:')
-        if day in days:
-            if capturing:
-                break
-            if day == days[day_nth]:
-                capturing = True
-                yield Soup(name=row.select('td')[1].get_text())
-        elif capturing:
-            spaces = all(not td.get_text().strip() for td in row.select('td'))
-            if spaces:
-                break
-
-            try:
-                num = int(row.select('td')[0].get_text().strip().split('.')[0])
-                if food:
-                    yield food
-                food = Lunch(
-                    name=row.select('td')[1].get_text().strip(),
-                    price=row.select('td')[2].get_text() if len(row.select('td')) >= 3 else None,
-                    num=num,
-                )
-            except ValueError:
-                if food.name[-1] == '-':
-                    food.name = food.name[:-1]
+    today = datetime.datetime.strftime(datetime.datetime.now(), "%d. %m. %Y")
+    for row in dom.select('.celyden'):
+        parsed_day = row.select('.datum')[0].get_text()
+        if parsed_day == today:
+            records = row.select('.tabulka p')
+            records = [r.get_text().strip() for r in records]
+            records = [records[i:i+3] for i in range(0, len(records), 3)]
+            for first, name, price in records:
+                if first == 'Polévka':
+                    yield Soup(name)
                 else:
-                    food.name += ' '
-                food.name += row.select('td')[1].get_text().strip()
-
-    if food:
-        yield food
+                    yield Lunch(name, price=price, num=first.split('.')[0])
 
 @restaurant("U zlateho lva", "http://www.zlatylev.com/menu_zlaty_lev.html")
 def u_zlateho_lva(dom):
