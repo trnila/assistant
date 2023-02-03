@@ -140,39 +140,38 @@ def jacks_burger(dom):
             else:
                 prev_line = name
 
-@restaurant("Poklad", "https://dkpoklad.cz/restaurace/poledni-menu-4-8-6-8/")
-def poklad(res):
-    images = [r.strip().split(' ') for r in re.search('srcset="([^"]+)"', res).group(1).split(',')]
-    img = sorted(images, key=lambda r: int(r[1].replace('w', '')))[-1][0]
-    with requests.get(img) as r:
-        with tempfile.NamedTemporaryFile() as tmp:
-            tmp.write(r.content)
-            tmp.flush()
-            txt = subprocess.check_output(['tesseract', '--psm', '6', '-l', 'ces', tmp.name, '-'], text=True)
+@restaurant("Poklad", "https://dkpoklad.cz/restaurace/")
+def poklad(dom):
+    pdf_url = dom.select('.restaurace-box .wp-block-file a')[0]['href']
+    pdf = requests.get(pdf_url).content
+    text = subprocess.check_output(["pdftotext", "-layout", "-", "-"], input=pdf).decode('utf-8')
 
-        in_common = True
-        in_day = False
-        in_day_soup = False
-        for line in txt.splitlines():
-            m = re.match('([0-9]{1,2})\s*\.*\s*([0-9]{1,2})\s*\.*\s*([0-9]{4})', line)
-            if m:
-                c = [int(i) for i in m.groups()]
-                day = datetime.date(day=c[0], month=c[1], year=c[2]).weekday()
-                day_nth = datetime.datetime.today().weekday()
-                in_day = day == day_nth
-                in_day_soup = in_day
-                in_common = False
-            elif re.match('^[0-9]+', line):
-                if in_common or in_day:
-                    price = re.search('([0-9]{3}) kč', line.lower())
-                    m = re.search('^(?P<num>[0-9]+)\s*\.?\s*[0-9]+\s*(g|ks|)\s*[\|—]?\s*(?P<name>.+).*?(?P<price>[12][0-9]{2})', line)
-                    values = m.groupdict() if m else {'name': line}
-                    if len(values['name']) > 8:
-                        yield Lunch(**values)
-            elif in_day_soup:
-                in_day_soup = False
-                for soup in line.split('/'):
-                    yield Soup(name=soup)
+    today = datetime.datetime.strftime(datetime.datetime.now(), "%-d.%-m.%Y")
+    capturing = False
+    soup = True
+    item = None
+    for line in text.splitlines():
+        if line.startswith(today):
+            capturing = True
+        elif capturing:
+            if soup:
+                soup = False
+                for s in line.split('/'):
+                    yield Soup(s)
+            else:
+                if not line.strip():
+                    break
+
+                m = re.match("^(?P<num>[0-9]+)\.(?P<name>.*?) (?P<price>[0-9]+) Kč", line)
+                if m:
+                    if item:
+                        yield Lunch(**item)
+                    item = m.groupdict()
+                elif item:
+                    item['name'] += line
+
+    if item:
+        yield Lunch(**item)
 
 @restaurant("Trebovicky mlyn", "https://www.trebovickymlyn.cz/")
 def trebovicky_mlyn(dom):
