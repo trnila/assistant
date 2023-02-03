@@ -253,7 +253,7 @@ def gather_restaurants(allowed_restaurants=None):
             name = re.sub('\d+\s*(g|ml|ks) ', '', name)
             name = re.sub('\([^)]+\)', '', name)
             name = re.sub('(\s*[0-9]+\s*,)+\s*$', '', name)
-            name = re.sub('A?[0-9]+(,[0-9]+){1,},?', '', name)
+            name = re.sub('A?\s*[0-9]+(,[0-9]+)*,?', '', name)
             name = name.strip(string.punctuation + string.whitespace + string.digits + '–\xa0')
             name = re.sub(' +', ' ', name)
             return name
