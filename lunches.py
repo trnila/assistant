@@ -152,23 +152,23 @@ def poklad(dom):
     pdf = requests.get(pdf_url).content
     text = subprocess.check_output(["pdftotext", "-layout", "-", "-"], input=pdf).decode('utf-8')
 
-    today = datetime.datetime.strftime(datetime.datetime.now(), "%-d.%-m.%Y")
+    today = datetime.datetime.strftime(datetime.datetime.now(), "%-d I %-m")
+    tomorrow = datetime.datetime.strftime(datetime.datetime.now() + datetime.timedelta(days=1), "%-d I %-m")
     capturing = False
     soup = True
     item = None
     for line in text.splitlines():
-        if line.startswith(today):
+        if today in line:
             capturing = True
         elif capturing:
+            if tomorrow in line:
+                break
             if soup:
                 soup = False
-                for s in line.split('/'):
+                for s in line.split(' I '):
                     yield Soup(s)
             else:
-                if not line.strip():
-                    break
-
-                m = re.match("^(?P<num>[0-9]+)\.(?P<name>.*?) (?P<price>[0-9]+) Kč", line)
+                m = re.match("^(?P<num>[0-9]+)\s*\.?\s*(?P<name>.*?) (?P<price>[0-9]+) Kč", line)
                 if m:
                     if item:
                         yield Lunch(**item)
