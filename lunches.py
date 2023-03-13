@@ -19,6 +19,9 @@ USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Ge
 
 logging.basicConfig(level=logging.DEBUG)
 
+def strip_tags(s):
+    return re.sub(r'(<[^>]+>|/>)', '', s)
+
 def restaurant(title, url=None):
     def wrapper(fn):
         def wrap(*args, **kwargs):
@@ -216,9 +219,8 @@ def ellas(dom):
         yield Soup(name=foods[0].text)
 
         for food in foods[1:]:
-            parts = food.decode_contents().split('<br')
+            parts = [strip_tags(s) for s in food.decode_contents().split('<br')]
             num, name = parts[0].split('.')
-
             yield Lunch(num=num, name=name, ingredients=parts[1], price=parts[2])
 
 @restaurant("La Futura", "http://www.lafuturaostrava.cz/menu/")
