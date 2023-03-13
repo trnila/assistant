@@ -126,23 +126,25 @@ def jacks_burger(dom):
         if 'line-wider' in el.get('class', []):
             break
         name = el.select_one('.item-name')
-        if name:
-            name = name.text.strip()
-            num = None
-            if re.match('^[0-9]+\..+', name):
-                num = name.split('.')[0]
+        if name is None:
+            continue
+        name = name.text.strip()
+        if 'ROZVOZ PŘES' in name.upper() or '---------' in name or 'JBB OSTRAVA' in name.upper():
+            continue
+        num = None
+        if re.match('^[0-9]+\..+', name):
+            num = name.split('.')[0]
 
-            if num:
-                if not started:
-                    yield Soup(name=prev_line)
-                    started = True
+        if not started:
+            yield Soup(name=prev_line)
+            started = True
 
-                price = el.select_one('.item-price')
-                if price:
-                    price = price.text.strip()
-                    yield Lunch(name=name, price=price, num=num)
-            else:
-                prev_line = name
+        price = el.select_one('.item-price')
+        if price:
+            price = price.text.strip()
+            yield Lunch(name=name, price=price, num=num)
+        else:
+            prev_line = name
 
 @restaurant("Poklad", "https://dkpoklad.cz/restaurace/")
 def poklad(dom):
