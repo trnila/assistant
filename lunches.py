@@ -191,23 +191,6 @@ def trebovicky_mlyn(dom):
         if len(parts) == 2:
             yield Lunch(num=parts[0], name=parts[1], ingredients=lunch.select('h2 + div')[0].text, price=lunch.select('span')[0].text.split(',')[0])
 
-@restaurant("Arrows", "https://restaurace.arrows.cz/")
-def arrows():
-    tday = datetime.datetime.now().date()
-    week = tday.isocalendar().week
-
-    for t in ['GetSoupsByActualWeekNumber', 'GetMenusByActualWeekNumber']:
-        res = requests.get(f"https://restaurace.arrows.cz/api/menu/{t}/{week}")
-        for item in res.json():
-            date = datetime.datetime.fromisoformat(item['validDateTime']).date()
-            if date != tday or item['deletedDate']:
-                continue
-
-            if item['isSoup']:
-                yield Soup(name=item['text'])
-            else:
-                yield Lunch(num=item['menuItemOrder'] + 1, name=item['text'], price=item['price'])
-
 @restaurant("La Strada", "http://www.lastrada.cz/cz/?tpl=plugins/DailyMenu/print&week_shift=")
 def lastrada(dom):
     day_nth = datetime.datetime.today().weekday()
