@@ -80,7 +80,7 @@ def u_zlateho_lva(dom):
 
     capturing = False
     counter = 0
-    state = 'name'
+    state = 'num'
     for line in text.splitlines():
         line = line.strip()
 
@@ -93,16 +93,20 @@ def u_zlateho_lva(dom):
             if line.startswith(soup_prefix):
                 yield Soup(line.replace(soup_prefix, ''))
             else:
-                if state == 'name':
+                if state == 'num':
                     if re.match('^[0-9]+\.', line):
                         line, name = line.split('.', 1)
                         food = Lunch(name=name, num=line)
+                        state = 'price' if name else 'name'
+                elif state == 'name':
+                    if line:
+                        food.name = line
                         state = 'price'
                 elif state == 'price':
                     if re.match('^[0-9]+\s*(,-|Kč)$', line):
                         food.price = line.split(' ')[0]
                         yield food
-                        state = 'name'
+                        state = 'num'
 
 @restaurant("Globus", "https://www.globus.cz/ostrava/nabidka/restaurace.html")
 def globus(dom):
