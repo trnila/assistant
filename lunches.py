@@ -223,13 +223,14 @@ def ellas(dom):
             num, name = parts[0].split('.')
             yield Lunch(num=num, name=name, ingredients=parts[1], price=parts[2])
 
-@restaurant("La Futura", "http://www.lafuturaostrava.cz/menu/")
+@restaurant("La Futura", "http://lafuturaostrava.cz/")
 def lafutura(dom):
-    el = dom.select_one('.denni-menu:first-of-type strong')
-    if el:
-        yield Soup(name=el.text)
-    for div in dom.select('.denni-menu')[1:]:
-        yield Lunch(name=div.find('strong').text, price=div.select('.denni-menu-cena')[0].text, num=div.find('b').text)
+    for item in dom.select_one('.jet-listing-dynamic-repeater__items').select('.jet-listing-dynamic-repeater__item'):
+        tds = item.select('td')
+        if tds[0].text.strip() == '𐃸':
+            yield Soup(name=tds[1].text)
+        else:
+            yield Lunch(name=tds[1].text, price=tds[2].text, num=tds[0].text)
 
 def gather_restaurants(allowed_restaurants=None):
     requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += ':HIGH:!DH:!aNULL'
