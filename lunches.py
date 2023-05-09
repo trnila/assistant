@@ -113,7 +113,7 @@ def u_zlateho_lva(dom):
 
 @restaurant("Globus", "https://www.globus.cz/ostrava/nabidka/restaurace.html")
 def globus(dom):
-    for row in dom.select('.restaurant__menu-food-table')[0].select('tr'):
+    for row in dom.select('.restaurant__menu-table-row--active')[0].select('tr'):
         tds = row.select('td')
         name = tds[1].text
         price = tds[2].text.replace(',–', '') if len(tds) >= 3 else None
