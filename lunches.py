@@ -232,8 +232,6 @@ def lafutura(dom):
             yield Lunch(name=tds[1].text, price=tds[2].text, num=tds[0].text)
 
 def gather_restaurants(allowed_restaurants=None):
-    requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += ':HIGH:!DH:!aNULL'
-
     def cleanup(restaurant):
         def fix_name(name):
             uppers = sum(1 for c in name if c.isupper())
