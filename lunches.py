@@ -219,9 +219,8 @@ def ellas(dom):
         yield Soup(name=foods[0].text)
 
         for food in foods[1:]:
-            parts = [strip_tags(s) for s in food.decode_contents().split('<br')]
-            num, name = parts[0].split('.')
-            yield Lunch(num=num, name=name, ingredients=parts[1], price=parts[2])
+            parsed = re.match("(?P<num>[0-9]+)\s*\.\s*(?P<name>[A-Z -]+)\s+(?P<ingredients>.*?)\s*(\([0-9 ,]+\))?\s*(?P<price>[0-9]+),-", food.text).groupdict()
+            yield Lunch(**parsed)
 
 @restaurant("La Futura", "http://lafuturaostrava.cz/")
 def lafutura(dom):
