@@ -1,29 +1,36 @@
-<style>
-h3 {
-  margin: 0;
-}
-</style>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+  </head>
+  <body>
+    <style>
+    h3 {
+      margin: 0;
+    }
+    </style>
 
-{% for connection in connections %}
-  <h3>{{ connection.total }} min, <span data-time="{{ connection.connections[0].from.time.timestamp() }}"></span></h3>
-  {% for link in connection.connections %}
-    <strong>{{ link.link }}</strong><br>
-    &nbsp;&nbsp;&nbsp;{{ link.from.time.strftime("%H:%M") }} {{ link.from.station }}<br>
-    &nbsp;&nbsp;&nbsp;{{ link.to.time.strftime("%H:%M") }} {{ link.to.station }}<br>
-  {% endfor %}
-  <hr>
-{% endfor %}
+    {% for connection in connections %}
+      <h3>{{ connection.total }} min, <span data-time="{{ connection.connections[0].from.time.timestamp() }}"></span></h3>
+      {% for link in connection.connections %}
+        <strong>{{ link.link }}</strong><br>
+        &nbsp;&nbsp;&nbsp;{{ link.from.time.strftime("%H:%M") }} {{ link.from.station }}<br>
+        &nbsp;&nbsp;&nbsp;{{ link.to.time.strftime("%H:%M") }} {{ link.to.station }}<br>
+      {% endfor %}
+      <hr>
+    {% endfor %}
 
-<script>
-  function update_times() {
-    let now = new Date();
-    now.setSeconds(0);
-    document.querySelectorAll('span[data-time]').forEach(el => {
-      const diff = el.dataset.time - (now / 1000);
-      el.innerText = `in ${parseInt(diff / 60)} min`;
-    });
-  }
+    <script>
+      function update_times() {
+        let now = new Date();
+        now.setSeconds(0);
+        document.querySelectorAll('span[data-time]').forEach(el => {
+          const diff = el.dataset.time - (now / 1000);
+          el.innerText = `in ${parseInt(diff / 60)} min`;
+        });
+      }
 
-  setInterval(update_times, 5000);
-  update_times();
-</script>
+      setInterval(update_times, 5000);
+      update_times();
+    </script>
+  </body>
+</html>
