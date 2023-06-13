@@ -237,8 +237,9 @@ def black_kale(res):
 
 @restaurant("Saloon Pub", "http://www.saloon-pub.cz/cs/denni-nabidka/")
 def saloon_pub(dom):
-    yield Soup(name=dom.select_one('.category-info').text)
-    for tr in dom.select('.main-meal-info'):
+    day = dom.find(attrs={'id': datetime.datetime.strftime(datetime.datetime.now(), "%Y-%m-%d")}).find_next('section')
+    yield Soup(name=day.select_one('.category-info').text)
+    for tr in day.select('.main-meal-info'):
         yield Lunch(name=tr.select_one('.meal-name').text, price=tr.select_one('.meal-price').text)
 
 
