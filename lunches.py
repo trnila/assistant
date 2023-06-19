@@ -242,6 +242,13 @@ def saloon_pub(dom):
     for tr in day.select('.main-meal-info'):
         yield Lunch(name=tr.select_one('.meal-name').text, price=tr.select_one('.meal-price').text)
 
+@restaurant("Canteen", "https://canteen.cz/menu")
+def canteen(dom):
+    day_nth = datetime.datetime.today().weekday() + 1
+    for item in dom.select(f'[data-week-day="{day_nth}"] .food-banner__item'):
+        name = item.select_one('h2 a').text
+        price = re.search('([0-9]+)\s*kč', item.select_one('.food-banner__item__price').text, flags=re.IGNORECASE).group(1)
+        yield Lunch(name=name, price=price)
 
 @restaurant("La Futura", "http://lafuturaostrava.cz/")
 def lafutura(dom):
