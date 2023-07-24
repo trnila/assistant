@@ -46,27 +46,29 @@
   let promise = load();
 </script>
 
-<Date />
-
 <div>
   {#await promise}
     <Loader />
   {:then { restaurants, last_fetch, fetch_count, first_access, access_count }}
-    <div class="buttons">
-      <LocationFilter
-        locations={[...new Set(restaurants.map((r) => r.location))]}
-        bind:selected_location={$selected_location}
-      />
+    <div class="header">
+      <Date />
 
-      <button on:click={toggleDarkMode}>
-        <Icon icon="ic:baseline-dark-mode" width="20" height="20" />
-      </button>
-      <button on:click={() => (showStats = !showStats)}>
-        <Icon icon="bi:bar-chart-line-fill" width="20" height="20" />
-      </button>
-      <button on:click={refresh}>
-        <Icon icon="zondicons:reload" width="20" height="20" />
-      </button>
+      <div class="settings">
+        <LocationFilter
+          locations={[...new Set(restaurants.map((r) => r.location))]}
+          bind:selected_location={$selected_location}
+        />
+
+        <button on:click={toggleDarkMode}>
+          <Icon icon="ic:baseline-dark-mode" width="20" height="20" />
+        </button>
+        <button on:click={() => (showStats = !showStats)}>
+          <Icon icon="bi:bar-chart-line-fill" width="20" height="20" />
+        </button>
+        <button on:click={refresh}>
+          <Icon icon="zondicons:reload" width="20" height="20" />
+        </button>
+      </div>
     </div>
 
     {#if access_count === 1}
@@ -154,10 +156,15 @@
     white-space: nowrap;
   }
 
-  .buttons {
-    position: absolute;
+  .header {
     top: 5px;
     right: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .settings {
     display: flex;
     gap: 5px;
   }

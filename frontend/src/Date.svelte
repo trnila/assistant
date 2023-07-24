@@ -1,6 +1,7 @@
 <style>
     h1 {
         margin: 0;
+        white-space: nowrap;
     }
 </style>
 
