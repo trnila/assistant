@@ -342,6 +342,8 @@ def gather_restaurants(allowed_restaurants=None):
             arg_names = parser.parser['args']
             if 'res' in arg_names or 'dom' in arg_names:
                 response = requests.get(parser.parser['url'], headers={'User-Agent': USER_AGENT})
+                if 'utf-8' in response.text:
+                    response.encoding = 'utf-8'
                 if 'res' in arg_names:
                     args['res'] = response.text
                 else:
