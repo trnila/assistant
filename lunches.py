@@ -259,6 +259,22 @@ def lafutura(dom):
         else:
             yield Lunch(name=tds[1].text, price=tds[2].text, num=tds[0].text)
 
+@restaurant("Srub", "https://www.menicka.cz/api/iframe/?id=5568")
+def srub(dom):
+    current_day = datetime.datetime.now().strftime("%-d.%-m.%Y")
+    for day_dom in dom.select('.content'):
+        day = day_dom.select_one('h2').text.strip().split(' ', 2)[1]
+        if day != current_day:
+            continue
+        yield Soup(day_dom.select_one('.soup .food').text)
+
+        for food in day_dom.select('.main'):
+            yield Lunch(
+                num=food.select_one('.no').text.strip(' .'),
+                name=food.select_one('.food').text,
+                price=food.select_one('.prize').text,
+            )
+
 def gather_restaurants(allowed_restaurants=None):
     def cleanup(restaurant):
         def fix_name(name):
@@ -319,7 +335,6 @@ def gather_restaurants(allowed_restaurants=None):
             arg_names = parser.parser['args']
             if 'res' in arg_names or 'dom' in arg_names:
                 response = requests.get(parser.parser['url'], headers={'User-Agent': USER_AGENT})
-                response.encoding = 'utf-8'
                 if 'res' in arg_names:
                     args['res'] = response.text
                 else:
