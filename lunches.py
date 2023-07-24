@@ -59,7 +59,10 @@ def menicka_parser(dom):
         day = day_dom.select_one('h2').text.strip().split(' ', 2)[1]
         if day != current_day:
             continue
-        yield Soup(day_dom.select_one('.soup .food').text)
+        yield Soup(
+            day_dom.select_one('.soup .food').text,
+            day_dom.select_one('.soup .prize').text
+        )
 
         for food in day_dom.select('.main'):
             yield Lunch(
@@ -286,6 +289,10 @@ def srub(dom):
 
 @restaurant("U formana", "https://www.menicka.cz/api/iframe/?id=4405", Location.Dubina)
 def uformana(dom):
+    yield from menicka_parser(dom)
+
+@restaurant("Maston", "https://www.menicka.cz/api/iframe/?id=7945", Location.Dubina)
+def maston(dom):
     yield from menicka_parser(dom)
 
 def gather_restaurants(allowed_restaurants=None):
