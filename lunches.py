@@ -281,10 +281,11 @@ def gather_restaurants(allowed_restaurants=None):
                 if food.price:
                     if isinstance(food.price, str):
                         try:
-                            food.price = int(food.price.replace('Kč', '').replace('.00', '').strip(string.punctuation + string.whitespace))
+                            sanitized = re.sub('kč', '', food.price, flags=re.IGNORECASE)
+                            sanitized = sanitized.replace('.00', '').strip(string.punctuation + string.whitespace)
+                            food.price = int(sanitized)
                         except ValueError as e:
                             print(e)
-                            pass
                     else:
                         food.price = int(food.price)
 
