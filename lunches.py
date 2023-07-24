@@ -10,6 +10,7 @@ import tempfile
 import logging
 import requests
 import string
+from enum import Enum
 from dataclasses import dataclass
 from concurrent.futures import ThreadPoolExecutor
 import time
@@ -17,12 +18,16 @@ import time
 days = ['Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota', 'Neděle']
 USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36'
 
+class Location(str, Enum):
+    Poruba = "Poruba",
+    Dubina = "Dubina"
+
 logging.basicConfig(level=logging.DEBUG)
 
 def strip_tags(s):
     return re.sub(r'(<[^>]+>|/>)', '', s)
 
-def restaurant(title, url=None):
+def restaurant(title, url=None, location:Location=None):
     def wrapper(fn):
         def wrap(*args, **kwargs):
             return fn(*args, **kwargs)
@@ -30,6 +35,7 @@ def restaurant(title, url=None):
             'name': fn.__name__,
             'title': title,
             'url': url,
+            'location': location,
             'args': fn.__code__.co_varnames[:fn.__code__.co_argcount],
         }
         return wrap
@@ -62,7 +68,7 @@ def menicka_parser(dom):
                 price=food.select_one('.prize').text,
             )
 
-@restaurant("Bistro IN", "https://bistroin.choiceqr.com/delivery")
+@restaurant("Bistro IN", "https://bistroin.choiceqr.com/delivery", Location.Poruba)
 def bistroin(dom):
     data = json.loads(dom.select('#__NEXT_DATA__')[0].get_text())
 
@@ -76,7 +82,7 @@ def bistroin(dom):
             if match:
                 yield Lunch(**match.groupdict(), price=price - 5, ingredients=ingredients)
 
-@restaurant("U jarosu", "https://www.ujarosu.cz/cz/denni-menu/")
+@restaurant("U jarosu", "https://www.ujarosu.cz/cz/denni-menu/", Location.Poruba)
 def u_jarosu(dom):
     today = datetime.datetime.strftime(datetime.datetime.now(), "%d. %m. %Y")
     for row in dom.select('.celyden'):
@@ -91,7 +97,7 @@ def u_jarosu(dom):
                 else:
                     yield Lunch(name, price=price, num=first.split('.')[0])
 
-@restaurant("U zlateho lva", "http://www.zlatylev.com/menu_zlaty_lev.html")
+@restaurant("U zlateho lva", "http://www.zlatylev.com/menu_zlaty_lev.html", Location.Poruba)
 def u_zlateho_lva(dom):
     day_nth = datetime.datetime.today().weekday()
     text = dom.select('.xr_txt.xr_s0')[0].get_text()
@@ -126,7 +132,7 @@ def u_zlateho_lva(dom):
                         yield food
                         state = 'num'
 
-@restaurant("Globus", "https://www.globus.cz/ostrava/nabidka/restaurace.html")
+@restaurant("Globus", "https://www.globus.cz/ostrava/nabidka/restaurace.html", Location.Poruba)
 def globus(dom):
     for row in dom.select('.restaurant__menu-table-row--active')[0].select('tr'):
         tds = row.select('td')
@@ -134,7 +140,7 @@ def globus(dom):
         price = tds[2].text.replace(',–', '') if len(tds) >= 3 else None
         yield (Lunch if price and int(price) > 50 else Soup)(name=name, price=price)
 
-@restaurant("Jacks Burger", "https://www.zomato.com/cs/widgets/daily_menu.php?entity_id=16525845")
+@restaurant("Jacks Burger", "https://www.zomato.com/cs/widgets/daily_menu.php?entity_id=16525845", Location.Poruba)
 def jacks_burger(dom):
     day_nth = datetime.datetime.today().weekday()
 
@@ -164,7 +170,7 @@ def jacks_burger(dom):
         else:
             prev_line = name
 
-@restaurant("Poklad", "https://dkpoklad.cz/restaurace/")
+@restaurant("Poklad", "https://dkpoklad.cz/restaurace/", Location.Poruba)
 def poklad(dom):
     pdf_url = dom.select('.restaurace-box .wp-block-file a')[0]['href']
     pdf = requests.get(pdf_url).content
@@ -197,7 +203,7 @@ def poklad(dom):
     if item:
         yield Lunch(**item)
 
-@restaurant("Trebovicky mlyn", "https://www.trebovickymlyn.cz/")
+@restaurant("Trebovicky mlyn", "https://www.trebovickymlyn.cz/", Location.Poruba)
 def trebovicky_mlyn(dom):
     el = dom.select('.soup h2')
     if not el:
@@ -209,7 +215,7 @@ def trebovicky_mlyn(dom):
         if len(parts) == 2:
             yield Lunch(num=parts[0], name=parts[1], ingredients=lunch.select('h2 + div')[0].text, price=lunch.select('span')[0].text.split(',')[0])
 
-@restaurant("La Strada", "http://www.lastrada.cz/cz/?tpl=plugins/DailyMenu/print&week_shift=")
+@restaurant("La Strada", "http://www.lastrada.cz/cz/?tpl=plugins/DailyMenu/print&week_shift=", Location.Poruba)
 def lastrada(dom):
     day_nth = datetime.datetime.today().weekday()
 
@@ -223,7 +229,7 @@ def lastrada(dom):
             if 'highlight' in tr.get('class', []):
                 yield Lunch(name=tr.select_one('td').text, price=tr.select_one('.price').text)
 
-@restaurant("Ellas", "https://www.restauraceellas.cz/")
+@restaurant("Ellas", "https://www.restauraceellas.cz/", Location.Poruba)
 def ellas(dom):
     day_nth = datetime.datetime.today().weekday()
 
@@ -237,7 +243,7 @@ def ellas(dom):
             parsed = re.match("\s*(?P<num>[0-9]+)\s*\.\s*(?P<name>[A-Z -]+)\s+(?P<ingredients>.*?)\s*(\([0-9 ,]+\))?\s*(?P<price>[0-9]+),-", food.text).groupdict()
             yield Lunch(**parsed)
 
-@restaurant("Black Kale", "https://deliveryuser.live.boltsvc.net/deliveryClient/public/getMenuCategories?provider_id=64252&version=FW.0.17.8&deviceId=server&deviceType=web&device_name=IOS&device_os_version=Google+Inc.&language=cs-CZ")
+@restaurant("Black Kale", "https://deliveryuser.live.boltsvc.net/deliveryClient/public/getMenuCategories?provider_id=64252&version=FW.0.17.8&deviceId=server&deviceType=web&device_name=IOS&device_os_version=Google+Inc.&language=cs-CZ", Location.Poruba)
 def black_kale(res):
     res = json.loads(res)
     items = res['data']['items']
@@ -250,14 +256,14 @@ def black_kale(res):
                     t = Soup if i == 0 else Lunch
                     yield t(name=name, price=dish['price']['value'])
 
-@restaurant("Saloon Pub", "http://www.saloon-pub.cz/cs/denni-nabidka/")
+@restaurant("Saloon Pub", "http://www.saloon-pub.cz/cs/denni-nabidka/", Location.Poruba)
 def saloon_pub(dom):
     day = dom.find(attrs={'id': datetime.datetime.strftime(datetime.datetime.now(), "%Y-%m-%d")}).find_next('section')
     yield Soup(name=day.select_one('.category-info').text)
     for tr in day.select('.main-meal-info'):
         yield Lunch(name=tr.select_one('.meal-name').text, price=tr.select_one('.meal-price').text)
 
-@restaurant("Canteen", "https://canteen.cz/menu")
+@restaurant("Canteen", "https://canteen.cz/menu", Location.Poruba)
 def canteen(dom):
     day_nth = datetime.datetime.today().weekday() + 1
     for item in dom.select(f'[data-week-day="{day_nth}"] .food-banner__item'):
@@ -265,7 +271,7 @@ def canteen(dom):
         price = re.search('([0-9]+)\s*kč', item.select_one('.food-banner__item__price').text, flags=re.IGNORECASE).group(1)
         yield Lunch(name=name, price=price)
 
-@restaurant("La Futura", "http://lafuturaostrava.cz/")
+@restaurant("La Futura", "http://lafuturaostrava.cz/", Location.Dubina)
 def lafutura(dom):
     for item in dom.select_one('.jet-listing-dynamic-repeater__items').select('.jet-listing-dynamic-repeater__item'):
         tds = item.select('td')
@@ -274,11 +280,11 @@ def lafutura(dom):
         else:
             yield Lunch(name=tds[1].text, price=tds[2].text, num=tds[0].text)
 
-@restaurant("Srub", "https://www.menicka.cz/api/iframe/?id=5568")
+@restaurant("Srub", "https://www.menicka.cz/api/iframe/?id=5568", Location.Dubina)
 def srub(dom):
     yield from menicka_parser(dom)
 
-@restaurant("U formana", "https://www.menicka.cz/api/iframe/?id=4405")
+@restaurant("U formana", "https://www.menicka.cz/api/iframe/?id=4405", Location.Dubina)
 def uformana(dom):
     yield from menicka_parser(dom)
 
@@ -333,6 +339,7 @@ def gather_restaurants(allowed_restaurants=None):
         res = {
             'name': parser.parser['title'],
             'url': parser.parser['url'],
+            'location': parser.parser['location'],
         }
         try:
             lunches = []

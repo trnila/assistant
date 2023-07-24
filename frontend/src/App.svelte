@@ -5,8 +5,22 @@
   import Icon from "@iconify/svelte";
   import Timeline from "./Timeline.svelte";
   import Fireworks from "./Fireworks.svelte";
+  import LocationFilter from "./LocationFilter.svelte";
+  import { writable } from "svelte/store";
 
   let showStats = false;
+
+  const selected_location_key = "location";
+  const selected_location = writable(
+    localStorage.getItem(selected_location_key)
+  );
+  selected_location.subscribe((val) => {
+    if (val === null) {
+      localStorage.removeItem(selected_location_key);
+    } else {
+      localStorage.setItem(selected_location_key, val);
+    }
+  });
 
   async function load(args) {
     //await new Promise((r) => setTimeout(r, 2000000));
@@ -33,24 +47,28 @@
 </script>
 
 <Date />
-<Nextbikes />
 
 <div>
-  <div class="buttons">
-    <button on:click={toggleDarkMode}>
-      <Icon icon="ic:baseline-dark-mode" width="20" height="20" />
-    </button>
-    <button on:click={() => (showStats = !showStats)}>
-      <Icon icon="bi:bar-chart-line-fill" width="20" height="20" />
-    </button>
-    <button on:click={refresh}>
-      <Icon icon="zondicons:reload" width="20" height="20" />
-    </button>
-  </div>
-
   {#await promise}
     <Loader />
   {:then { restaurants, last_fetch, fetch_count, first_access, access_count }}
+    <div class="buttons">
+      <LocationFilter
+        locations={[...new Set(restaurants.map((r) => r.location))]}
+        bind:selected_location={$selected_location}
+      />
+
+      <button on:click={toggleDarkMode}>
+        <Icon icon="ic:baseline-dark-mode" width="20" height="20" />
+      </button>
+      <button on:click={() => (showStats = !showStats)}>
+        <Icon icon="bi:bar-chart-line-fill" width="20" height="20" />
+      </button>
+      <button on:click={refresh}>
+        <Icon icon="zondicons:reload" width="20" height="20" />
+      </button>
+    </div>
+
     {#if access_count === 1}
       <Fireworks />
     {/if}
@@ -65,7 +83,11 @@
       />
     {/if}
 
-    {#each restaurants as restaurant}
+    {#if $selected_location !== "Dubina"}
+      <Nextbikes />
+    {/if}
+
+    {#each restaurants.filter((r) => r.location == $selected_location || $selected_location == null) as restaurant}
       <div class="restaurant">
         <h2>
           <a href={restaurant.url}>
@@ -136,6 +158,8 @@
     position: absolute;
     top: 5px;
     right: 5px;
+    display: flex;
+    gap: 5px;
   }
 
   button {

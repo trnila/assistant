@@ -1,10 +1,18 @@
 body {
     font-family: sans-serif;
+    overflow-y: scroll;
+}
+
+body {
+    --theme-color: black;
+    --theme-color-selected: white;
 }
 
 body.dark {
     background-color: #2B2B2B;
-    color: #A9B7C6 !important
+    color: #A9B7C6 !important;
+    --theme-color: #FFC66D;
+    --theme-color-selected: black;
 }
 
 body.dark h1 {
@@ -13,7 +21,7 @@ body.dark h1 {
 
 body.dark h2 a,
 body.dark .iconify {
-    color: #FFC66D !important
+    color: var(--theme-color) !important
 }
 
 body.dark strong {
