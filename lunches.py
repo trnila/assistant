@@ -295,6 +295,14 @@ def uformana(dom):
 def maston(dom):
     yield from menicka_parser(dom)
 
+@restaurant("Kozlovna U Ježka", "https://www.menicka.cz/api/iframe/?id=5122", Location.Dubina)
+def kozlovna(dom):
+    yield from menicka_parser(dom)
+
+@restaurant("Fontána", "https://www.menicka.cz/api/iframe/?id=1456", Location.Dubina)
+def fontana(dom):
+    yield from menicka_parser(dom)
+
 def gather_restaurants(allowed_restaurants=None):
     def cleanup(restaurant):
         def fix_name(name):
