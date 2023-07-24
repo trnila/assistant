@@ -47,6 +47,21 @@ class Lunch:
     price: int = None
     ingredients: str = None
 
+def menicka_parser(dom):
+    current_day = datetime.datetime.now().strftime("%-d.%-m.%Y")
+    for day_dom in dom.select('.content'):
+        day = day_dom.select_one('h2').text.strip().split(' ', 2)[1]
+        if day != current_day:
+            continue
+        yield Soup(day_dom.select_one('.soup .food').text)
+
+        for food in day_dom.select('.main'):
+            yield Lunch(
+                num=food.select_one('.no').text.strip(' .'),
+                name=food.select_one('.food').text,
+                price=food.select_one('.prize').text,
+            )
+
 @restaurant("Bistro IN", "https://bistroin.choiceqr.com/delivery")
 def bistroin(dom):
     data = json.loads(dom.select('#__NEXT_DATA__')[0].get_text())
@@ -261,19 +276,11 @@ def lafutura(dom):
 
 @restaurant("Srub", "https://www.menicka.cz/api/iframe/?id=5568")
 def srub(dom):
-    current_day = datetime.datetime.now().strftime("%-d.%-m.%Y")
-    for day_dom in dom.select('.content'):
-        day = day_dom.select_one('h2').text.strip().split(' ', 2)[1]
-        if day != current_day:
-            continue
-        yield Soup(day_dom.select_one('.soup .food').text)
+    yield from menicka_parser(dom)
 
-        for food in day_dom.select('.main'):
-            yield Lunch(
-                num=food.select_one('.no').text.strip(' .'),
-                name=food.select_one('.food').text,
-                price=food.select_one('.prize').text,
-            )
+@restaurant("U formana", "https://www.menicka.cz/api/iframe/?id=4405")
+def uformana(dom):
+    yield from menicka_parser(dom)
 
 def gather_restaurants(allowed_restaurants=None):
     def cleanup(restaurant):
