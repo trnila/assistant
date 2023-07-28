@@ -274,7 +274,7 @@ def canteen(dom):
         price = re.search('([0-9]+)\s*kč', item.select_one('.food-banner__item__price').text, flags=re.IGNORECASE).group(1)
         yield Lunch(name=name, price=price)
 
-@restaurant("Peters Kitchen", "http://webcache.googleusercontent.com/search?q=cache:https://www.peterskitchen.cz/", Location.Poruba)
+@restaurant("Peters Kitchen", "https://www.peterskitchen.cz/", Location.Poruba)
 def peters_kitchen(dom):
     yield Soup(dom.select_one('.pizza_list li h4').text)
 
