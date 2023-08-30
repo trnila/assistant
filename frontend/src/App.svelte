@@ -108,7 +108,7 @@
 
         <ul>
           {#each restaurant.lunches || [] as lunch}
-            <li>
+            <li class:ondras={lunch.name.toLowerCase().includes('ondráš')}>
               <strong>
                 {lunch.num}.
                 {lunch.name}
@@ -174,5 +174,17 @@
     background: transparent;
     border: 0;
     cursor: pointer;
+  }
+
+  .ondras {
+    font-size: 3em;
+    animation: blink 1s linear infinite;
+  }
+  .ondras strong {
+    color: red !important;
+  }
+
+  @keyframes -global-blink {
+    50% {opacity: 0.2}
   }
 </style>
