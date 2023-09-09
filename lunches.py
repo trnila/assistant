@@ -274,17 +274,6 @@ def canteen(dom):
         price = re.search('([0-9]+)\s*kč', item.select_one('.food-banner__item__price').text, flags=re.IGNORECASE).group(1)
         yield Lunch(name=name, price=price)
 
-@restaurant("Peters Kitchen", "https://www.peterskitchen.cz/", Location.Poruba)
-def peters_kitchen(dom):
-    yield Soup(dom.select_one('.pizza_list li h4').text)
-
-    for item in dom.select('.pizza_list li')[1:]:
-        txt = item.select_one('h4').text
-        match = re.match('^\s*Menu\s*(?P<num>[0-9]+):\s*(?P<name>.+)', txt)
-        if match:
-            price = item.select_one('.bbtn').text
-            yield Lunch(price=price, **match.groupdict())
-
 @restaurant("La Futura", "http://lafuturaostrava.cz/", Location.Dubina)
 def lafutura(dom):
     for item in dom.select_one('.jet-listing-dynamic-repeater__items').select('.jet-listing-dynamic-repeater__item'):
