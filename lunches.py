@@ -261,7 +261,10 @@ def black_kale(res):
 
 @restaurant("Saloon Pub", "http://www.saloon-pub.cz/cs/denni-nabidka/", Location.Poruba)
 def saloon_pub(dom):
-    day = dom.find(attrs={'id': datetime.datetime.strftime(datetime.datetime.now(), "%Y-%m-%d")}).find_next('section')
+    day = dom.find(attrs={'id': datetime.datetime.strftime(datetime.datetime.now(), "%Y-%m-%d")})
+    if not day:
+        return
+    day = day.find_next('section')
     yield Soup(name=day.select_one('.category-info').text)
     for tr in day.select('.main-meal-info'):
         yield Lunch(name=tr.select_one('.meal-name').text, price=tr.select_one('.meal-price').text)
@@ -276,7 +279,10 @@ def canteen(dom):
 
 @restaurant("La Futura", "http://lafuturaostrava.cz/", Location.Dubina)
 def lafutura(dom):
-    for item in dom.select_one('.jet-listing-dynamic-repeater__items').select('.jet-listing-dynamic-repeater__item'):
+    container = dom.select_one('.jet-listing-dynamic-repeater__items')
+    if not container:
+        return
+    for item in container.select('.jet-listing-dynamic-repeater__item'):
         tds = item.select('td')
         if tds[0].text.strip() == '𐃸':
             yield Soup(name=tds[1].text)
