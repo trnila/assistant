@@ -71,6 +71,14 @@ def menicka_parser(dom):
                 price=food.select_one('.prize').text,
             )
 
+@restaurant("Kurnik sopa", "https://www.kurniksopahospoda.cz", Location.Poruba)
+def kurniksopa(dom):
+    for pivo in dom.select('#naCepu-list tr'):
+        yield Lunch(
+                name=f"{pivo.select_one('.nazev').text} {pivo.select_one('.stupne').text} - {pivo.select_one('.typ').text}",
+        )
+
+
 @restaurant("Bistro IN", "https://bistroin.choiceqr.com/delivery", Location.Poruba)
 def bistroin(dom):
     data = json.loads(dom.select('#__NEXT_DATA__')[0].get_text())
@@ -320,7 +328,7 @@ def gather_restaurants(allowed_restaurants=None):
             name = re.sub('\d+\s*(g|ml|ks) ', '', name)
             name = re.sub('\([^)]+\)', '', name)
             name = re.sub('(\s*[0-9]+\s*,)+\s*$', '', name)
-            name = re.sub('A?\s*[0-9]+(,[0-9]+)*,?', '', name)
+            name = re.sub('A?\s*[0-9]+(,[0-9]+)*,? ', '', name)
             name = name.strip(string.punctuation + string.whitespace + string.digits + '–\xa0')
             name = re.sub(' +', ' ', name)
             return name
