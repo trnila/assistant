@@ -74,8 +74,12 @@ def menicka_parser(dom):
 @restaurant("Kurnik sopa", "https://www.kurniksopahospoda.cz", Location.Poruba)
 def kurniksopa(dom):
     for pivo in dom.select('#naCepu-list tr'):
+        name = pivo.select_one('.nazev').text
+        deg = pivo.select_one('.stupne').text
+        type = pivo.select_one('.typ').text
+        origin = pivo.select_one('.puvod').text
         yield Lunch(
-                name=f"{pivo.select_one('.nazev').text} {pivo.select_one('.stupne').text} - {pivo.select_one('.typ').text}",
+                name=f"{name} {deg} - {type}, {origin}",
         )
 
 
