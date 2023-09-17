@@ -335,6 +335,7 @@ def gather_restaurants(allowed_restaurants=None):
                 name = name.capitalize()
             name = unescape(name)
             name = re.sub('<[^<]+?>', '', name)
+            name = re.sub('\s*,\s*', ', ', name)
             name = re.sub('\d+\s*(g|ml|ks) ', '', name)
             name = re.sub('\([^)]+\)', '', name)
             name = re.sub('(\s*[0-9]+\s*,)+\s*$', '', name)
