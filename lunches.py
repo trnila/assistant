@@ -161,7 +161,7 @@ def jacks_burger(dom):
     day_nth = datetime.datetime.today().weekday()
 
     started = False
-    prev_line = ""
+    full_name = ""
     for el in dom.select('.main-body > div'):
         if 'line-wider' in el.get('class', []):
             break
@@ -175,16 +175,20 @@ def jacks_burger(dom):
         if re.match('^[0-9]+\..+', name):
             num = name.split('.')[0]
 
+        full_name += name
         if not started:
-            yield Soup(name=prev_line)
+            if 'Polévka dle denní nabídky' != full_name:
+                yield Soup(name=full_name)
+            full_name = ""
             started = True
-
-        price = el.select_one('.item-price')
-        if price:
-            price = price.text.strip()
-            yield Lunch(name=name, price=price, num=num)
         else:
-            prev_line = name
+            price = el.select_one('.item-price')
+            if price:
+                price = price.text.strip()
+                if price:
+                    yield Lunch(name=full_name, price=price, num=num)
+                    full_name = ""
+                    price = None
 
 @restaurant("Poklad", "https://dkpoklad.cz/restaurace/", Location.Poruba)
 def poklad(dom):
