@@ -10,6 +10,7 @@ import tempfile
 import logging
 import requests
 import string
+from html import unescape
 from enum import Enum
 from dataclasses import dataclass
 from concurrent.futures import ThreadPoolExecutor
@@ -328,6 +329,7 @@ def gather_restaurants(allowed_restaurants=None):
             if uppers > len(name) / 2:
                 name = name.lower()
                 name = name.capitalize()
+            name = unescape(name)
             name = re.sub('<[^<]+?>', '', name)
             name = re.sub('\d+\s*(g|ml|ks) ', '', name)
             name = re.sub('\([^)]+\)', '', name)
