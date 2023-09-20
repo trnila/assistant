@@ -85,7 +85,7 @@
       />
     {/if}
 
-    {#if $selected_location !== "Dubina"}
+    {#if $selected_location !== "Dubina" && $selected_location !== "Olomouc"}
       <Nextbikes />
     {/if}
 
