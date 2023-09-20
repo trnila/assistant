@@ -21,7 +21,8 @@ USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Ge
 
 class Location(str, Enum):
     Poruba = "Poruba",
-    Dubina = "Dubina"
+    Dubina = "Dubina",
+    Olomouc = "Olomouc"
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -324,6 +325,18 @@ def kozlovna(dom):
 
 @restaurant("Fontána", "https://www.menicka.cz/api/iframe/?id=1456", Location.Dubina)
 def fontana(dom):
+    yield from menicka_parser(dom)
+
+@restaurant("Burger & Beer Brothers", "https://www.menicka.cz/api/iframe/?id=7863", Location.Olomouc)
+def bbbrothers(dom):
+    yield from menicka_parser(dom)
+
+@restaurant("Café Restaurant Caesar", "https://www.menicka.cz/api/iframe/?id=5293", Location.Olomouc)
+def caesar(dom):
+    yield from menicka_parser(dom)
+
+@restaurant("Morgans restaurant", "https://www.menicka.cz/api/iframe/?id=5294", Location.Olomouc)
+def morgans(dom):
     yield from menicka_parser(dom)
 
 def gather_restaurants(allowed_restaurants=None):
