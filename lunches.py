@@ -61,8 +61,12 @@ def menicka_parser(dom):
         day = day_dom.select_one('h2').text.strip().split(' ', 2)[1]
         if day != current_day:
             continue
+
+        soup_name = day_dom.select_one('.soup .food').text
+        if 'Pro tento den nebylo zadáno menu' in soup_name:
+            break
         yield Soup(
-            day_dom.select_one('.soup .food').text,
+            soup_name,
             day_dom.select_one('.soup .prize').text
         )
 
