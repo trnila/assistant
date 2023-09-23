@@ -42,7 +42,7 @@ def lunch():
             'fetch_count': redis_client.incr(f'{key}.fetch_count'),
             'restaurants': list(gather_restaurants()),
         }
-        redis_client.set(key, pickle.dumps(result), ex=60 * 60 * 24)
+        redis_client.set(key, pickle.dumps(result))
     else:
         result = pickle.loads(result_str)
 
