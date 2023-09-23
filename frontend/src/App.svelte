@@ -12,7 +12,7 @@
 
   const selected_location_key = "location";
   const selected_location = writable(
-    localStorage.getItem(selected_location_key)
+    localStorage.getItem(selected_location_key) || "Poruba"
   );
   selected_location.subscribe((val) => {
     if (val === null) {
@@ -85,7 +85,7 @@
       />
     {/if}
 
-    {#if $selected_location !== "Dubina" && $selected_location !== "Olomouc"}
+    {#if $selected_location == "Poruba"}
       <Nextbikes />
     {/if}
 

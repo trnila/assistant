@@ -7,10 +7,6 @@
 
 <div>
     <Icon icon="mdi:location" width="20" height="20" />
-    <button
-        on:click={() => (selected_location = null)}
-        class:selected={selected_location === null}>All</button
-    >
     {#each locations as location}
         <button
             on:click={() => (selected_location = location)}
