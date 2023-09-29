@@ -2,13 +2,12 @@
 import datetime
 import pickle
 import ipaddress
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_redis import FlaskRedis
 from lunches import gather_restaurants
 from public_transport import public_transport_connections
-
-
+from waitress import serve
 
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
@@ -59,7 +58,7 @@ def lunch():
 
     visitor_addr = ipaddress.ip_address(request.remote_addr)
     if not any([net for net in disallow_nets if visitor_addr in net]):
-        redis_client.incr(f'{key}.access_count');
+        redis_client.incr(f'{key}.access_count')
         redis_client.setnx(f'{key}.first_access', now)
 
     def get(k):
@@ -74,5 +73,4 @@ def lunch():
     return result
 
 
-from waitress import serve
 serve(app, port=5001, host="127.0.0.1")

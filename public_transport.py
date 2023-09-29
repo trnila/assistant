@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 from bs4 import BeautifulSoup
 from time import time
-import re
-import json
 import datetime
-import asyncio
 import itertools
 import requests
 from concurrent.futures import ThreadPoolExecutor

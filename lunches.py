@@ -4,9 +4,7 @@ import subprocess
 import re
 import json
 import datetime
-import itertools
 import traceback
-import tempfile
 import logging
 import requests
 import string
@@ -112,7 +110,6 @@ def u_zlateho_lva(dom):
     text = dom.select('.xr_txt.xr_s0')[0].get_text()
 
     capturing = False
-    counter = 0
     state = 'num'
     for line in text.splitlines():
         line = line.strip()
@@ -151,11 +148,10 @@ def globus(dom):
 
 @restaurant("Jacks Burger", "https://www.zomato.com/cs/widgets/daily_menu.php?entity_id=16525845", Location.Poruba)
 def jacks_burger(dom):
-    day_nth = datetime.datetime.today().weekday()
-
     started = False
     full_name = ""
     num = None
+    price = None
     for el in dom.select('.main-body > div'):
         if 'line-wider' in el.get('class', []):
             break
@@ -433,7 +429,7 @@ def gather_restaurants(allowed_restaurants=None):
                 'soups': soups,
                 'elapsed': time.time() - start,
             })
-        except:
+        except: # noqa: E722
             return {
                 **res,
                 'error': traceback.format_exc(),
