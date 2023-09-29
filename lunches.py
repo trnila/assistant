@@ -77,18 +77,6 @@ def menicka_parser(dom):
                 price=food.select_one('.prize').text,
             )
 
-@restaurant("Kurnik sopa", "https://www.kurniksopahospoda.cz", Location.Poruba)
-def kurniksopa(dom):
-    for pivo in dom.select('#naCepu-list tr'):
-        name = pivo.select_one('.nazev').text
-        deg = pivo.select_one('.stupne').text
-        type = pivo.select_one('.typ').text
-        origin = pivo.select_one('.puvod').text
-        yield Lunch(
-                name=f"{name} {deg} - {type}, {origin}",
-        )
-
-
 @restaurant("Bistro IN", "https://bistroin.choiceqr.com/delivery", Location.Poruba)
 def bistroin(dom):
     data = json.loads(dom.select('#__NEXT_DATA__')[0].get_text())
@@ -304,6 +292,17 @@ def canteen(dom):
         name = item.select_one('h2 a').text
         price = re.search('([0-9]+)\s*kč', item.select_one('.food-banner__item__price').text, flags=re.IGNORECASE).group(1)
         yield Lunch(name=name, price=price)
+
+@restaurant("Kurnik sopa", "https://www.kurniksopahospoda.cz", Location.Poruba)
+def kurniksopa(dom):
+    for pivo in dom.select('#naCepu-list tr'):
+        name = pivo.select_one('.nazev').text
+        deg = pivo.select_one('.stupne').text
+        type = pivo.select_one('.typ').text
+        origin = pivo.select_one('.puvod').text
+        yield Lunch(
+                name=f"{name} {deg} - {type}, {origin}",
+        )
 
 @restaurant("La Futura", "http://lafuturaostrava.cz/", Location.Dubina)
 def lafutura(dom):
