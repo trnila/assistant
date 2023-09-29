@@ -380,6 +380,8 @@ def gather_restaurants(allowed_restaurants=None):
                             print(e)
                     else:
                         food.price = int(food.price)
+                else:
+                    food.price = None
 
                 food.name = fix_name(food.name)
                 if t == 'lunches':
