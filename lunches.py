@@ -167,6 +167,7 @@ def jacks_burger(dom):
 
     started = False
     full_name = ""
+    num = None
     for el in dom.select('.main-body > div'):
         if 'line-wider' in el.get('class', []):
             break
@@ -176,8 +177,12 @@ def jacks_burger(dom):
         name = name.text.strip()
         if 'ROZVOZ PŘES' in name.upper() or '---------' in name or 'JBB OSTRAVA' in name.upper():
             continue
-        num = None
+
         if re.match('^[0-9]+\..+', name):
+            if full_name:
+                yield Lunch(name=full_name, price=price, num=num)
+                full_name = ""
+                price = None
             num = name.split('.')[0]
 
         full_name += name
@@ -194,6 +199,7 @@ def jacks_burger(dom):
                     yield Lunch(name=full_name, price=price, num=num)
                     full_name = ""
                     price = None
+                    num = None
 
 @restaurant("Poklad", "https://dkpoklad.cz/restaurace/", Location.Poruba)
 def poklad(dom):
