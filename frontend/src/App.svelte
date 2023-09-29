@@ -22,6 +22,47 @@
     }
   });
 
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      ({ coords: { latitude: lat, longitude: lon } }) => {
+        function distance(lat1, lon1, lat2, lon2) {
+          const R = 6371 * 1000; // Earth radius in metres
+          const deg2rad = (deg) => (deg * Math.PI) / 180;
+          const d_lat = deg2rad(lat2 - lat1);
+          const d_lon = deg2rad(lon2 - lon1);
+          const a =
+            Math.sin(d_lat / 2) * Math.sin(d_lat / 2) +
+            Math.cos(deg2rad(lat1)) *
+              Math.cos(deg2rad(lat2)) *
+              Math.sin(d_lon / 2) *
+              Math.sin(d_lon / 2);
+          return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        }
+
+        const places = [
+          {
+            lat: 49.7761644,
+            lon: 18.2525182,
+            distance: 1000,
+            location: "Dubina",
+          },
+          {
+            lat: 49.5931709,
+            lon: 17.2643092,
+            distance: 5000,
+            location: "Olomouc",
+          },
+        ];
+        for (const place of places) {
+          const d = distance(lat, lon, place.lat, place.lon);
+          if (d <= place.distance) {
+            $selected_location = place.location;
+          }
+        }
+      }
+    );
+  }
+
   async function load(args) {
     //await new Promise((r) => setTimeout(r, 2000000));
 
