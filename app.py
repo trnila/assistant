@@ -61,7 +61,7 @@ def lunch():
     if not any([net for net in disallow_nets if visitor_addr in net]):
         redis_client.incr(f'{key}.access_count');
         redis_client.setnx(f'{key}.first_access', now)
-    
+
     def get(k):
         val = redis_client.get(f'{key}.{k}')
         if val:
@@ -76,4 +76,3 @@ def lunch():
 
 from waitress import serve
 serve(app, port=5001, host="127.0.0.1")
-

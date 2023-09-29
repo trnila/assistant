@@ -78,4 +78,3 @@
 </h1>
 
 <audio bind:this={alarm} src="https://trnila.eu/rooster.mp3"></audio>
-

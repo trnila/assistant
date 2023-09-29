@@ -69,7 +69,7 @@
         background: lightblue;
         white-space: nowrap;
     }
- 
+
     :global(body.dark .timeline) {
       background: #add8e636;
     }

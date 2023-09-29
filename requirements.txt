@@ -1,5 +1,5 @@
+bs4
 flask
 flask_redis
-bs4
 requests
 waitress

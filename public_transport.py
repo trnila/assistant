@@ -68,6 +68,3 @@ if __name__ == '__main__':
     from pprint import pprint
     result = public_transport_connections(["Václava Jiřikovského"], ["Hlavní třída", "Rektorát VŠB", "Pustkovecká", "Poruba,Studentské koleje"])
     pprint(result)
-
-
-
