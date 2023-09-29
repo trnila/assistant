@@ -5,6 +5,9 @@
 Install and start redis server for caching.
 
 ```sh
+$ pip install pre-commit
+$ pre-commit install
+
 $ pip install -r requirements.txt
 
 # parse restaurant from CLI
