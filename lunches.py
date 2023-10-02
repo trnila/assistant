@@ -347,10 +347,6 @@ def morgans(dom):
 def gather_restaurants(allowed_restaurants=None):
     def cleanup(restaurant):
         def fix_name(name):
-            uppers = sum(1 for c in name if c.isupper())
-            if uppers > len(name) / 2:
-                name = name.lower()
-                name = name.capitalize()
             name = unescape(name)
             name = re.sub('<[^<]+?>', '', name)
             name = re.sub('\s*(,|:)\s*', '\\1 ', name)
@@ -360,6 +356,10 @@ def gather_restaurants(allowed_restaurants=None):
             name = re.sub('A?\s*[0-9]+(,[0-9]+)*,? ', '', name)
             name = name.strip(string.punctuation + string.whitespace + string.digits + '–—\xa0')
             name = re.sub(' +', ' ', name)
+            uppers = sum(1 for c in name if c.isupper())
+            if uppers > len(name) / 2:
+                name = name.lower()
+                name = name.capitalize()
             return name
 
         for t in ['lunches', 'soups']:
