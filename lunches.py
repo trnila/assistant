@@ -320,9 +320,31 @@ def srub(dom):
 def uformana(dom):
     yield from menicka_parser(dom)
 
-@restaurant("Maston", "https://www.menicka.cz/api/iframe/?id=7945", Location.Dubina)
+@restaurant("Maston", "https://maston.cz/jidelni-listek/", Location.Dubina)
 def maston(dom):
-    yield from menicka_parser(dom)
+    srcs = dom.select_one('.attachment-large').attrs['srcset']
+    img_url = srcs.split(',')[-1].strip().split(' ')[0]
+
+    img = requests.get(img_url).content
+    text = subprocess.check_output(["tesseract", "-l", "ces", "--psm", "6", "-", "-"], input=img).decode('utf-8')
+
+    today = datetime.datetime.strftime(datetime.datetime.now(), "%-d.%-m")
+    capturing = False
+    soup = False
+    for line in text.splitlines():
+        if today in line:
+            capturing = True
+        elif capturing:
+            if 'POLÉVKA' in line:
+                if soup:
+                    break
+                soup = True
+                yield Soup(line.split(':', 1)[1])
+            else:
+                m = re.search('((?P<num>\d)\))?\s*(?P<name>.*?)\s*(?P<price>\d+),-', line)
+                if m:
+                    yield Lunch(**m.groupdict())
+
 
 @restaurant("Kozlovna U Ježka", "https://www.menicka.cz/api/iframe/?id=5122", Location.Dubina)
 def kozlovna(dom):
