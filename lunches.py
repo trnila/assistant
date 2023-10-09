@@ -326,7 +326,7 @@ def maston(dom):
     img_url = srcs.split(',')[-1].strip().split(' ')[0]
 
     img = requests.get(img_url).content
-    text = subprocess.check_output(["tesseract", "-l", "ces", "--psm", "6", "-", "-"], input=img).decode('utf-8')
+    text = subprocess.check_output(["tesseract", "-l", "ces", "--psm", "4", "-", "-"], input=img).decode('utf-8')
 
     today = datetime.datetime.strftime(datetime.datetime.now(), "%-d%-m")
     capturing = False
