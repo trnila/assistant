@@ -328,13 +328,11 @@ def maston(dom):
     img = requests.get(img_url).content
     text = subprocess.check_output(["tesseract", "-l", "ces", "--psm", "6", "-", "-"], input=img).decode('utf-8')
 
-    today = datetime.datetime.strftime(datetime.datetime.now(), "%-d.%-m")
+    today = datetime.datetime.strftime(datetime.datetime.now(), "%-d%-m")
     capturing = False
     soup = False
     for line in text.splitlines():
-        if today in line:
-            capturing = True
-        elif capturing:
+        if capturing:
             if 'POLÉVKA' in line:
                 if soup:
                     break
@@ -344,6 +342,9 @@ def maston(dom):
                 m = re.search('((?P<num>\d)\))?\s*(?P<name>.*?)\s*(?P<price>\d+),-', line)
                 if m:
                     yield Lunch(**m.groupdict())
+        else:
+            if line.replace(' ', '').replace('.', '').endswith(today):
+                capturing = True
 
 
 @restaurant("Kozlovna U Ježka", "https://www.menicka.cz/api/iframe/?id=5122", Location.Dubina)
