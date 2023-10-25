@@ -300,8 +300,22 @@ def kurniksopa(dom):
                 name=f"{name} {deg} - {type}, {origin}",
         )
 
-@restaurant("Sbeerka", "https://sbeerka.cz/aktualne-na-cepu", Location.Poruba)
+@restaurant("Sbeerka", "https://sbeerka.cz/denni-nabidka", Location.Poruba)
 def sbeerka(dom):
+    t = None
+    for line in dom.select_one('.wysiwyg').text.splitlines():
+        line = line.strip()
+        if 'Polévky' in line:
+            t = Soup
+        elif 'Hlavní jídla' in line:
+            t = Lunch
+        elif t and 'Záloha' not in line:
+            m = re.search('(?P<name>.*?)\s*(/[0-9,\s*]+/)?\s*(?P<price>[0-9]+\s*,-)', line)
+            if m:
+                yield t(**m.groupdict())
+
+    response = requests.get("https://sbeerka.cz/aktualne-na-cepu", headers={'User-Agent': USER_AGENT})
+    dom = BeautifulSoup(response.text, 'html.parser')
     for beer in dom.select('.wysiwyg li'):
         price = None
         m = re.search(r'([0-9]+)\s*,-', beer.text)
