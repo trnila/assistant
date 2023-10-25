@@ -300,6 +300,15 @@ def kurniksopa(dom):
                 name=f"{name} {deg} - {type}, {origin}",
         )
 
+@restaurant("Sbeerka", "https://sbeerka.cz/aktualne-na-cepu", Location.Poruba)
+def sbeerka(dom):
+    for beer in dom.select('.wysiwyg li'):
+        price = None
+        m = re.search(r'([0-9]+)\s*,-', beer.text)
+        if m:
+            price = m.group(0)
+        yield Lunch(name=beer.text, price=price)
+
 @restaurant("La Futura", "http://lafuturaostrava.cz/", Location.Dubina)
 def lafutura(dom):
     container = dom.select_one('.jet-listing-dynamic-repeater__items')
