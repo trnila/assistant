@@ -497,5 +497,9 @@ if __name__ == '__main__':
     allowed_restaurants = None
     if len(sys.argv) > 1:
         allowed_restaurants = sys.argv[1].split(',')
-    res = gather_restaurants(allowed_restaurants)
-    pprint(list(res), width=180)
+    restaurants = list(gather_restaurants(allowed_restaurants))
+    pprint(restaurants, width=180)
+
+    for restaurant in restaurants:
+        if 'error' in restaurant:
+            exit(1)
