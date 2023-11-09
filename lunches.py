@@ -394,6 +394,7 @@ def gather_restaurants(allowed_restaurants=None):
     def cleanup(restaurant):
         def fix_name(name):
             name = unescape(name)
+            name = re.sub('^\s*Polévka:', '', name)
             name = re.sub('<[^<]+?>', '', name)
             name = re.sub('\s*(,|:)\s*', '\\1 ', name)
             name = re.sub('\d+\s*(g|ml|l|ks) ', '', name)
