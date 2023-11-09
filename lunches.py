@@ -499,7 +499,7 @@ if __name__ == '__main__':
     restaurants = list(gather_restaurants(allowed_restaurants))
 
     exit_code = 0
-    for i, restaurant in enumerate(restaurants):
+    for restaurant in restaurants:
         print()
         print(restaurant['name'], f"({restaurant['elapsed']:.3}s)")
         if 'error' in restaurant:
