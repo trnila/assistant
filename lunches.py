@@ -491,15 +491,24 @@ def gather_restaurants(allowed_restaurants=None):
         return pool.map(collect, [r for r in restaurants if r.parser['name'] in allowed_restaurants])
 
 if __name__ == '__main__':
-    from pprint import pprint
     import sys
 
     allowed_restaurants = None
     if len(sys.argv) > 1:
         allowed_restaurants = sys.argv[1].split(',')
     restaurants = list(gather_restaurants(allowed_restaurants))
-    pprint(restaurants, width=180)
 
-    for restaurant in restaurants:
+    exit_code = 0
+    for i, restaurant in enumerate(restaurants):
+        print()
+        print(restaurant['name'], f"({restaurant['elapsed']:.3}s)")
         if 'error' in restaurant:
-            exit(1)
+            exit_code = 1
+            print(restaurant['error'])
+        else:
+            for soup in restaurant['soups']:
+                print(' ', soup)
+            for lunch in restaurant['lunches']:
+                print(' ', lunch)
+
+    exit(exit_code)
