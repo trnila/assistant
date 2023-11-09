@@ -404,13 +404,13 @@ def slepico_parser(dom):
 
         parsed_soup = None
 
-        for food in day_dom.select('.soup'):    
+        for food in day_dom.select('.soup'):
             if 'Pro tento den nebylo zadáno menu' in food.text:
                 break
             matched = re.match(slepico_regex, food.select_one('.food').text)
 
             if parsed_soup is None:
-                parsed_soup = matched['soup'] 
+                parsed_soup = matched['soup']
                 yield Soup(
                     parsed_soup
                 )
