@@ -1,0 +1,14 @@
+name: test
+on:
+ push:
+ pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+    - run: sudo apt-get install -y poppler-utils tesseract-ocr-ces
+    - run: pip install -r requirements.txt
+    - run: ./lunches.py
