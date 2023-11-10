@@ -6,6 +6,7 @@ on:
     branches: [ master ]
 jobs:
   deploy:
+    if: github.repository == 'trnila/assistant'
     runs-on: ubuntu-latest
     steps:
       - run: 'curl -X POST --fail -s -H"Authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}" https://trnila.eu/hooks/assistant'
