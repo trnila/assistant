@@ -394,9 +394,10 @@ def morgans(dom):
 def moric(dom):
     yield from menicka_parser(dom)
 
-def slepico_parser(dom):
+@restaurant("Kikiriki", "https://www.menicka.cz/api/iframe/?id=5309", Location.Olomouc)
+def kikiriki(dom):
     current_day = datetime.datetime.now().strftime("%-d.%-m.%Y")
-    slepico_regex = re.compile("^(\d\s?[,.]\s?\d\s?l?\s)?(?P<soup>[^+]+)(\s+\+\s+)(\d+g)?(?P<lunch>.*)$")
+    slepico_regex = re.compile("^(\d\s*[,.]\s*\d\s*l?\s)?(?P<soup>[^+]+)\s+\+\s+(\d+\s*g\s*)?(?P<lunch>.*)$")
     for day_dom in dom.select('.content'):
         day = day_dom.select_one('h2').text.strip().split(' ', 2)[1]
         if day != current_day:
@@ -416,14 +417,9 @@ def slepico_parser(dom):
                 )
 
             yield Lunch(
-                num=0,
                 name=matched["lunch"],
                 price=food.select_one('.prize').text,
             )
-
-@restaurant("Kikiriki", "https://www.menicka.cz/api/iframe/?id=5309", Location.Olomouc)
-def kikiriki(dom):
-    yield from slepico_parser(dom)
 
 @restaurant("U Kristýna", "https://www.menicka.cz/api/iframe/?id=5471", Location.Olomouc)
 def kristyn(dom):
