@@ -364,7 +364,7 @@ def maston(dom):
                 soup = True
                 yield Soup(line.split(':', 1)[1])
             else:
-                m = re.search('((?P<num>\d)\))?\s*(?P<name>.*?)\s*(?P<price>\d+),-', line)
+                m = re.search('((?P<num>\d)\))?\s*(?P<name>.+)(\s*(?P<price>\d+),-)?', line)
                 if m:
                     yield Lunch(**m.groupdict())
         else:
