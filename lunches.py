@@ -535,7 +535,7 @@ if __name__ == '__main__':
     restaurants = list(gather_restaurants(allowed_restaurants))
 
     exit_code = 0
-    for restaurant in restaurants:
+    for restaurant in sorted(restaurants, key=lambda r: ('error' in r, len(r.get('lunches', [])) == 0)):
         print()
         print(restaurant['name'], f"({restaurant['elapsed']:.3}s)")
         if 'error' in restaurant:
