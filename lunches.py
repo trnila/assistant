@@ -291,6 +291,25 @@ def canteen(dom):
         price = re.search('([0-9]+)\s*kč', item.select_one('.food-banner__item__price').text, flags=re.IGNORECASE).group(1)
         yield Lunch(name=name, price=price)
 
+@restaurant("Plzenka aura", "https://www.plzenkaaura.cz/denni-menu", Location.Poruba)
+def plzenka(dom):
+    food_type = None
+    for el in dom.select('.list-items > *'):
+        if el.name == 'h5':
+            food_type = {
+                "POLÉVKA": Soup,
+                "HLAVNÍ JÍDLO": Lunch,
+            }.get(el.text.strip(), None)
+        elif food_type:
+            if food_type == Soup:
+                yield Soup(el.select_one('.modify_item').text)
+            else:
+                yield Lunch(
+                    name=el.select_one('.modify_item').text,
+                    ingredients=el.select_one('.food-info').text,
+                    price=el.select_one('.menu-price').text,
+            )
+
 @restaurant("Kurnik sopa", "https://www.kurniksopahospoda.cz", Location.Poruba)
 def kurniksopa(dom):
     for pivo in dom.select('#naCepu-list tr'):
