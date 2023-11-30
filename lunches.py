@@ -140,13 +140,13 @@ def u_zlateho_lva(dom):
                         yield food
                         state = 'num'
 
-@restaurant("Globus", "https://www.globus.cz/ostrava/nabidka/restaurace.html", Location.Poruba)
+@restaurant("Globus", "https://www.globus.cz/ostrava/sluzby-a-produkty/restaurace", Location.Poruba)
 def globus(dom):
-    for row in dom.select('.restaurant__menu-table-row--active')[0].select('tr'):
-        tds = row.select('td')
-        name = tds[1].text
-        price = tds[2].text.replace(',–', '') if len(tds) >= 3 else None
-        yield (Lunch if price and int(price) > 50 else Soup)(name=name, price=price)
+    for row in dom.select('.space-y-2 .flex'):
+        spans = row.find_all(recursive=False)
+        price = fix_price(spans[2].text)
+        t = Soup if price < 50 else Lunch
+        yield t(spans[1].text, price=price)
 
 @restaurant("Jacks Burger", "https://www.zomato.com/cs/widgets/daily_menu.php?entity_id=16525845", Location.Poruba)
 def jacks_burger(dom):
