@@ -291,6 +291,17 @@ def canteen(dom):
         price = re.search('([0-9]+)\s*kč', item.select_one('.food-banner__item__price').text, flags=re.IGNORECASE).group(1)
         yield Lunch(name=name, price=price)
 
+@restaurant("Parlament", "https://www.restauraceparlament.cz/", Location.Poruba)
+def parlament(dom):
+    today = datetime.datetime.strftime(datetime.datetime.now(), "%d. %m. %Y")
+    day = dom.select_one(f'.txt div:-soup-contains("{today}")')
+    if day:
+        yield Soup(day.findNext('dt').text)
+    for line in day.findNext('p').text.splitlines():
+        m = re.match('(?P<num>\d+)\.\s*(?P<name>.*?)(?P<price>\d+),-Kč', line)
+        if m:
+            yield Lunch(**m.groupdict())
+
 @restaurant("Plzenka aura", "https://www.plzenkaaura.cz/denni-menu", Location.Poruba)
 def plzenka(dom):
     food_type = None
