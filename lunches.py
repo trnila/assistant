@@ -321,6 +321,10 @@ def plzenka(dom):
                     price=el.select_one('.menu-price').text,
             )
 
+@restaurant("El Amigo Muerto", "https://www.menicka.cz/api/iframe/?id=5560", Location.Poruba)
+def el_amigo_muerto(dom):
+    yield from menicka_parser(dom)
+
 @restaurant("Kurnik sopa", "https://www.kurniksopahospoda.cz", Location.Poruba)
 def kurniksopa(dom):
     for pivo in dom.select('#naCepu-list tr'):
