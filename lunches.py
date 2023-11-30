@@ -468,6 +468,19 @@ def kikiriki(dom):
 def kristyn(dom):
     yield from menicka_parser(dom)
 
+def fix_price(price):
+    if not price:
+        return None
+    if not isinstance(price, str):
+        return int(price)
+    try:
+        sanitized = re.sub('kč', '', price, flags=re.IGNORECASE)
+        sanitized = sanitized.replace('.00', '').strip(string.punctuation + string.whitespace)
+        return int(sanitized)
+    except ValueError as e:
+        print(e)
+    return None
+
 def gather_restaurants(allowed_restaurants=None):
     def cleanup(restaurant):
         def fix_name(name):
@@ -491,19 +504,7 @@ def gather_restaurants(allowed_restaurants=None):
         for t in ['lunches', 'soups']:
             num = 0
             for food in restaurant.get(t, []):
-                if food.price:
-                    if isinstance(food.price, str):
-                        try:
-                            sanitized = re.sub('kč', '', food.price, flags=re.IGNORECASE)
-                            sanitized = sanitized.replace('.00', '').strip(string.punctuation + string.whitespace)
-                            food.price = int(sanitized)
-                        except ValueError as e:
-                            print(e)
-                    else:
-                        food.price = int(food.price)
-                else:
-                    food.price = None
-
+                food.price = fix_price(food.price)
                 food.name = fix_name(food.name)
                 if t == 'lunches':
                     if food.ingredients:
