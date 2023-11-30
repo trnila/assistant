@@ -325,6 +325,13 @@ def plzenka(dom):
 def el_amigo_muerto(dom):
     yield from menicka_parser(dom)
 
+@restaurant("Rusty Bell Pub", "https://www.menicka.cz/api/iframe/?id=1547", Location.Poruba)
+def rusty_bell_pub(dom):
+    foods = list(menicka_parser(dom))
+    yield Soup(foods[1].name)
+    for food in foods[2:]:
+        yield food
+
 @restaurant("Kurnik sopa", "https://www.kurniksopahospoda.cz", Location.Poruba)
 def kurniksopa(dom):
     for pivo in dom.select('#naCepu-list tr'):
