@@ -297,10 +297,10 @@ def parlament(dom):
     day = dom.select_one(f'.txt div:-soup-contains("{today}")')
     if day:
         yield Soup(day.findNext('dt').text)
-    for line in day.findNext('p').text.splitlines():
-        m = re.match('(?P<num>\d+)\.\s*(?P<name>.*?)(?P<price>\d+),-Kč', line)
-        if m:
-            yield Lunch(**m.groupdict())
+        for line in day.findNext('p').text.splitlines():
+            m = re.match('(?P<num>\d+)\.\s*(?P<name>.*?)(?P<price>\d+),-Kč', line)
+            if m:
+                yield Lunch(**m.groupdict())
 
 @restaurant("Plzenka aura", "https://www.plzenkaaura.cz/denni-menu", Location.Poruba)
 def plzenka(dom):
