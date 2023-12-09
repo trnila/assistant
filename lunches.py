@@ -328,6 +328,8 @@ def el_amigo_muerto(dom):
 @restaurant("Rusty Bell Pub", "https://www.menicka.cz/api/iframe/?id=1547", Location.Poruba)
 def rusty_bell_pub(dom):
     foods = list(menicka_parser(dom))
+    if not foods:
+        return
     yield Soup(foods[1].name)
     for food in foods[2:]:
         yield food
