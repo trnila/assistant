@@ -398,22 +398,19 @@ def maston(dom):
 
     today = datetime.datetime.strftime(datetime.datetime.now(), "%-d%-m")
     capturing = False
-    soup = False
     for line in text.splitlines():
-        if capturing:
+        print(line)
+        if line.replace(' ', '').replace('.', '').endswith(today):
+            capturing = True
+        elif capturing:
+            if not line.strip():
+                break
             if 'POLÉVKA' in line:
-                if soup:
-                    break
-                soup = True
                 yield Soup(line.split(':', 1)[1])
             else:
                 m = re.search('((?P<num>\d)\))?\s*(?P<name>.+)(\s*(?P<price>\d+),-)?', line)
                 if m:
                     yield Lunch(**m.groupdict())
-        else:
-            if line.replace(' ', '').replace('.', '').endswith(today):
-                capturing = True
-
 
 @restaurant("Kozlovna U Ježka", "https://www.menicka.cz/api/iframe/?id=5122", Location.Dubina)
 def kozlovna(dom):
