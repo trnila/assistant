@@ -432,27 +432,25 @@ def moric(dom):
 @restaurant("Kikiriki", "https://www.menicka.cz/api/iframe/?id=5309", Location.Olomouc)
 def kikiriki(dom):
     current_day = datetime.datetime.now().strftime("%-d.%-m.%Y")
-    slepico_regex = re.compile("^(\d\s*[,.]\s*\d\s*l?\s)?(?P<soup>[^+]+)\s+\+\s+(\d+\s*g\s*)?(?P<lunch>.*)$")
     for day_dom in dom.select('.content'):
         day = day_dom.select_one('h2').text.strip().split(' ', 2)[1]
         if day != current_day:
             continue
 
-        parsed_soup = None
-
+        parsed_soup = False
         for food in day_dom.select('.soup'):
             if 'Pro tento den nebylo zadáno menu' in food.text:
                 break
-            matched = re.match(slepico_regex, food.select_one('.food').text)
+            txt = food.select_one('.food').text
+            txt = re.sub('^\s*[0-9]+\s*,\s*[0-9]+', '', txt)
+            soup, lunch = re.split('\+|,', txt, 1)
 
-            if parsed_soup is None:
-                parsed_soup = matched['soup']
-                yield Soup(
-                    parsed_soup
-                )
+            if not parsed_soup:
+                parsed_soup = True
+                yield Soup(soup)
 
             yield Lunch(
-                name=matched["lunch"],
+                name=lunch,
                 price=food.select_one('.prize').text,
             )
 
