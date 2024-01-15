@@ -257,8 +257,9 @@ def ellas(dom):
         yield Soup(name=foods[0].text)
 
         for food in foods[1:]:
-            parsed = re.match("\s*(?P<num>[0-9]+)\s*\.\s*(?P<name>[A-Z -]+)\s+(?P<ingredients>.*?)\s*(\([0-9 ,]+\))?\s*(?P<price>[0-9]+),-", food.text).groupdict()
-            yield Lunch(**parsed)
+            if food.text:
+                parsed = re.match("\s*(?P<num>[0-9]+)\s*\.\s*(?P<name>[A-Z -]+)\s+(?P<ingredients>.*?)\s*(\([0-9 ,]+\))?\s*(?P<price>[0-9]+),-", food.text).groupdict()
+                yield Lunch(**parsed)
 
 @restaurant("Black Kale", "https://deliveryuser.live.boltsvc.net/deliveryClient/public/getMenuCategories?provider_id=64252&version=FW.0.17.8&deviceId=server&deviceType=web&device_name=IOS&device_os_version=Google+Inc.&language=cs-CZ", Location.Poruba)
 def black_kale(res):
