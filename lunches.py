@@ -390,13 +390,14 @@ def maston(dom):
     text = subprocess.check_output(["tesseract", "-l", "ces", "--psm", "4", "-", "-"], input=img).decode('utf-8')
 
     today = datetime.datetime.strftime(datetime.datetime.now(), "%-d%-m")
+    tomorrow = datetime.datetime.strftime(datetime.datetime.now() + datetime.timedelta(days=1), "%-d%-m")
     capturing = False
     for line in text.splitlines():
-        print(line)
-        if line.replace(' ', '').replace('.', '').endswith(today):
+        txt = line.replace(' ', '').replace('.', '')
+        if txt.endswith(today):
             capturing = True
         elif capturing:
-            if not line.strip():
+            if 'SAMOSTATN' in txt.upper() or tomorrow in txt:
                 break
             if 'POLÉVKA' in line:
                 yield Soup(line.split(':', 1)[1])
