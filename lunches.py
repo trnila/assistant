@@ -286,7 +286,7 @@ def saloon_pub(dom):
 
 @restaurant("Parlament", "https://www.restauraceparlament.cz/", Location.Poruba)
 def parlament(dom):
-    today = datetime.datetime.strftime(datetime.datetime.now(), "%d. %m. %Y")
+    today = datetime.datetime.strftime(datetime.datetime.now(), "%-d. %-m. %Y")
     day = dom.select_one(f'.txt div:-soup-contains("{today}")')
     if day:
         yield Soup(day.findNext('dt').text)
