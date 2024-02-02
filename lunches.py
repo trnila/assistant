@@ -473,17 +473,23 @@ def fix_price(price):
     return None
 
 def gather_restaurants(allowed_restaurants=None):
+    replacements = [
+        (re.compile('^\s*Polévka:', re.IGNORECASE), ''),
+        (re.compile('(s|š|S|Š)vestk'), 'Trnk'),
+        (re.compile('\s*(,|:)\s*'), '\\1 '),
+        (re.compile('<[^<]+?>'), ''),
+        (re.compile('\d+\s*(g|ml|l|ks) '), ''),
+        (re.compile('\([^)]+\)'), ''),
+        (re.compile('(\s*[0-9]+\s*,)+\s*$'), ''),
+        (re.compile('A?\s*[0-9]+(,[0-9]+)*,? '), ''),
+        (re.compile(' +'), ' '),
+    ]
+
     def cleanup(restaurant):
         def fix_name(name):
             name = unescape(name)
-            name = re.sub('^\s*Polévka:', '', name, flags=re.IGNORECASE)
-            name = re.sub('<[^<]+?>', '', name)
-            name = re.sub('\s*(,|:)\s*', '\\1 ', name)
-            name = re.sub('\d+\s*(g|ml|l|ks) ', '', name)
-            name = re.sub('\([^)]+\)', '', name)
-            name = re.sub('(\s*[0-9]+\s*,)+\s*$', '', name)
-            name = re.sub('A?\s*[0-9]+(,[0-9]+)*,? ', '', name)
-            name = re.sub('(s|š|S|Š)vestk', 'Trnk', name)
+            for pattern, replacement in replacements:
+                name = pattern.sub(replacement, name)
             name = name.strip(string.punctuation + string.whitespace + string.digits + '–—\xa0')
             name = re.sub(' +', ' ', name)
             uppers = sum(1 for c in name if c.isupper())
