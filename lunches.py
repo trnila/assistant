@@ -488,7 +488,6 @@ def gather_restaurants(allowed_restaurants=None):
             for pattern, replacement in replacements:
                 name = pattern.sub(replacement, name)
             name = name.strip(string.punctuation + string.whitespace + string.digits + '–—\xa0')
-            name = re.sub(' +', ' ', name)
             uppers = sum(1 for c in name if c.isupper())
             if uppers > len(name) / 2:
                 name = name.lower()
