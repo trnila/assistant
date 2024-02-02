@@ -481,6 +481,7 @@ def gather_restaurants(allowed_restaurants=None):
         (re.compile('A?\s*[0-9]+(,[0-9]+)*,? '), ''),
         (re.compile(' +'), ' '),
     ]
+    UPPER_REGEXP = re.compile('[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ]')
 
     def cleanup(restaurant):
         def fix_name(name):
@@ -488,7 +489,7 @@ def gather_restaurants(allowed_restaurants=None):
             for pattern, replacement in replacements:
                 name = pattern.sub(replacement, name)
             name = name.strip(string.punctuation + string.whitespace + string.digits + '–—\xa0')
-            uppers = sum(1 for c in name if c.isupper())
+            uppers = len(UPPER_REGEXP.findall(name))
             if uppers > len(name) / 2:
                 name = name.lower()
                 name = name.capitalize()
