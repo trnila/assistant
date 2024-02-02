@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from bs4 import BeautifulSoup
+from selectolax.parser import HTMLParser, Selector
 import subprocess
 import re
 import json
@@ -55,31 +55,31 @@ class Lunch:
 
 def menicka_parser(dom):
     current_day = datetime.datetime.now().strftime("%-d.%-m.%Y")
-    for day_dom in dom.select('.content'):
-        day = day_dom.select_one('h2').text.strip().split(' ', 2)[1]
-        if day != current_day:
+    for day_dom in dom.css('.content'):
+        day = day_dom.css_first('h2').text(strip=True).split(' ', 2)[1]
+        if current_day not in day:
             continue
 
-        soup_el = day_dom.select_one('.soup .food')
+        soup_el = day_dom.css_first('.soup .food')
         if soup_el:
-            soup_name = soup_el.text
+            soup_name = soup_el.text()
             if 'Pro tento den nebylo zadáno menu' in soup_name:
                 break
             yield Soup(
                 soup_name,
-                day_dom.select_one('.soup .prize').text
+                day_dom.css_first('.soup .prize').text()
             )
 
-        for food in day_dom.select('.main'):
+        for food in day_dom.css('.main'):
             yield Lunch(
-                num=food.select_one('.no').text.strip(' .'),
-                name=food.select_one('.food').text,
-                price=food.select_one('.prize').text,
+                num=food.css_first('.no').text().strip(' .'),
+                name=food.css_first('.food').text(),
+                price=food.css_first('.prize').text(),
             )
 
 @restaurant("Bistro IN", "https://bistroin.choiceqr.com/delivery", Location.Poruba)
 def bistroin(dom):
-    data = json.loads(dom.select('#__NEXT_DATA__')[0].get_text())
+    data = json.loads(dom.css_first('#__NEXT_DATA__').text())
 
     for item in data["props"]["app"]["menu"]:
         ingredients = re.sub('Al\. \(.+', '', item['description'])
@@ -94,11 +94,11 @@ def bistroin(dom):
 @restaurant("U jarosu", "https://www.ujarosu.cz/cz/denni-menu/", Location.Poruba)
 def u_jarosu(dom):
     today = datetime.datetime.strftime(datetime.datetime.now(), "%d. %m. %Y")
-    for row in dom.select('.celyden'):
-        parsed_day = row.select('.datum')[0].get_text()
+    for row in dom.css('.celyden'):
+        parsed_day = row.css_first('.datum').text()
         if parsed_day == today:
-            records = row.select('.tabulka p')
-            records = [r.get_text().strip() for r in records]
+            records = row.css('.tabulka p')
+            records = [r.text().strip() for r in records]
             records = [records[i:i+3] for i in range(0, len(records), 3)]
             for first, name, price in records:
                 if first == 'Polévka':
@@ -109,7 +109,7 @@ def u_jarosu(dom):
 @restaurant("U zlateho lva", "http://www.zlatylev.com/menu_zlaty_lev.html", Location.Poruba)
 def u_zlateho_lva(dom):
     day_nth = datetime.datetime.today().weekday()
-    text = dom.select('.xr_txt.xr_s0')[0].get_text()
+    text = dom.css_first('.xr_txt.xr_s0').text()
 
     capturing = False
     state = 'num'
@@ -142,11 +142,11 @@ def u_zlateho_lva(dom):
 
 @restaurant("Globus", "https://www.globus.cz/ostrava/sluzby-a-produkty/restaurace", Location.Poruba)
 def globus(dom):
-    for row in dom.select('.space-y-2 .flex'):
-        spans = row.find_all(recursive=False)
-        price = fix_price(spans[2].text)
+    for row in dom.css('.space-y-2 .flex'):
+        spans = row.css('* > span')
+        price = fix_price(spans[2].text())
         t = Soup if price < 50 else Lunch
-        yield t(spans[1].text, price=price)
+        yield t(spans[1].text(), price=price)
 
 @restaurant("Jacks Burger", "https://www.zomato.com/cs/widgets/daily_menu.php?entity_id=16525845", Location.Poruba)
 def jacks_burger(dom):
@@ -154,13 +154,13 @@ def jacks_burger(dom):
     full_name = ""
     num = None
     price = None
-    for el in dom.select('.main-body > div'):
-        if 'line-wider' in el.get('class', []):
+    for el in dom.css('.main-body > div'):
+        if el.css_matches('.line-wider'):
             break
-        name = el.select_one('.item-name')
+        name = el.css_first('.item-name')
         if name is None:
             continue
-        name = name.text.strip()
+        name = name.text(strip=True)
         if 'ROZVOZ PŘES' in name.upper() or '---------' in name or 'JBB OSTRAVA' in name.upper():
             continue
 
@@ -178,9 +178,9 @@ def jacks_burger(dom):
             full_name = ""
             started = True
         else:
-            price = el.select_one('.item-price')
+            price = el.css_first('.item-price')
             if price:
-                price = price.text.strip()
+                price = price.text(strip=True)
                 if price:
                     yield Lunch(name=full_name, price=price, num=num)
                     full_name = ""
@@ -189,7 +189,7 @@ def jacks_burger(dom):
 
 @restaurant("Poklad", "https://dkpoklad.cz/restaurace/", Location.Poruba)
 def poklad(dom):
-    pdf_url = dom.select('.restaurace-box .wp-block-file a')[0]['href']
+    pdf_url = dom.css_first('.restaurace-box .wp-block-file a').attributes['href']
     pdf = requests.get(pdf_url).content
     text = subprocess.check_output(["pdftotext", "-layout", "-", "-"], input=pdf).decode('utf-8')
 
@@ -222,43 +222,43 @@ def poklad(dom):
 
 @restaurant("Trebovicky mlyn", "https://www.trebovickymlyn.cz/", Location.Poruba)
 def trebovicky_mlyn(dom):
-    el = dom.select('.soup h2')
+    el = dom.css_first('.soup h2')
     if not el:
         return
-    yield Soup(el[0].text)
+    yield Soup(el.text())
 
-    for lunch in dom.select('.owl-carousel')[0].select('.menu-post'):
-        parts = lunch.select('h2')[0].text.split(')')
+    for lunch in dom.css_first('.owl-carousel').css('.menu-post'):
+        parts = lunch.css_first('h2').text().split(')')
         if len(parts) == 2:
-            yield Lunch(num=parts[0], name=parts[1], ingredients=lunch.select('h2 + div')[0].text, price=lunch.select('span')[0].text.split(',')[0])
+            yield Lunch(num=parts[0], name=parts[1], ingredients=lunch.css_first('h2 + div').text(), price=lunch.css_first('span').text().split(',')[0])
 
 @restaurant("La Strada", "http://www.lastrada.cz/cz/?tpl=plugins/DailyMenu/print&week_shift=", Location.Poruba)
 def lastrada(dom):
     day_nth = datetime.datetime.today().weekday()
 
     capturing = False
-    for tr in dom.select('tr'):
-        if 'day' in tr.get('class', []):
+    for tr in dom.css('tr'):
+        if tr.css_matches('.day'):
             capturing = False
-            if days[day_nth] in tr.text or 'Menu na celý týden' in tr.text:
+            if days[day_nth] in tr.text() or 'Menu na celý týden' in tr.text():
                 capturing = True
         elif capturing:
-            if 'highlight' in tr.get('class', []):
-                yield Lunch(name=tr.select_one('td').text, price=tr.select_one('.price').text)
+            if tr.css_matches('.highlight'):
+                yield Lunch(name=tr.css_first('td').text(), price=tr.css_first('.price').text())
 
 @restaurant("Ellas", "https://www.restauraceellas.cz/", Location.Poruba)
 def ellas(dom):
     day_nth = datetime.datetime.today().weekday()
 
-    for div in dom.select('.moduletable .custom'):
-        if div.find('h3').text.strip() != days[day_nth]:
+    for div in dom.css('.moduletable .custom'):
+        if div.css_first('h3').text(strip=True) != days[day_nth]:
             continue
-        foods = div.select('p')
-        yield Soup(name=foods[0].text)
+        foods = div.css('p')
+        yield Soup(name=foods[0].text())
 
         for food in foods[1:]:
-            if food.text:
-                parsed = re.match("\s*(?P<num>[0-9]+)\s*\.\s*(?P<name>[A-Z -]+)\s+(?P<ingredients>.*?)\s*(\([0-9 ,]+\))?\s*(?P<price>[0-9]+),-", food.text).groupdict()
+            if food.text():
+                parsed = re.match("\s*(?P<num>[0-9]+)\s*\.\s*(?P<name>[A-Z -]+)\s+(?P<ingredients>.*?)\s*(\([0-9 ,]+\))?\s*(?P<price>[0-9]+),-", food.text()).groupdict()
                 yield Lunch(**parsed)
 
 @restaurant("Black Kale", "https://deliveryuser.live.boltsvc.net/deliveryClient/public/getMenuCategories?provider_id=64252&version=FW.0.17.8&deviceId=server&deviceType=web&device_name=IOS&device_os_version=Google+Inc.&language=cs-CZ", Location.Poruba)
@@ -276,21 +276,21 @@ def black_kale(res):
 
 @restaurant("Saloon Pub", "http://www.saloon-pub.cz/cs/denni-nabidka/", Location.Poruba)
 def saloon_pub(dom):
-    day = dom.find(attrs={'id': datetime.datetime.strftime(datetime.datetime.now(), "%Y-%m-%d")})
+    day = dom.css_first(f'#{datetime.datetime.strftime(datetime.datetime.now(), "%Y-%m-%d")} + section')
     if not day:
         return
-    day = day.find_next('section')
-    yield Soup(name=day.select_one('.category-info').text)
-    for tr in day.select('.main-meal-info'):
-        yield Lunch(name=tr.select_one('.meal-name').text, price=tr.select_one('.meal-price').text)
+    yield Soup(name=day.css_first('.category-info').text())
+    for tr in day.css('.main-meal-info'):
+        yield Lunch(name=tr.css_first('.meal-name').text(), price=tr.css_first('.meal-price').text())
 
 @restaurant("Parlament", "https://www.restauraceparlament.cz/", Location.Poruba)
 def parlament(dom):
     today = datetime.datetime.strftime(datetime.datetime.now(), "%-d. %-m. %Y")
-    day = dom.select_one(f'.txt div:-soup-contains("{today}")')
+    day = Selector(dom.css_first('.txt'), 'div div').text_contains(today)
     if day:
-        yield Soup(day.findNext('dt').text)
-        for line in day.findNext('p').text.splitlines():
+        day = day.matches[0]
+        yield Soup(day.css_first('* + dt').text())
+        for line in day.css_first('* + dt + p').text().splitlines():
             m = re.match('(?P<num>\d+)\.\s*(?P<name>.*?)(?P<price>\d+),-Kč', line)
             if m:
                 yield Lunch(**m.groupdict())
@@ -298,20 +298,20 @@ def parlament(dom):
 @restaurant("Plzenka aura", "https://www.plzenkaaura.cz/denni-menu", Location.Poruba)
 def plzenka(dom):
     food_type = None
-    for el in dom.select('.list-items > *'):
-        if el.name == 'h5':
+    for el in dom.css('.list-items > *'):
+        if el.tag == 'h5':
             food_type = {
                 "POLÉVKA": Soup,
                 "HLAVNÍ JÍDLO": Lunch,
-            }.get(el.text.strip(), None)
+            }.get(el.text(strip=True), None)
         elif food_type:
             if food_type == Soup:
-                yield Soup(el.select_one('.modify_item').text)
+                yield Soup(el.css_first('.modify_item').text())
             else:
                 yield Lunch(
-                    name=el.select_one('.modify_item').text,
-                    ingredients=el.select_one('.food-info').text,
-                    price=el.select_one('.menu-price').text,
+                    name=el.css_first('.modify_item').text(),
+                    ingredients=el.css_first('.food-info').text(),
+                    price=el.css_first('.menu-price').text(),
             )
 
 @restaurant("El Amigo Muerto", "https://www.menicka.cz/api/iframe/?id=5560", Location.Poruba)
@@ -329,11 +329,11 @@ def rusty_bell_pub(dom):
 
 @restaurant("Kurnik sopa", "https://www.kurniksopahospoda.cz", Location.Poruba)
 def kurniksopa(dom):
-    for pivo in dom.select('#naCepu-list tr'):
-        name = pivo.select_one('.nazev').text
-        deg = pivo.select_one('.stupne').text
-        type = pivo.select_one('.typ').text
-        origin = pivo.select_one('.puvod').text
+    for pivo in dom.css('#naCepu-list tr'):
+        name = pivo.css_first('.nazev').text()
+        deg = pivo.css_first('.stupne').text()
+        type = pivo.css_first('.typ').text()
+        origin = pivo.css_first('.puvod').text()
         yield Lunch(
                 name=f"{name} {deg} - {type}, {origin}",
         )
@@ -341,7 +341,7 @@ def kurniksopa(dom):
 @restaurant("Sbeerka", "https://sbeerka.cz/denni-nabidka", Location.Poruba)
 def sbeerka(dom):
     t = None
-    for line in dom.select_one('.wysiwyg').text.splitlines():
+    for line in dom.css_first('.wysiwyg').text().splitlines():
         line = line.strip()
         if 'Polévky' in line:
             t = Soup
@@ -353,25 +353,25 @@ def sbeerka(dom):
                 yield t(**m.groupdict())
 
     response = requests.get("https://sbeerka.cz/aktualne-na-cepu", headers={'User-Agent': USER_AGENT})
-    dom = BeautifulSoup(response.text, 'html.parser')
-    for beer in dom.select('.wysiwyg li'):
+    dom = HTMLParser(response.text)
+    for beer in dom.css('.wysiwyg li'):
         price = None
-        m = re.search(r'([0-9]+)\s*,-', beer.text)
+        m = re.search(r'([0-9]+)\s*,-', beer.text())
         if m:
             price = m.group(0)
-        yield Lunch(name=beer.text, price=price)
+        yield Lunch(name=beer.text(), price=price)
 
 @restaurant("La Futura", "http://lafuturaostrava.cz/", Location.Dubina)
 def lafutura(dom):
-    container = dom.select_one('.jet-listing-dynamic-repeater__items')
+    container = dom.css_first('.jet-listing-dynamic-repeater__items')
     if not container:
         return
-    for item in container.select('.jet-listing-dynamic-repeater__item'):
-        tds = item.select('td')
-        if tds[0].text.strip() == '𐃸':
-            yield Soup(name=tds[1].text)
+    for item in container.css('.jet-listing-dynamic-repeater__item'):
+        tds = item.css('td')
+        if tds[0].text(strip=True) == '𐃸':
+            yield Soup(name=tds[1].text())
         else:
-            yield Lunch(name=tds[1].text, price=tds[2].text, num=tds[0].text)
+            yield Lunch(name=tds[1].text(), price=tds[2].text(), num=tds[0].text())
 
 @restaurant("Srub", "https://www.menicka.cz/api/iframe/?id=5568", Location.Dubina)
 def srub(dom):
@@ -383,7 +383,7 @@ def uformana(dom):
 
 @restaurant("Maston", "https://maston.cz/jidelni-listek/", Location.Dubina)
 def maston(dom):
-    srcs = dom.select_one('.attachment-large').attrs['srcset']
+    srcs = dom.css_first('.attachment-large').attrs['srcset']
     img_url = srcs.split(',')[-1].strip().split(' ')[0]
 
     img = requests.get(img_url).content
@@ -433,16 +433,16 @@ def moric(dom):
 @restaurant("Kikiriki", "https://www.menicka.cz/api/iframe/?id=5309", Location.Olomouc)
 def kikiriki(dom):
     current_day = datetime.datetime.now().strftime("%-d.%-m.%Y")
-    for day_dom in dom.select('.content'):
-        day = day_dom.select_one('h2').text.strip().split(' ', 2)[1]
-        if day != current_day:
+    for day_dom in dom.css('.content'):
+        day = day_dom.css_first('h2').text(strip=True).split(' ', 2)[1]
+        if current_day not in day:
             continue
 
         parsed_soup = False
-        for food in day_dom.select('.soup'):
-            if 'Pro tento den nebylo zadáno menu' in food.text:
+        for food in day_dom.css('.soup'):
+            if 'Pro tento den nebylo zadáno menu' in food.text():
                 break
-            txt = food.select_one('.food').text
+            txt = food.css_first('.food').text()
             txt = re.sub('^\s*[0-9]+\s*,\s*[0-9]+', '', txt)
             soup, lunch = re.split('\+|,', txt, 1)
 
@@ -452,7 +452,7 @@ def kikiriki(dom):
 
             yield Lunch(
                 name=lunch,
-                price=food.select_one('.prize').text,
+                price=food.css_first('.prize').text(),
             )
 
 @restaurant("U Kristýna", "https://www.menicka.cz/api/iframe/?id=5471", Location.Olomouc)
@@ -533,7 +533,7 @@ def gather_restaurants(allowed_restaurants=None):
                 if 'res' in arg_names:
                     args['res'] = response.text
                 else:
-                    args['dom'] = BeautifulSoup(response.text, 'html.parser')
+                    args['dom'] = HTMLParser(response.text)
 
             for item in parser(**args) or []:
                 if isinstance(item, Soup):
