@@ -24,9 +24,6 @@ class Location(str, Enum):
 
 logging.basicConfig(level=logging.DEBUG)
 
-def strip_tags(s):
-    return re.sub(r'(<[^>]+>|/>)', '', s)
-
 def restaurant(title, url=None, location:Location=None):
     def wrapper(fn):
         def wrap(*args, **kwargs):
