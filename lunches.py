@@ -337,6 +337,7 @@ def kurniksopa(dom):
 
 @restaurant("Sbeerka", "https://sbeerka.cz/denni-nabidka", Location.Poruba)
 def sbeerka(dom):
+    REGEXP = re.compile('(?P<name>.*?)\s*(/[0-9,\s*]+/)?\s*(?P<price>[0-9]+\s*,-)')
     t = None
     for line in dom.css_first('.wysiwyg').text().splitlines():
         line = line.strip()
@@ -345,15 +346,16 @@ def sbeerka(dom):
         elif 'Hlavní jídla' in line:
             t = Lunch
         elif t and 'Záloha' not in line:
-            m = re.search('(?P<name>.*?)\s*(/[0-9,\s*]+/)?\s*(?P<price>[0-9]+\s*,-)', line)
+            m = REGEXP.search(line)
             if m:
                 yield t(**m.groupdict())
 
+    PRICE_REGEXP = re.compile(r'([0-9]+)\s*,-')
     response = requests.get("https://sbeerka.cz/aktualne-na-cepu", headers={'User-Agent': USER_AGENT})
     dom = HTMLParser(response.text)
     for beer in dom.css('.wysiwyg li'):
         price = None
-        m = re.search(r'([0-9]+)\s*,-', beer.text())
+        m = PRICE_REGEXP.search(beer.text())
         if m:
             price = m.group(0)
         yield Lunch(name=beer.text(), price=price)
