@@ -282,8 +282,8 @@ def saloon_pub(dom):
 
 @restaurant("Parlament", "https://www.restauraceparlament.cz/", Location.Poruba)
 def parlament(dom):
-    today = datetime.datetime.strftime(datetime.datetime.now(), "%-d. %-m. %Y")
-    day = Selector(dom.css_first('.txt'), 'div div').text_contains(today)
+    day_nth = datetime.datetime.today().weekday()
+    day = Selector(dom.css_first('.txt'), 'div div').text_contains(days[day_nth])
     if day:
         day = day.matches[0]
         yield Soup(day.css_first('* + dt').text())
