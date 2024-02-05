@@ -6,7 +6,7 @@ import json
 import datetime
 import traceback
 import logging
-import requests
+import httpx as requests
 import string
 from html import unescape
 from enum import Enum
@@ -360,7 +360,7 @@ def sbeerka(dom):
             price = m.group(0)
         yield Lunch(name=beer.text(), price=price)
 
-@restaurant("La Futura", "http://lafuturaostrava.cz/", Location.Dubina)
+@restaurant("La Futura", "https://lafuturaostrava.cz/", Location.Dubina)
 def lafutura(dom):
     container = dom.css_first('.jet-listing-dynamic-repeater__items')
     if not container:
@@ -485,6 +485,12 @@ def gather_restaurants(allowed_restaurants=None):
     ]
     UPPER_REGEXP = re.compile('[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ]')
 
+    def detect_encoding(text):
+        if b'windows-1250' in text:
+            return 'windows-1250'
+        return 'utf-8'
+    client = requests.Client(default_encoding=detect_encoding, headers={'User-Agent': USER_AGENT})
+
     def cleanup(restaurant):
         def fix_name(name):
             name = unescape(name)
@@ -531,10 +537,7 @@ def gather_restaurants(allowed_restaurants=None):
             args = {}
             arg_names = parser.parser['args']
             if 'res' in arg_names or 'dom' in arg_names:
-                response = requests.get(parser.parser['url'], headers={'User-Agent': USER_AGENT})
-                for encoding in ['utf-8', 'windows-1250']:
-                    if encoding in response.text:
-                        response.encoding = encoding
+                response = client.get(parser.parser['url'])
                 if 'res' in arg_names:
                     args['res'] = response.text
                 else:
