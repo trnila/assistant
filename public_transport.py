@@ -1,31 +1,32 @@
 #!/usr/bin/env python3
-from bs4 import BeautifulSoup
+from selectolax.parser import HTMLParser
 from time import time
 import datetime
 import itertools
-import requests
+import httpx
 from concurrent.futures import ThreadPoolExecutor
 
 
 def public_transport_connections(sources, destinations):
+    client = httpx.Client()
     def fetch(source, destination):
         url = f'https://idos.idnes.cz/odis/spojeni/vysledky/?f={source}&fc=303003&t={destination}&tc=303003'
         start = time()
         links = []
-        text = requests.get(url).text
+        text = client.get(url).text
         print(f"{url} took {time() - start} sec")
-        dom = BeautifulSoup(text, 'html.parser')
+        dom = HTMLParser(text)
 
-        for node in dom.select('.connection.box'):
+        for node in dom.css('.connection.box'):
             link = {
                 'connections': [],
             }
-            total = node.select('.total strong')[0].get_text()
+            total = node.css('.total strong')[0].text()
             if 'hod' in total:
                 continue
 
             link['total'] = int(total.split(' ')[0])
-            for a in node.select('.outside-of-popup'):
+            for a in node.css('.outside-of-popup'):
                 def to_datetime(s):
                     date = datetime.datetime.now()
                     hour, minute = s.split(':')
@@ -33,14 +34,14 @@ def public_transport_connections(sources, destinations):
 
                 def p(node):
                     return {
-                        'time': to_datetime(node.select('.time')[0].get_text()),
-                        'station': node.select('.station strong')[0].get_text(),
+                        'time': to_datetime(node.css_first('.time').text()),
+                        'station': node.css_first('.station strong').text(),
                     }
 
                 link['connections'].append({
-                    'link': a.select('.line-title h3')[0].get_text(),
-                    'from': p(a.select('.stations .item')[0]),
-                    'to': p(a.select('.stations .item')[1]),
+                    'link': a.css_first('.line-title h3').text(),
+                    'from': p(a.css_first('.stations .item')),
+                    'to': p(a.css('.stations .item')[1]),
                 })
 
             links.append(link)
