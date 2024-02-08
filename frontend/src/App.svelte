@@ -6,7 +6,6 @@
   import Timeline from "./Timeline.svelte";
   import Fireworks from "./Fireworks.svelte";
   import LocationFilter from "./LocationFilter.svelte";
-  import License from './License.svelte';
   import { writable } from "svelte/store";
 
   let showStats = false;
@@ -93,9 +92,7 @@
     <Loader />
   {:then { restaurants, last_fetch, fetch_count, first_access, access_count }}
     <div class="header">
-      <License artwork="showing current day">
-        <Date />
-      </License>
+      <Date />
 
       <div class="settings">
         <LocationFilter
@@ -141,7 +138,6 @@
           </a>
         </h2>
 
-        <License artwork={restaurant.name}>
         <ul>
           {#each restaurant.soups || [] as soup}
             <li>
@@ -171,7 +167,6 @@
         {#if restaurant.error}
           <pre>{restaurant.error}</pre>
         {/if}
-        </License>
       </div>
     {/each}
   {:catch error}
