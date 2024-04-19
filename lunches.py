@@ -354,7 +354,7 @@ def lafutura(dom):
         return
     for item in container.css('.jet-listing-dynamic-repeater__item'):
         tds = item.css('td')
-        if tds[0].text(strip=True) == '𐃸':
+        if tds[0].text(strip=True).upper() == 'POLÉVKA:':
             yield Soup(name=tds[1].text())
         else:
             yield Lunch(name=tds[1].text(), price=tds[2].text(), num=tds[0].text())
