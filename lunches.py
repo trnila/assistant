@@ -258,19 +258,6 @@ def ellas(dom):
                 parsed = re.match("\s*(?P<num>[0-9]+)\s*\.\s*(?P<name>[A-Z -]+)\s+(?P<ingredients>.*?)\s*(\([0-9 ,]+\))?\s*(?P<price>[0-9]+),-", food.text()).groupdict()
                 yield Lunch(**parsed)
 
-@restaurant("Black Kale", "https://deliveryuser.live.boltsvc.net/deliveryClient/public/getMenuCategories?provider_id=64252&version=FW.0.17.8&deviceId=server&deviceType=web&device_name=IOS&device_os_version=Google+Inc.&language=cs-CZ", Location.Poruba)
-def black_kale(res):
-    res = json.loads(res)
-    items = res['data']['items']
-    for item in items.values():
-        if item['type'] == 'category' and item['name']['value'].lower() == 'polední menu':
-            for i, child_id in enumerate(item['child_ids']):
-                dish = items[str(child_id)]
-                name = dish['name']['value']
-                if '+' not in name:
-                    t = Soup if i == 0 else Lunch
-                    yield t(name=name, price=dish['price']['value'])
-
 @restaurant("Saloon Pub", "http://www.saloon-pub.cz/cs/denni-nabidka/", Location.Poruba)
 def saloon_pub(dom):
     day = dom.css_first(f'#{datetime.datetime.strftime(datetime.datetime.now(), "%Y-%m-%d")} + section')
