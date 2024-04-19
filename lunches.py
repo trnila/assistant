@@ -474,6 +474,7 @@ def fix_price(price):
 def gather_restaurants(allowed_restaurants=None):
     replacements = [
         (re.compile('^\s*Polévka:', re.IGNORECASE), ''),
+        (re.compile('k menu\s*$'), ''),
         (re.compile('(s|š|S|Š)vestk'), 'Trnk'),
         (re.compile('\s*(,|:)\s*'), '\\1 '),
         (re.compile('<[^<]+?>'), ''),
