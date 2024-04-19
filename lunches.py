@@ -199,7 +199,7 @@ def poklad(dom):
         if today in line:
             capturing = True
         elif capturing:
-            if tomorrow in line:
+            if tomorrow in line or 'NABÍDKA NÁPOJŮ' in line:
                 break
             if soup:
                 soup = False
