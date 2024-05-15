@@ -79,12 +79,12 @@ def bistroin(dom):
     data = json.loads(dom.css_first('#__NEXT_DATA__').text())
 
     for item in data["props"]["app"]["menu"]:
-        ingredients = re.sub('Al\. \(.+', '', item['description'])
+        ingredients = re.sub(r'Al\. \(.+', '', item['description'])
         price = item['price'] // 100
         if 'Polévka k menu:' in item['name']:
             yield Soup(name=item['name'].split(':')[1], price=price)
         else:
-            match = re.match('^\s*(?P<num>[0-9]+)\s*\.\s*(?P<name>.+)', item['name'])
+            match = re.match(r'^\s*(?P<num>[0-9]+)\s*\.\s*(?P<name>.+)', item['name'])
             if match:
                 yield Lunch(**match.groupdict(), price=price - 5, ingredients=ingredients)
 
@@ -123,7 +123,7 @@ def u_zlateho_lva(dom):
                 yield Soup(line.replace(soup_prefix, ''))
             else:
                 if state == 'num':
-                    if re.match('^[0-9]+\.', line):
+                    if re.match(r'^[0-9]+\.', line):
                         line, name = line.split('.', 1)
                         food = Lunch(name=name, num=line)
                         state = 'price' if name else 'name'
@@ -132,7 +132,7 @@ def u_zlateho_lva(dom):
                         food.name = line
                         state = 'price'
                 elif state == 'price':
-                    if re.match('^[0-9]+\s*(,-|Kč)$', line):
+                    if re.match(r'^[0-9]+\s*(,-|Kč)$', line):
                         food.price = line.split(' ')[0]
                         yield food
                         state = 'num'
@@ -161,7 +161,7 @@ def jacks_burger(dom):
         if 'ROZVOZ PŘES' in name.upper() or '---------' in name or 'JBB OSTRAVA' in name.upper():
             continue
 
-        if re.match('^[0-9]+\..+', name):
+        if re.match(r'^[0-9]+\..+', name):
             if full_name:
                 yield Lunch(name=full_name, price=price, num=num)
                 full_name = ""
@@ -206,7 +206,7 @@ def poklad(dom):
                 for s in line.split(' I '):
                     yield Soup(s)
             else:
-                m = re.match("^(?P<num>[0-9]+)\s*\.?\s*(?P<name>.*?) (?P<price>[0-9]+) Kč", line)
+                m = re.match(r"^(?P<num>[0-9]+)\s*\.?\s*(?P<name>.*?) (?P<price>[0-9]+) Kč", line)
                 if m:
                     if item:
                         yield Lunch(**item)
@@ -255,7 +255,7 @@ def ellas(dom):
 
         for food in foods[1:]:
             if food.text():
-                parsed = re.match("\s*(?P<num>[0-9]+)\s*\.\s*(?P<name>[A-Z -]+)\s+(?P<ingredients>.*?)\s*(\([0-9 ,]+\))?\s*(?P<price>[0-9]+),-", food.text()).groupdict()
+                parsed = re.match(r"\s*(?P<num>[0-9]+)\s*\.\s*(?P<name>[A-Z -]+)\s+(?P<ingredients>.*?)\s*(\([0-9 ,]+\))?\s*(?P<price>[0-9]+),-", food.text()).groupdict()
                 yield Lunch(**parsed)
 
 @restaurant("Saloon Pub", "http://www.saloon-pub.cz/cs/denni-nabidka/", Location.Poruba)
@@ -275,7 +275,7 @@ def parlament(dom):
         day = day.matches[0]
         yield Soup(day.css_first('* + dt').text())
         for line in day.css_first('* + dt + p').text().splitlines():
-            m = re.match('(?P<num>\d+)\.\s*(?P<name>.*?)(?P<price>\d+),-Kč', line)
+            m = re.match(r'(?P<num>\d+)\.\s*(?P<name>.*?)(?P<price>\d+),-Kč', line)
             if m:
                 yield Lunch(**m.groupdict())
 
@@ -324,7 +324,7 @@ def kurniksopa(dom):
 
 @restaurant("Sbeerka", "https://sbeerka.cz/denni-nabidka", Location.Poruba)
 def sbeerka(dom):
-    REGEXP = re.compile('(?P<name>.*?)\s*(/[0-9,\s*]+/)?\s*(?P<price>[0-9]+\s*,-)')
+    REGEXP = re.compile(r'(?P<name>.*?)\s*(/[0-9,\s*]+/)?\s*(?P<price>[0-9]+\s*,-)')
     t = None
     for line in dom.css_first('.wysiwyg').text().splitlines():
         line = line.strip()
@@ -388,7 +388,7 @@ def maston(dom):
             if 'POLÉVKA' in line:
                 yield Soup(line.split(':', 1)[1])
             else:
-                m = re.search('((?P<num>\d)\))?\s*(?P<name>.+)(\s*(?P<price>\d+),-)?', line)
+                m = re.search(r'((?P<num>\d)\))?\s*(?P<name>.+)(\s*(?P<price>\d+),-)?', line)
                 if m:
                     yield Lunch(**m.groupdict())
 
@@ -429,8 +429,8 @@ def kikiriki(dom):
             if 'Pro tento den nebylo zadáno menu' in food.text():
                 break
             txt = food.css_first('.food').text()
-            txt = re.sub('^\s*[0-9]+\s*,\s*[0-9]+\s*l?', '', txt)
-            soup, lunch = re.split('\+|,', txt, 1)
+            txt = re.sub(r'^\s*[0-9]+\s*,\s*[0-9]+\s*l?', '', txt)
+            soup, lunch = re.split(r'\+|,', txt, 1)
 
             if not parsed_soup:
                 parsed_soup = True
@@ -460,18 +460,18 @@ def fix_price(price):
 
 def gather_restaurants(allowed_restaurants=None):
     replacements = [
-        (re.compile('^\s*(Polévka|BUSINESS MENU)', re.IGNORECASE), ''),
-        (re.compile('k menu\s*$'), ''),
-        (re.compile('(s|š|S|Š)vestk'), 'Trnk'),
-        (re.compile('\s*(,|:)\s*'), '\\1 '),
-        (re.compile('<[^<]+?>'), ''),
-        (re.compile('\d+\s*(g|ml|l|ks) '), ''),
-        (re.compile('\([^)]+\)'), ''),
-        (re.compile('(\s*[0-9]+\s*,)+\s*$'), ''),
-        (re.compile('A?\s*[0-9]+(,[0-9]+)*,? '), ''),
-        (re.compile(' +'), ' '),
+        (re.compile(r'^\s*(Polévka|BUSINESS MENU)', re.IGNORECASE), ''),
+        (re.compile(r'k menu\s*$'), ''),
+        (re.compile(r'(s|š|S|Š)vestk'), 'Trnk'),
+        (re.compile(r'\s*(,|:)\s*'), '\\1 '),
+        (re.compile(r'<[^<]+?>'), ''),
+        (re.compile(r'\d+\s*(g|ml|l|ks) '), ''),
+        (re.compile(r'\([^)]+\)'), ''),
+        (re.compile(r'(\s*[0-9]+\s*,)+\s*$'), ''),
+        (re.compile(r'A?\s*[0-9]+(,[0-9]+)*,? '), ''),
+        (re.compile(r' +'), ' '),
     ]
-    UPPER_REGEXP = re.compile('[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ]')
+    UPPER_REGEXP = re.compile(r'[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ]')
 
     def detect_encoding(text):
         if b'windows-1250' in text:
