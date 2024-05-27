@@ -52,6 +52,12 @@
             distance: 5000,
             location: "Olomouc",
           },
+          {
+            lat: 49.8051033,
+            lon: 18.2361661,
+            distance: 1500,
+            location: "Zábřeh",
+          },
         ];
         for (const place of places) {
           const d = distance(lat, lon, place.lat, place.lon);

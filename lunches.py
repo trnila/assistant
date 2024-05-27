@@ -20,7 +20,8 @@ USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Ge
 class Location(str, Enum):
     Poruba = "Poruba",
     Dubina = "Dubina",
-    Olomouc = "Olomouc"
+    Zabreh = "Zábřeh",
+    Olomouc = "Olomouc",
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -444,6 +445,11 @@ def kikiriki(dom):
 @restaurant("U Kristýna", "https://www.menicka.cz/api/iframe/?id=5471", Location.Olomouc)
 def kristyn(dom):
     yield from menicka_parser(dom)
+
+@restaurant("Assen", "https://www.menicka.cz/api/iframe/?id=8767", Location.Zabreh)
+def assen(dom):
+    yield from menicka_parser(dom)
+
 
 def fix_price(price):
     if not price:
