@@ -69,10 +69,14 @@ def menicka_parser(dom):
             )
 
         for food in day_dom.css('.main'):
+            match = re.search(r'\((?P<ingredients>.*)\)', food.css_first('.food').text())
+            ingredients = match.group('ingredients') if match else None
+
             yield Lunch(
                 num=food.css_first('.no').text().strip(' .'),
                 name=food.css_first('.food').text(),
                 price=food.css_first('.prize').text(),
+                ingredients=ingredients,
             )
 
 def lcs(strings):
