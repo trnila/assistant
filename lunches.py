@@ -75,6 +75,30 @@ def menicka_parser(dom):
                 price=food.css_first('.prize').text(),
             )
 
+def lcs(strings):
+    if not strings:
+        return ""
+    common_subsequence = strings[0]
+
+    for s in strings[1:]:
+        common_subsequence_lower = common_subsequence.lower()
+        string_lower = s.lower()
+
+        common_length = min(len(common_subsequence_lower), len(string_lower))
+        common_subsequence_lower = common_subsequence_lower[:common_length]
+
+        for i in range(common_length):
+            if common_subsequence_lower[i] != string_lower[i]:
+                common_subsequence = common_subsequence[:i]
+                break
+        else:
+            common_subsequence = common_subsequence[:common_length]
+
+        if not common_subsequence:
+            break
+
+    return common_subsequence.lower().capitalize()
+
 @restaurant("Bistro IN", "https://bistroin.choiceqr.com/delivery", Location.Poruba)
 def bistroin(dom):
     data = json.loads(dom.css_first('#__NEXT_DATA__').text())
@@ -425,22 +449,27 @@ def kikiriki(dom):
         if current_day not in day:
             continue
 
-        parsed_soup = False
+
+        parsed_food = []
+
         for food in day_dom.css('.soup'):
             if 'Pro tento den nebylo zadáno menu' in food.text():
                 break
             txt = food.css_first('.food').text()
-            txt = re.sub(r'^\s*[0-9]+\s*,\s*[0-9]+\s*l?', '', txt)
-            soup, lunch = re.split(r'\+|,', txt, 1)
+            txt = re.sub(r'^\s*[0-9]+\s*[,.]\s*[0-9]+\s*l?\s*', '', txt)
+            lunch = txt
 
-            if not parsed_soup:
-                parsed_soup = True
-                yield Soup(soup)
-
-            yield Lunch(
+            parsed_food.append(Lunch(
                 name=lunch,
                 price=food.css_first('.prize').text(),
-            )
+            ))
+
+        soup = lcs([f.name for f in parsed_food])
+        yield Soup(soup)
+        soup_len = len(soup)
+        for f in parsed_food:
+            f.name = f.name[soup_len:-1]
+            yield f
 
 @restaurant("U Kristýna", "https://www.menicka.cz/api/iframe/?id=5471", Location.Olomouc)
 def kristyn(dom):
