@@ -24,9 +24,16 @@
         <dd>{fetch_count}</dd>
     </dl>
     {#each data as restaurant}
+        <br>
         <div style="width: {(restaurant.elapsed / max) * 100}%;" class="timeline">
             ({restaurant.elapsed.toFixed(3)} s)
             <strong>{restaurant.name}</strong>
+        </div>
+         <div style="width: {(restaurant.elapsed_html_request / max) * 100}%;" class="timeline">
+            HTML request: {restaurant.elapsed_html_request.toFixed(3)} s
+        </div>
+         <div style="width: {(restaurant.elapsed_parsing / max) * 100}%;" class="timeline">
+            Parsing: {restaurant.elapsed_parsing.toFixed(3)} s
         </div>
     {/each}
 </div>
