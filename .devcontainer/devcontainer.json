@@ -1,4 +1,5 @@
 {
+	"postAttachCommand": ".devcontainer/post_attach.sh",
 	"build": {
 		"dockerfile": "Dockerfile",
 		"context": ".."
