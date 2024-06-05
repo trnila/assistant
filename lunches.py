@@ -565,7 +565,8 @@ def gather_restaurants(allowed_restaurants=None):
                     args['res'] = response.text
                 else:
                     args['dom'] = HTMLParser(response.text)
-
+            html_request_time = time.time() - start
+            start = time.time()
             for item in parser(**args) or []:
                 if isinstance(item, Soup):
                     soups.append(item)
@@ -573,17 +574,22 @@ def gather_restaurants(allowed_restaurants=None):
                     lunches.append(item)
                 else:
                     raise "Unsupported item"
+            match_time = time.time() - start
             return cleanup({
                 **res,
                 'lunches': lunches,
                 'soups': soups,
-                'elapsed': time.time() - start,
+                'elapsed': html_request_time + match_time,
+                'elapsed_html_request': html_request_time,
+                'elapsed_parsing': match_time,
             })
         except: # noqa: E722
             return {
                 **res,
                 'error': traceback.format_exc(),
                 'elapsed': time.time() - start,
+                'elapsed_html_request': 0,
+                'elapsed_parsing': 0,
             }
 
     restaurants = [obj for _, obj in globals().items() if hasattr(obj, 'parser')]
