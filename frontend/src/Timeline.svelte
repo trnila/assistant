@@ -30,7 +30,7 @@
             <strong>{restaurant.name}</strong>
         </div>
          <div style="width: {(restaurant.elapsed_html_request / max) * 100}%;" class="timeline">
-            HTML request: {restaurant.elapsed_html_request.toFixed(3)} s
+            HTTP request: {restaurant.elapsed_html_request.toFixed(3)} s
         </div>
          <div style="width: {(restaurant.elapsed_parsing / max) * 100}%;" class="timeline">
             Parsing: {restaurant.elapsed_parsing.toFixed(3)} s
