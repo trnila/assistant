@@ -2,3 +2,4 @@
 /.vscode
 /__pycache__
 tesseract_opencl_profile_devices.dat
+dump.rdb
