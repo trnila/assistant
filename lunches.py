@@ -460,7 +460,7 @@ def kikiriki(dom):
             if 'Pro tento den nebylo zadáno menu' in food.text():
                 break
             txt = food.css_first('.food').text()
-            txt = re.sub(r'^\s*[0-9]+\s*[,.]\s*[0-9]+\s*l?\s*', '', txt)
+            txt = re.sub(r'^\s*.*[0-9]+\s*[,.]\s*[0-9]+\s*l?\s*', '', txt)
             lunch = txt
 
             parsed_food.append(Lunch(
