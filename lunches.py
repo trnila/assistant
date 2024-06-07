@@ -338,6 +338,7 @@ def rusty_bell_pub(dom):
         return
     yield Soup(foods[1].name)
     for food in foods[2:]:
+        food.num = None
         yield food
 
 @restaurant("Kurnik sopa", "https://www.kurniksopahospoda.cz", Location.Poruba)
