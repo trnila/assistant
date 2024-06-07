@@ -18,6 +18,6 @@ $ ./app.py
 
 # install frontend
 $ cd frontend
-$ npm install
-$ npm run dev
+$ yarn install
+$ yarn run dev
 ```
