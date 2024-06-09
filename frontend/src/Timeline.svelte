@@ -23,7 +23,7 @@
         <dt>Fetch count</dt>
         <dd>{fetch_count}</dd>
     </dl>
-    {#each data as restaurant}
+    {#each data.sort((a, b) => a.elapsed > b.elapsed ? -1 : 1) as restaurant}
         <br>
         <div style="width: {(restaurant.elapsed / max) * 100}%;" class="timeline">
             ({restaurant.elapsed.toFixed(3)} s)
