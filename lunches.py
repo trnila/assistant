@@ -23,8 +23,6 @@ class Location(str, Enum):
     Zabreh = "Zábřeh",
     Olomouc = "Olomouc",
 
-logging.basicConfig(level=logging.DEBUG)
-
 def restaurant(title, url=None, location:Location=None):
     def wrapper(fn):
         def wrap(*args, **kwargs):
@@ -606,6 +604,8 @@ def gather_restaurants(allowed_restaurants=None):
 
 if __name__ == '__main__':
     import sys
+
+    logging.basicConfig(level=logging.INFO)
 
     allowed_restaurants = None
     if len(sys.argv) > 1:
