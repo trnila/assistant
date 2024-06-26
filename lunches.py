@@ -515,7 +515,7 @@ def gather_restaurants(allowed_restaurants=None):
         if b'windows-1250' in text:
             return 'windows-1250'
         return 'utf-8'
-    client = requests.Client(default_encoding=detect_encoding, headers={'User-Agent': USER_AGENT})
+    client = requests.Client(default_encoding=detect_encoding, headers={'User-Agent': USER_AGENT}, timeout=15)
 
     def cleanup(restaurant):
         def fix_name(name):
