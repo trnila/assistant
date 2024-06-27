@@ -607,6 +607,7 @@ if __name__ == '__main__':
 
     p = argparse.ArgumentParser()
     p.add_argument('restaurant', nargs='*')
+    p.add_argument('--sort', '-s', choices=['error', 'time'], default='error')
     args = p.parse_args()
 
     logging.basicConfig(
@@ -616,8 +617,13 @@ if __name__ == '__main__':
 
     restaurants = list(gather_restaurants(args.restaurant))
 
+    sorters = {
+        'time': lambda r: r['elapsed'],
+        'error': lambda r: ('error' in r, len(r.get('lunches', [])) == 0),
+    }
+
     exit_code = 0
-    for restaurant in sorted(restaurants, key=lambda r: ('error' in r, len(r.get('lunches', [])) == 0)):
+    for restaurant in sorted(restaurants, key=sorters[args.sort]):
         print()
         print(restaurant['name'], f"({restaurant['elapsed']:.3}s)")
         if 'error' in restaurant:
