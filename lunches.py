@@ -605,7 +605,10 @@ def gather_restaurants(allowed_restaurants=None):
 if __name__ == '__main__':
     import sys
 
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(
+        format="[%(asctime)s] %(levelname)s %(name)s - %(message)s",
+        level=logging.INFO
+    )
 
     allowed_restaurants = None
     if len(sys.argv) > 1:
