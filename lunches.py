@@ -603,17 +603,18 @@ def gather_restaurants(allowed_restaurants=None):
         return pool.map(collect, [r for r in restaurants if r.parser['name'] in allowed_restaurants])
 
 if __name__ == '__main__':
-    import sys
+    import argparse
+
+    p = argparse.ArgumentParser()
+    p.add_argument('restaurant', nargs='*')
+    args = p.parse_args()
 
     logging.basicConfig(
         format="[%(asctime)s] %(levelname)s %(name)s - %(message)s",
         level=logging.INFO
     )
 
-    allowed_restaurants = None
-    if len(sys.argv) > 1:
-        allowed_restaurants = sys.argv[1].split(',')
-    restaurants = list(gather_restaurants(allowed_restaurants))
+    restaurants = list(gather_restaurants(args.restaurant))
 
     exit_code = 0
     for restaurant in sorted(restaurants, key=lambda r: ('error' in r, len(r.get('lunches', [])) == 0)):
