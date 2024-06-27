@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 from selectolax.parser import HTMLParser, Selector
-import subprocess
 import re
 import json
 import datetime
 import traceback
 import logging
-import httpx as requests
+import httpx
 import string
+import asyncio
+import inspect
 from html import unescape
 from enum import Enum
 from dataclasses import dataclass
-from concurrent.futures import ThreadPoolExecutor
 import time
 
 days = ['Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota', 'Neděle']
@@ -76,6 +76,10 @@ def menicka_parser(dom):
                 price=food.css_first('.prize').text(),
                 ingredients=ingredients,
             )
+
+async def subprocess_check_output(cmd, input):
+    p = await asyncio.create_subprocess_exec(*cmd, stdin=asyncio.subprocess.PIPE, stdout=asyncio.subprocess.PIPE)
+    return (await p.communicate(input))[0].decode('utf-8')
 
 def lcs(strings):
     if not strings:
@@ -212,10 +216,10 @@ def jacks_burger(dom):
                     num = None
 
 @restaurant("Poklad", "https://dkpoklad.cz/restaurace/", Location.Poruba)
-def poklad(dom):
+async def poklad(dom, http):
     pdf_url = dom.css_first('.restaurace-box .wp-block-file a').attributes['href']
-    pdf = requests.get(pdf_url).content
-    text = subprocess.check_output(["pdftotext", "-layout", "-", "-"], input=pdf).decode('utf-8')
+    pdf = (await http.get(pdf_url)).content
+    text = await subprocess_check_output(["pdftotext", "-layout", "-", "-"], pdf)
 
     today = datetime.datetime.strftime(datetime.datetime.now(), "%-d I %-m")
     tomorrow = datetime.datetime.strftime(datetime.datetime.now() + datetime.timedelta(days=1), "%-d I %-m")
@@ -351,7 +355,7 @@ def kurniksopa(dom):
         )
 
 @restaurant("Sbeerka", "https://sbeerka.cz/denni-nabidka", Location.Poruba)
-def sbeerka(dom):
+async def sbeerka(dom, http):
     REGEXP = re.compile(r'(?P<name>.*?)\s*(/[0-9,\s*]+/)?\s*(?P<price>[0-9]+\s*,-)')
     t = None
     for line in dom.css_first('.wysiwyg').text().splitlines():
@@ -366,7 +370,7 @@ def sbeerka(dom):
                 yield t(**m.groupdict())
 
     PRICE_REGEXP = re.compile(r'([0-9]+)\s*,-')
-    response = requests.get("https://sbeerka.cz/aktualne-na-cepu", headers={'User-Agent': USER_AGENT})
+    response = await http.get("https://sbeerka.cz/aktualne-na-cepu", headers={'User-Agent': USER_AGENT})
     dom = HTMLParser(response.text)
     for beer in dom.css('.wysiwyg li'):
         price = None
@@ -396,12 +400,12 @@ def uformana(dom):
     yield from menicka_parser(dom)
 
 @restaurant("Maston", "https://maston.cz/jidelni-listek/", Location.Dubina)
-def maston(dom):
+async def maston(dom, http):
     srcs = dom.css_first('.attachment-large').attrs['srcset']
     img_url = srcs.split(',')[-1].strip().split(' ')[0]
 
-    img = requests.get(img_url).content
-    text = subprocess.check_output(["tesseract", "-l", "ces", "--psm", "4", "-", "-"], input=img).decode('utf-8')
+    img = (await http.get(img_url)).content
+    text = await subprocess_check_output(["tesseract", "-l", "ces", "--psm", "4", "-", "-"], img)
 
     today = datetime.datetime.strftime(datetime.datetime.now(), "%-d%-m")
     tomorrow = datetime.datetime.strftime(datetime.datetime.now() + datetime.timedelta(days=1), "%-d%-m")
@@ -496,7 +500,7 @@ def fix_price(price):
         print(e)
     return None
 
-def gather_restaurants(allowed_restaurants=None):
+async def gather_restaurants(allowed_restaurants=None):
     replacements = [
         (re.compile(r'^\s*(Polévka|BUSINESS MENU)', re.IGNORECASE), ''),
         (re.compile(r'k menu\s*$'), ''),
@@ -515,7 +519,7 @@ def gather_restaurants(allowed_restaurants=None):
         if b'windows-1250' in text:
             return 'windows-1250'
         return 'utf-8'
-    client = requests.Client(default_encoding=detect_encoding, headers={'User-Agent': USER_AGENT}, timeout=15)
+    client = httpx.AsyncClient(default_encoding=detect_encoding, headers={'User-Agent': USER_AGENT}, timeout=15)
 
     def cleanup(restaurant):
         def fix_name(name):
@@ -549,7 +553,7 @@ def gather_restaurants(allowed_restaurants=None):
                     num = food.num
         return restaurant
 
-    def collect(parser):
+    async def collect(parser):
         start = time.time()
         res = {
             'name': parser.parser['title'],
@@ -563,14 +567,19 @@ def gather_restaurants(allowed_restaurants=None):
             args = {}
             arg_names = parser.parser['args']
             if 'res' in arg_names or 'dom' in arg_names:
-                response = client.get(parser.parser['url'])
+                response = await client.get(parser.parser['url'])
                 if 'res' in arg_names:
                     args['res'] = response.text
-                else:
+                elif 'dom' in arg_names:
                     args['dom'] = HTMLParser(response.text)
+            if 'http' in arg_names:
+                args['http'] = client
             html_request_time = time.time() - start
             start = time.time()
-            for item in parser(**args) or []:
+            parsed = parser(**args)
+            if inspect.isasyncgen(parsed):
+                parsed = [i async for i in parsed]
+            for item in parsed or []:
                 if isinstance(item, Soup):
                     soups.append(item)
                 elif isinstance(item, Lunch):
@@ -599,8 +608,7 @@ def gather_restaurants(allowed_restaurants=None):
     if not allowed_restaurants:
         allowed_restaurants = [r.parser['name'] for r in restaurants]
 
-    with ThreadPoolExecutor(max_workers=len(allowed_restaurants)) as pool:
-        return pool.map(collect, [r for r in restaurants if r.parser['name'] in allowed_restaurants])
+    return await asyncio.gather(*[collect(r) for r in restaurants if r.parser['name'] in allowed_restaurants])
 
 if __name__ == '__main__':
     import argparse
@@ -615,7 +623,7 @@ if __name__ == '__main__':
         level=logging.INFO
     )
 
-    restaurants = list(gather_restaurants(args.restaurant))
+    restaurants = asyncio.run(gather_restaurants(args.restaurant))
 
     sorters = {
         'time': lambda r: r['elapsed'],

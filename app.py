@@ -26,7 +26,7 @@ def public_transport():
     )
 
 @app.route("/lunch.json", methods=['GET', 'POST'])
-def lunch():
+async def lunch():
     now = int(datetime.datetime.now().timestamp())
     key = f'restaurants.{datetime.date.today().strftime("%d-%m-%Y")}'
     result_str = redis_client.get(key)
@@ -39,7 +39,7 @@ def lunch():
         result = {
             'last_fetch': now,
             'fetch_count': redis_client.incr(f'{key}.fetch_count'),
-            'restaurants': list(gather_restaurants()),
+            'restaurants': list(await gather_restaurants()),
         }
         redis_client.set(key, pickle.dumps(result))
     else:
