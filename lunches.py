@@ -385,7 +385,7 @@ def lafutura(dom):
         if "POLÉVKA" in tds[0].text(strip=True).upper():
             yield Soup(name=tds[1].text())
         else:
-            yield Lunch(name=tds[1].text(), price=tds[2].text(), num=tds[0].text())
+            yield Lunch(name=tds[1].text(), price=tds[2].text())
 
 @restaurant("Srub", "https://www.menicka.cz/api/iframe/?id=5568", Location.Dubina)
 def srub(dom):
