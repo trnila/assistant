@@ -541,8 +541,8 @@ def gather_restaurants(allowed_restaurants=None):
                     if isinstance(food.num, str):
                         try:
                             food.num = int(food.num.replace('.', ''))
-                        except ValueError as e:
-                            logging.exception(e)
+                        except ValueError:
+                            logging.warning("Failed to parse lunch position: %s", food.num)
                             food.num = None
                     if not food.num:
                         food.num = num + 1
