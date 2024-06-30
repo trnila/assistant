@@ -16,6 +16,14 @@ on:
         - '**.py'
         - '.github/workflows/validation.yml'
 
+env:
+  POETRY_NO_INTERACTION: 1
+  POETRY_VIRTUALENVS_IN_PROJECT: 1
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -58,9 +66,8 @@ jobs:
           poetry install --no-interaction
 
       - name: Ruff format
-        if: success() || failure()
         run: |
-          poetry run ruff format --check . --output-format github
+          poetry run ruff format --check .
 
       - name: Ruff lint
         if: success() || failure()

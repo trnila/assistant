@@ -16,6 +16,9 @@ RUN poetry install --without dev --no-root && rm -rf $POETRY_CACHE_DIR
 
 FROM python:3.12-slim-bookworm as runtime
 
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+     && apt-get -y install tesseract-ocr
+
 WORKDIR /app
 
 COPY --from=build-stage /app .
