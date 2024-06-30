@@ -106,6 +106,9 @@
           bind:selected_location={$selected_location}
         />
 
+        <a href="https://github.com/trnila/assistant">
+          <Icon icon="bi:github" width="20" height="20" />
+        </a>
         <button on:click={toggleDarkMode}>
           <Icon icon="ic:baseline-dark-mode" width="20" height="20" />
         </button>
@@ -214,6 +217,7 @@
   .settings {
     display: flex;
     gap: 5px;
+    align-items: center;
   }
 
   button {
