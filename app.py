@@ -15,7 +15,7 @@ from public_transport import public_transport_connections
 app = FastAPI(debug=True)
 templates = Jinja2Templates(directory="templates")
 # app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
-redis_client = redis.Redis(host="redis", port=6379)
+redis_client = redis.Redis()
 
 
 @app.get("/public_transport")
