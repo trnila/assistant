@@ -4,6 +4,7 @@
 ## Local setup
 Install and start redis server for caching.
 
+
 ```sh
 $ pip install pre-commit
 $ pre-commit install
@@ -21,4 +22,10 @@ $ fastapi dev
 $ cd frontend
 $ yarn install
 $ yarn run dev
+```
+
+## Production setup
+
+```sh
+docker build --target=runtime --tag="lunchmenu" .
 ```

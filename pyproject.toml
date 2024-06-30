@@ -8,13 +8,48 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.8"
+
 httpx = "^0.27.0"
 selectolax = "^0.3.21"
+
 fastapi = "^0.111.0"
 uvicorn = {extras = ["standard"], version = "^0.30.1"}
+
 redis = {extras = ["hiredis"], version = "^5.0.7"}
 
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.5.0"
+ruff = "^0.4.6"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+strict = true
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.format]
+quote-style = "double"
+docstring-code-format = true
+
+[tool.ruff.lint]
+extend-select = [
+    "C4", # flake8-comprehensions
+    "E", # Error
+    "I", # isort
+    "F", # pyflakes
+    "N", # pep8-naming
+    "Q", # flake8-quotes
+    "SIM", # flake8-simplify
+    "TRY", # tryceratops
+    "UP", # pyupgrade
+    "W", # Warning
+    "YTT", # flake8-2020
+]
+ignore = ["N806"]
+
+[tool.ruff.lint.isort]
+known-third-party = ["fastapi", "pydantic", "starlette"]
