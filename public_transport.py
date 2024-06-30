@@ -4,18 +4,17 @@ from time import time
 import datetime
 import itertools
 import httpx
-from concurrent.futures import ThreadPoolExecutor
+import asyncio
 
 
-def public_transport_connections(sources, destinations):
-    client = httpx.Client()
-    def fetch(source, destination):
+async def public_transport_connections(sources, destinations):
+    async def fetch(http, source, destination):
         url = f'https://idos.idnes.cz/odis/spojeni/vysledky/?f={source}&fc=303003&t={destination}&tc=303003'
         start = time()
         links = []
-        text = client.get(url).text
+        resp = await http.get(url)
         print(f"{url} took {time() - start} sec")
-        dom = HTMLParser(text)
+        dom = HTMLParser(resp.text)
 
         for node in dom.css('.connection.box'):
             link = {
@@ -48,8 +47,9 @@ def public_transport_connections(sources, destinations):
         return links
 
     searches = list(itertools.product(sources, destinations))
-    with ThreadPoolExecutor(max_workers=len(searches)) as pool:
-        all_links = list(itertools.chain(*pool.map(lambda s: fetch(*s), searches)))
+    async with httpx.AsyncClient() as http:
+        results = await asyncio.gather(*[fetch(http, *s) for s in searches])
+        all_links = list(itertools.chain(*results))
 
     def time_to_num(t):
         return t
@@ -64,5 +64,5 @@ def public_transport_connections(sources, destinations):
 
 if __name__ == '__main__':
     from pprint import pprint
-    result = public_transport_connections(["Václava Jiřikovského"], ["Hlavní třída", "Rektorát VŠB", "Pustkovecká", "Poruba,Studentské koleje"])
+    result = asyncio.run(public_transport_connections(["Václava Jiřikovského"], ["Hlavní třída", "Rektorát VŠB", "Pustkovecká", "Poruba,Studentské koleje"]))
     pprint(result)

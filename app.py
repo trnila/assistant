@@ -16,7 +16,7 @@ templates = Jinja2Templates(directory="templates")
 redis_client = redis.Redis()
 
 @app.get("/public_transport")
-def public_transport(request: Request):
+async def public_transport(request: Request):
     srcs = ["Václava Jiřikovského"]
     dsts = ["Hlavní třída", "Rektorát VŠB", "Pustkovecká", "Poruba,Studentské koleje"]
     if datetime.datetime.now().hour >= 12:
@@ -26,7 +26,7 @@ def public_transport(request: Request):
             request=request,
             name='public_transport.html',
             context={
-                'connections': public_transport_connections(srcs, dsts)
+                'connections': await public_transport_connections(srcs, dsts)
             }
     )
 
