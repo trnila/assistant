@@ -1,5 +1,0 @@
-flask[async]
-flask_redis
-httpx
-selectolax
-waitress

@@ -2,46 +2,52 @@
 import datetime
 import pickle
 import ipaddress
-from flask import Flask, render_template, request
-from werkzeug.middleware.proxy_fix import ProxyFix
-from flask_redis import FlaskRedis
+import redis.asyncio as redis
+from fastapi import FastAPI, Request
+from fastapi.templating import Jinja2Templates
+#from werkzeug.middleware.proxy_fix import ProxyFix
+#from flask_redis import FlaskRedis
 from lunches import gather_restaurants
 from public_transport import public_transport_connections
-from waitress import serve
 
-app = Flask(__name__)
-app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
-redis_client = FlaskRedis(app)
+app = FastAPI(debug=True)
+templates = Jinja2Templates(directory="templates")
+#app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
+redis_client = redis.Redis()
 
-@app.route("/public_transport")
-def public_transport():
+@app.get("/public_transport")
+def public_transport(request: Request):
     srcs = ["Václava Jiřikovského"]
     dsts = ["Hlavní třída", "Rektorát VŠB", "Pustkovecká", "Poruba,Studentské koleje"]
     if datetime.datetime.now().hour >= 12:
         srcs, dsts = dsts, srcs
 
-    return render_template(
-            'public_transport.html',
-            connections=public_transport_connections(srcs, dsts)
+    return templates.TemplateResponse(
+            request=request,
+            name='public_transport.html',
+            context={
+                'connections': public_transport_connections(srcs, dsts)
+            }
     )
 
-@app.route("/lunch.json", methods=['GET', 'POST'])
-async def lunch():
+@app.get("/lunch.json")
+@app.post("/lunch.json")
+async def lunch(request: Request):
     now = int(datetime.datetime.now().timestamp())
     key = f'restaurants.{datetime.date.today().strftime("%d-%m-%Y")}'
-    result_str = redis_client.get(key)
+    result_str = await redis_client.get(key)
     if not result_str or request.method == 'POST':
         throttle_key = f'{key}.throttle'
-        if redis_client.incr(throttle_key) != 1:
+        if await redis_client.incr(throttle_key) != 1:
             return {'error': 'Fetch limit reached. Try again later.'}
-        redis_client.expire(throttle_key, 60 * 3)
+        await redis_client.expire(throttle_key, 60 * 3)
 
         result = {
             'last_fetch': now,
-            'fetch_count': redis_client.incr(f'{key}.fetch_count'),
+            'fetch_count': await redis_client.incr(f'{key}.fetch_count'),
             'restaurants': list(await gather_restaurants()),
         }
-        redis_client.set(key, pickle.dumps(result))
+        await redis_client.set(key, pickle.dumps(result))
     else:
         result = pickle.loads(result_str)
 
@@ -56,21 +62,18 @@ async def lunch():
         if net.version == 4:
             disallow_nets.append(ipaddress.ip_network(f'::ffff:{net.network_address}/{96 + net.prefixlen}'))
 
-    visitor_addr = ipaddress.ip_address(request.remote_addr)
+    visitor_addr = ipaddress.ip_address(request.client.host)
     if not any([net for net in disallow_nets if visitor_addr in net]):
-        redis_client.incr(f'{key}.access_count')
-        redis_client.setnx(f'{key}.first_access', now)
+        await redis_client.incr(f'{key}.access_count')
+        await redis_client.setnx(f'{key}.first_access', now)
 
-    def get(k):
-        val = redis_client.get(f'{key}.{k}')
+    async def get(k):
+        val = await redis_client.get(f'{key}.{k}')
         if val:
             result[k] = int(val)
         else:
             result[k] = 0
 
-    get('access_count')
-    get('first_access')
+    await get('access_count')
+    await get('first_access')
     return result
-
-
-serve(app, port=5001, host="127.0.0.1")

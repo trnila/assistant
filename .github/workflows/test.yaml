@@ -10,5 +10,6 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
     - run: sudo apt-get install -y poppler-utils tesseract-ocr-ces
-    - run: pip install -r requirements.txt
-    - run: ./lunches.py
+    - run: pipx install poetry==1.8.3
+    - run: poetry install
+    - run: poetry run ./lunches.py

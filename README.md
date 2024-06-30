@@ -8,13 +8,14 @@ Install and start redis server for caching.
 $ pip install pre-commit
 $ pre-commit install
 
-$ pip install -r requirements.txt
+$ poetry install
+$ poetry shell
 
 # parse restaurant from CLI
 $ ./lunches.py bistroin
 
 # start API server
-$ ./app.py
+$ fastapi dev
 
 # install frontend
 $ cd frontend

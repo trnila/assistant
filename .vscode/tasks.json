@@ -33,7 +33,7 @@
         {
             "label": "Run Backend",
             "type": "shell",
-            "command": "python app.py",
+            "command": "poetry run fastapi dev",
             "group": {
                 "kind": "build",
                 "isDefault": true
