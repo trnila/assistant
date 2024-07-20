@@ -188,7 +188,7 @@
   h2 {
     margin: 0px;
   }
-  h2 a {
+  a {
     text-decoration: none;
     color: black;
   }
