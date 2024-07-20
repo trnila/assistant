@@ -534,7 +534,8 @@ def kikiriki(dom):
             )
 
         soup = lcs([f.name for f in parsed_food])
-        yield Soup(soup)
+        if soup:
+            yield Soup(soup)
         soup_len = len(soup)
         for f in parsed_food:
             f.name = f.name[soup_len:-1]
