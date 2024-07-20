@@ -572,7 +572,7 @@ async def gather_restaurants(allowed_restaurants=None):
         (re.compile(r"(s|š|S|Š)vestk"), "Trnk"),
         (re.compile(r"\s*(,|:)\s*"), "\\1 "),
         (re.compile(r"<[^<]+?>"), ""),
-        (re.compile(r"\d+\s*(g|ml|l|ks) "), ""),
+        (re.compile(r"\d+\s*(g|ml|l|ks)( |,)"), ""),
         (re.compile(r"\([^)]+\)"), ""),
         (re.compile(r"(\s*[0-9]+\s*,)+\s*$"), ""),
         (re.compile(r"A?\s*[0-9]+(,[0-9]+)*,? "), ""),
