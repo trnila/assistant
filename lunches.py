@@ -411,6 +411,25 @@ async def sbeerka(dom, http):
         yield Lunch(name=beer.text(), price=price)
 
 
+@restaurant("Menza", "https://stravovani.vsb.cz/webkredit", Location.Poruba)
+async def menza(http):
+    date = datetime.datetime.now().replace(hour=22, minute=0, second=0, microsecond=0)
+    fdate = date.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]
+
+    res = await http.get(f"https://stravovani.vsb.cz/webkredit/Api/Ordering/Menu?Dates={fdate}Z&CanteenId=1")
+    g = json.loads(res.text)["groups"]
+    if not g:
+        return
+
+    soup = g[0]["rows"][0]["item"]
+    yield Soup(soup["mealName"], soup["price"])
+
+    for lunch in g[1]["rows"]:
+        lunch = lunch["item"]
+        if lunch["price"] != 0:
+            yield Lunch(lunch["mealName"], lunch["price"])
+
+
 @restaurant("La Futura", "https://lafuturaostrava.cz/", Location.Dubina)
 def lafutura(dom):
     container = dom.css_first(".jet-listing-dynamic-repeater__items")
