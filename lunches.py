@@ -262,7 +262,7 @@ async def poklad(dom, http):
         yield Lunch(**item)
 
 
-@restaurant("Trebovicky mlyn", "https://www.trebovickymlyn.cz/", Location.Poruba)
+@restaurant("Trebovicky mlyn", "https://www.trebovickymlyn.cz/denni-menu/", Location.Poruba)
 def trebovicky_mlyn(dom):
     el = dom.css_first(".soup h2")
     if not el:
