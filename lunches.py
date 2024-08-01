@@ -577,6 +577,7 @@ async def gather_restaurants(allowed_restaurants=None):
         (re.compile(r"\([^)]+\)"), ""),
         (re.compile(r"(\s*[0-9]+\s*,)+\s*$"), ""),
         (re.compile(r"A?\s*[0-9]+(,[0-9]+)*,? "), ""),
+        (re.compile(r"\s+,"), ","),
         (re.compile(r" +"), " "),
     ]
     UPPER_REGEXP = re.compile(r"[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ]")
