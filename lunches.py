@@ -552,6 +552,26 @@ def assen(dom):
     yield from menicka_parser(dom)
 
 
+@restaurant("Bistro Paulus", "https://www.bistro-paulus.cz/poledni-menu/", Location.Olomouc)
+def paulus(dom):
+    current_day = datetime.datetime.now().strftime("%-d.%-m.%Y")
+    for day_dom in dom.css(".section-day"):
+        day = "".join(day_dom.css_first("h3").text(strip=True).split()[1:])
+        if current_day not in day:
+            continue
+        soup_table = day_dom.css("table")[0].css("span")
+        lunch_table = day_dom.css("table")[1].css("span") + day_dom.css("table")[2].css("span")
+        for i in range(0, len(soup_table), 2):
+            soup = soup_table[i].text(strip=True)
+            price = soup_table[i + 1].text(strip=True)
+            yield Soup(soup, price)
+
+        for i in range(0, len(lunch_table), 2):
+            name = lunch_table[i].text(strip=True)
+            price = lunch_table[i + 1].text(strip=True)
+            yield Lunch(name, price=price)
+
+
 def fix_price(price):
     if not price:
         return None
@@ -568,7 +588,7 @@ def fix_price(price):
 
 async def gather_restaurants(allowed_restaurants=None):
     replacements = [
-        (re.compile(r"^\s*(Polévka|BUSINESS MENU|business)", re.IGNORECASE), ""),
+        (re.compile(r"^\s*(Polévka|BUSINESS MENU|business|SALÁT TÝDNE)", re.IGNORECASE), ""),
         (re.compile(r"k menu\s*$"), ""),
         (re.compile(r"(s|š|S|Š)vestk"), "Trnk"),
         (re.compile(r"\s*(,|:)\s*"), "\\1 "),
