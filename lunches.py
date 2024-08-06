@@ -559,17 +559,14 @@ def paulus(dom):
         day = "".join(day_dom.css_first("h3").text(strip=True).split()[1:])
         if current_day not in day:
             continue
-        soup_table = day_dom.css("table")[0].css("span")
-        lunch_table = day_dom.css("table")[1].css("span") + day_dom.css("table")[2].css("span")
-        for i in range(0, len(soup_table), 2):
-            soup = soup_table[i].text(strip=True)
-            price = soup_table[i + 1].text(strip=True)
-            yield Soup(soup, price)
 
-        for i in range(0, len(lunch_table), 2):
-            name = lunch_table[i].text(strip=True)
-            price = lunch_table[i + 1].text(strip=True)
-            yield Lunch(name, price=price)
+        soup_table = day_dom.css("table")[0].css("span")
+        for soup, price in zip(soup_table[::2], soup_table[1::2]):
+            yield Soup(soup.text(strip=True), price.text(strip=True))
+
+        lunch_table = day_dom.css("table")[1].css("span") + day_dom.css("table")[2].css("span")
+        for lunch, price in zip(lunch_table[::2], lunch_table[1::2]):
+            yield Lunch(lunch.text(strip=True), price=price.text(strip=True))
 
 
 def fix_price(price):
