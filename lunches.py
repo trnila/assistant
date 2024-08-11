@@ -588,14 +588,18 @@ async def gather_restaurants(allowed_restaurants=None):
         (re.compile(r"^\s*(Polévka|BUSINESS MENU|business|SALÁT TÝDNE)", re.IGNORECASE), ""),
         (re.compile(r"k menu\s*$"), ""),
         (re.compile(r"(s|š|S|Š)vestk"), "Trnk"),
+        # ugly space before comma or colon
         (re.compile(r"\s*(,|:)\s*"), "\\1 "),
+        # HTML tags
         (re.compile(r"<[^<]+?>"), ""),
+        # grammage
         (re.compile(r"\d+\s*(g|ml|l|ks)( |,)"), ""),
+        # alergens pattern 'Al ('
+        (re.compile(r"\s*A?l?\.?\s*\("), "("),
+        # brackets
         (re.compile(r"\([^)]+\)"), ""),
-        (re.compile(r"(\s*[0-9]+\s*,)+\s*$"), ""),
-        (re.compile(r"A?\s*[0-9]+(,[0-9]+)*,? "), ""),
-        (re.compile(r"\s+,"), ","),
-        (re.compile(r" +"), " "),
+        # multiple white-spaces
+        (re.compile(r"\s+"), " "),
     ]
     UPPER_REGEXP = re.compile(r"[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ]")
 
