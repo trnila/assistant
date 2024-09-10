@@ -10,7 +10,7 @@ from selectolax.parser import HTMLParser
 
 async def public_transport_connections(sources, destinations):
     async def fetch(http, source, destination):
-        url = f"https://idos.idnes.cz/odis/spojeni/vysledky/?f={source}&fc=303003&t={destination}&tc=303003"
+        url = f"https://idos.cz/odis/spojeni/vysledky/?f={source}&fc=303003&t={destination}&tc=303003"
         start = time()
         links = []
         resp = await http.get(url)
