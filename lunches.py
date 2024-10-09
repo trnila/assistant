@@ -376,18 +376,18 @@ def rusty_bell_pub(dom):
 @restaurant("Viktorka", "https://www.viktorkaostrava.cz/denni-menu/", Location.Poruba)
 def viktorka(dom):
     sections = dom.css("ul.elementor-price-list")
-    type = [Soup, Lunch]
+    types = [Soup, Lunch]
     day_nth = datetime.datetime.today().weekday()
-    for i in range(2):
+    for i, food_type in enumerate(types):
         titles = sections[i].css("span.elementor-price-list-title")
         prices = sections[i].css("span.elementor-price-list-price")
 
         meals = [(title.text().strip(), price.text().strip()) for title, price in zip(titles, prices)]
 
         for name, price in meals:
-            # in case of soups [i = 0] check the current week day
-            if (i == 0 and name.startswith(days[day_nth])) or i == 1:
-                yield type[i](name=name, price=price)
+            # check the current week day in case of soup
+            if (food_type is Soup and name.startswith(days[day_nth])) or food_type is Lunch:
+                yield food_type(name=name, price=price)
 
 
 @restaurant("Kurnik sopa", "https://www.kurniksopahospoda.cz", Location.Poruba)
