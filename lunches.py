@@ -387,6 +387,8 @@ def viktorka(dom):
         for name, price in meals:
             # check the current week day in case of soup
             if (food_type is Soup and name.startswith(days[day_nth])) or food_type is Lunch:
+                #this is valid only for soups, but doesn't affect lunches
+                name = name.replace("{} - ".format(days[day_nth]), "", 1)
                 yield food_type(name=name, price=price)
 
 
