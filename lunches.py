@@ -373,23 +373,9 @@ def rusty_bell_pub(dom):
         yield food
 
 
-@restaurant("Viktorka", "https://www.viktorkaostrava.cz/denni-menu/", Location.Poruba)
+@restaurant("Viktorka", "https://www.menicka.cz/api/iframe/?id=6603", Location.Poruba)
 def viktorka(dom):
-    sections = dom.css("ul.elementor-price-list")
-    types = [Soup, Lunch]
-    day_nth = datetime.datetime.today().weekday()
-    for i, food_type in enumerate(types):
-        titles = sections[i].css("span.elementor-price-list-title")
-        prices = sections[i].css("span.elementor-price-list-price")
-
-        meals = [(title.text().strip(), price.text().strip()) for title, price in zip(titles, prices)]
-
-        for name, price in meals:
-            # check the current week day in case of soup
-            if (food_type is Soup and name.startswith(days[day_nth])) or food_type is Lunch:
-                #this is valid only for soups, but doesn't affect lunches
-                name = name.replace("{} - ".format(days[day_nth]), "", 1)
-                yield food_type(name=name, price=price)
+    yield from menicka_parser(dom)
 
 
 @restaurant("Kurnik sopa", "https://www.kurniksopahospoda.cz", Location.Poruba)
