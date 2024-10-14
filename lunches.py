@@ -280,7 +280,7 @@ def trebovicky_mlyn(dom):
             )
 
 
-@restaurant("La Strada", "http://www.lastrada.cz/cz/?tpl=plugins/DailyMenu/print&week_shift=", Location.Poruba)
+@restaurant("La Strada", "https://www.lastrada.cz/cz/?tpl=plugins/DailyMenu/print&week_shift=", Location.Poruba)
 def lastrada(dom):
     day_nth = datetime.datetime.today().weekday()
 
