@@ -1,4 +1,4 @@
-FROM python:3.12-slim-bookworm as build-stage
+FROM python:3.12-slim-bookworm AS build-stage
 
 RUN pip install poetry
 
@@ -14,7 +14,7 @@ RUN touch README.md
 
 RUN poetry install --without dev --no-root && rm -rf $POETRY_CACHE_DIR
 
-FROM python:3.12-slim-bookworm as runtime
+FROM python:3.12-slim-bookworm AS runtime
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
      && apt-get -y install poppler-utils tesseract-ocr-ces
