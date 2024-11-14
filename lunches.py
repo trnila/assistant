@@ -375,7 +375,7 @@ async def sbeerka(dom, http):
         line = line.strip()
         if "Polévky" in line:
             t = Soup
-        elif "Hlavní jídla" in line:
+        elif "Hlavní chody" in line:
             t = Lunch
         elif t and "Záloha" not in line:
             m = REGEXP.search(line)
