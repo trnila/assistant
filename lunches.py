@@ -355,6 +355,11 @@ def viktorka(dom):
     yield from menicka_parser(dom)
 
 
+@restaurant("Futrovna", "https://www.menicka.cz/api/iframe/?id=7200", Location.Poruba)
+def futrovna(dom):
+    yield from menicka_parser(dom)
+
+
 @restaurant("Kurnik sopa", "https://www.kurniksopahospoda.cz", Location.Poruba)
 def kurniksopa(dom):
     for pivo in dom.css("#naCepu-list tr"):
