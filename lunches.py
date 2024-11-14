@@ -47,6 +47,7 @@ def restaurant(title, url=None, location: Location = None):
 class Soup:
     name: str
     price: int = None
+    photo: str = None
 
 
 @dataclass
@@ -55,6 +56,7 @@ class Lunch:
     num: int = None
     price: int = None
     ingredients: str = None
+    photo: str = None
 
 
 def menicka_parser(dom):

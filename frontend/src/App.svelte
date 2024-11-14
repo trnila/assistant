@@ -150,8 +150,13 @@
         <ul>
           {#each restaurant.soups || [] as soup}
             <li>
-              <strong>{soup.name}</strong>
-              {#if soup.price}<span class="price">{soup.price} Kč</span>{/if}
+              {#if soup.photo}
+                <img src="{soup.photo}">
+              {/if}
+              <div>
+                <strong>{soup.name}</strong>
+                {#if soup.price}<span class="price">{soup.price} Kč</span>{/if}
+              </div>
             </li>
           {/each}
         </ul>
@@ -159,14 +164,19 @@
         <ul>
           {#each restaurant.lunches || [] as lunch}
             <li class:ondras={lunch.name.toLowerCase().includes('ondráš')}>
-              <strong>
-                {lunch.num}.
-                {lunch.name}
-              </strong>
-              {#if lunch.price}<span class="price">{lunch.price} Kč</span>{/if}
-              {#if lunch.ingredients}
-                <div>{lunch.ingredients}</div>
+              {#if lunch.photo}
+                <img src="{lunch.photo}">
               {/if}
+              <div>
+                <strong>
+                  {lunch.num}.
+                  {lunch.name}
+                </strong>
+                {#if lunch.price}<span class="price">{lunch.price} Kč</span>{/if}
+                {#if lunch.ingredients}
+                  <div>{lunch.ingredients}</div>
+                {/if}
+              </div>
             </li>
           {:else}
             No lunch found.
@@ -196,6 +206,16 @@
     padding: 0;
     margin: 0;
     list-style: none;
+  }
+
+  li {
+    display: flex;
+    gap: 5px;
+  }
+
+  li img {
+    width: 150px;
+    padding-bottom: 5px;
   }
 
   div.restaurant {
