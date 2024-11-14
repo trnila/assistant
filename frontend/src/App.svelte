@@ -166,6 +166,21 @@
             <li class:ondras={lunch.name.toLowerCase().includes('ondráš')}>
               {#if lunch.photo}
                 <img src="{lunch.photo}">
+                <div class="photo-zoom">
+                  <div>
+                    <img src="{lunch.photo}">
+                    <div>
+                      <strong>
+                        {lunch.num}.
+                        {lunch.name}
+                      </strong>
+                      {#if lunch.price}<span class="price">{lunch.price} Kč</span>{/if}
+                      {#if lunch.ingredients}
+                        <div>{lunch.ingredients}</div>
+                      {/if}
+                    </div>
+                  </div>
+                </div>
               {/if}
               <div>
                 <strong>
@@ -213,9 +228,37 @@
     gap: 5px;
   }
 
-  li img {
-    width: 150px;
+  li > img {
+    width: 100px;
     padding-bottom: 5px;
+  }
+
+  img:hover + .photo-zoom {
+    display: flex;
+  }
+
+  .photo-zoom {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.8);
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+  }
+
+  :global(body:not(.dark) .photo-zoom) {
+    color: white;
+  }
+
+  .photo-zoom > div {
+    margin: auto;
+  }
+
+  .photo-zoom img {
+    max-width: 80vw;
+    max-height: 80vh;
   }
 
   div.restaurant {
