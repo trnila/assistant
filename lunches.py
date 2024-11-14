@@ -100,7 +100,7 @@ def bistroin(dom):
         else:
             match = re.match(r"^\s*(?P<num>[0-9]+)\s*\.\s*(?P<name>.+)", item["name"])
             if match:
-                yield Lunch(**match.groupdict(), price=price - 5, ingredients=ingredients)
+                yield Lunch(**match.groupdict(), price=price - 10, ingredients=ingredients)
 
 
 @restaurant("U jarosu", "https://www.ujarosu.cz/cz/denni-menu/", Location.Poruba)
