@@ -227,13 +227,18 @@ async def poklad(dom, http):
                 for s in line.split(" I "):
                     yield Soup(s)
             else:
-                m = re.match(r"^(?P<num>[0-9]+)\s*\.?\s*(?P<name>.*?) (?P<price>[0-9]+) Kč", line)
+                print(line)
+                m = re.match(r"^\s*(?P<num>([0-9]+|BUSINESS))\s*\.?\s*(?P<name>.*?) (?P<price>[0-9]+) Kč", line)
                 if m:
                     if item:
                         yield Lunch(**item)
                     item = m.groupdict()
                 elif item:
-                    item["name"] += line
+                    if not line:
+                        yield Lunch(**item)
+                        item = None
+                    else:
+                        item["name"] += line
 
     if item:
         yield Lunch(**item)
