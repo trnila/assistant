@@ -290,9 +290,14 @@ def ellas(dom):
         for food in foods[1:]:
             if food.text():
                 parsed = re.match(
-                    r"\s*(?P<num>[0-9]+)\s*\.\s*(?P<name>[A-Z -]+)\s+(?P<ingredients>.*?)\s*(\([0-9 ,]+\))?\s*(?P<price>[0-9]+),-",  # noqa: E501
+                    r"\s*(?P<num>[0-9]+)\s*\.\s*(?P<name>.*?)\s*(\([0-9 ,]+\))?\s*(?P<price>[0-9]+),-",  # noqa: E501
                     food.text(),
                 ).groupdict()
+
+                m = re.match(r"^(?P<name>[A-Z -]+)\s+(?P<ingredients>.*?)$", parsed["name"])
+                if m:
+                    parsed.update(m.groupdict())
+
                 yield Lunch(**parsed)
 
 
