@@ -560,6 +560,8 @@ async def gather_restaurants(allowed_restaurants=None):
         (re.compile(r"\d+\s*(g|ml|l|ks)( |,)"), ""),
         # alergens pattern 'Al ('
         (re.compile(r"\s*A?l?\.?\s*\("), "("),
+        # alergens as a numbers: 1, 2, 3
+        (re.compile(r"[0-9]+(\s*,\s*[0-9]+)+"), ""),
         # brackets
         (re.compile(r"\([^)]+\)"), ""),
         # multiple white-spaces
