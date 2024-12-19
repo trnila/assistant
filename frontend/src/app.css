@@ -27,3 +27,28 @@ body.dark .iconify {
 body.dark strong {
     color: #BBBBBB !important
 }
+
+body.dark input[type=search] {
+    background: #2B2B2B !important;
+    color: var(--theme-color) !important;
+    border-color: var(--theme-color) !important;
+    border: 1px solid;
+    border-radius: 4px;
+}
+
+div.settings, div.settings-buttons {
+    flex-direction: row;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+@media all and (max-width: 666px) {
+    div.settings {
+        flex-direction: column;
+    }
+
+    div.settings-search, input[type=search] {
+        width: 100%;
+    }
+}
