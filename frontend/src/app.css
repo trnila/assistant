@@ -27,3 +27,7 @@ body.dark .iconify {
 body.dark strong {
     color: #BBBBBB !important
 }
+
+.restaurant.hidden {
+    display: none;
+}

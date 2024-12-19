@@ -9,6 +9,9 @@
   import { writable } from "svelte/store";
 
   let showStats = false;
+  let searchText = "";
+
+  $: search(searchText);
 
   const selected_location_key = "location";
   const selected_location = writable(
@@ -90,6 +93,18 @@
     document.body.classList[darkmode ? "add" : "remove"]("dark");
   }
 
+  function search(searchText) {
+    const restaurants = document.querySelectorAll('.restaurant');
+
+    restaurants.forEach(restaurant => {
+      const restaurantElements = restaurant.querySelectorAll('*');
+      const restaurantElementsArray = Array.from(restaurantElements);
+      const containsText = Array.from(restaurantElements).some(el => el.textContent?.toLowerCase().includes(searchText.toLowerCase()));
+
+      restaurant.classList.toggle("hidden", !containsText);
+    });
+  }
+
   let promise = load();
 </script>
 
@@ -101,6 +116,7 @@
       <Date />
 
       <div class="settings">
+        Search: <input type="search" placeholder="..." bind:value={searchText} />
         <LocationFilter
           locations={[...new Set(restaurants.map((r) => r.location))]}
           bind:selected_location={$selected_location}
