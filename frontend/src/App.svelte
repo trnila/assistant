@@ -9,6 +9,11 @@
   import { writable } from "svelte/store";
 
   let showStats = false;
+  let searchText = "";
+  let normalizedSearchText = "";
+  let searchElement;
+
+  $: search(searchText);
 
   const selected_location_key = "location";
   const selected_location = writable(
@@ -90,6 +95,21 @@
     document.body.classList[darkmode ? "add" : "remove"]("dark");
   }
 
+  function normalizeString(str) {
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  }
+
+  function search(searchText) {
+    normalizedSearchText = normalizeString(searchText);
+  }
+
+  function hasRestaurantMeal(restaurant, searchText) {
+    return ((normalizeString(restaurant.name).includes(searchText))
+          || ((restaurant.soups || []).some((s) => normalizeString(s.name).includes(searchText)))
+          || ((restaurant.lunches || []).some((l) => normalizeString(l.name).includes(searchText)))
+          || searchText === "")
+  }
+
   let promise = load();
 </script>
 
@@ -101,6 +121,10 @@
       <Date />
 
       <div class="settings">
+        <div class="settings-search">
+        Search: <input type="search" placeholder="..." bind:value={searchText} />
+      </div>
+        <div class="settings-buttons">
         <LocationFilter
           locations={[...new Set(restaurants.map((r) => r.location))]}
           bind:selected_location={$selected_location}
@@ -118,6 +142,7 @@
         <button on:click={refresh}>
           <Icon icon="zondicons:reload" width="20" height="20" />
         </button>
+      </div>
       </div>
     </div>
 
@@ -139,7 +164,8 @@
       <Nextbikes />
     {/if}
 
-    {#each restaurants.filter((r) => r.location == $selected_location || $selected_location == null) as restaurant}
+    {#each restaurants.filter((r) => (r.location == $selected_location || $selected_location == null)
+        && hasRestaurantMeal(r, normalizedSearchText)) as restaurant}
       <div class="restaurant">
         <h2>
           <a href={restaurant.url}>
