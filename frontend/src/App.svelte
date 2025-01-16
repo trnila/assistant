@@ -7,6 +7,7 @@
   import Fireworks from "./Fireworks.svelte";
   import LocationFilter from "./LocationFilter.svelte";
   import { writable } from "svelte/store";
+  import FocusKey from "svelte-focus-key";
 
   let showStats = false;
   let searchText = "";
@@ -122,27 +123,28 @@
 
       <div class="settings">
         <div class="settings-search">
-        Search: <input type="search" placeholder="..." bind:value={searchText} />
-      </div>
+          <input type="search" placeholder="Search (press '/' to focus)" bind:value={searchText} bind:this={searchElement} />
+          <FocusKey element={searchElement} />
+        </div>
         <div class="settings-buttons">
-        <LocationFilter
-          locations={[...new Set(restaurants.map((r) => r.location))]}
-          bind:selected_location={$selected_location}
-        />
+          <LocationFilter
+            locations={[...new Set(restaurants.map((r) => r.location))]}
+            bind:selected_location={$selected_location}
+          />
 
-        <a href="https://github.com/trnila/assistant">
-          <Icon icon="bi:github" width="20" height="20" />
-        </a>
-        <button on:click={toggleDarkMode}>
-          <Icon icon="ic:baseline-dark-mode" width="20" height="20" />
-        </button>
-        <button on:click={() => (showStats = !showStats)}>
-          <Icon icon="bi:bar-chart-line-fill" width="20" height="20" />
-        </button>
-        <button on:click={refresh}>
-          <Icon icon="zondicons:reload" width="20" height="20" />
-        </button>
-      </div>
+          <a href="https://github.com/trnila/assistant">
+            <Icon icon="bi:github" width="20" height="20" />
+          </a>
+          <button on:click={toggleDarkMode}>
+            <Icon icon="ic:baseline-dark-mode" width="20" height="20" />
+          </button>
+          <button on:click={() => (showStats = !showStats)}>
+            <Icon icon="bi:bar-chart-line-fill" width="20" height="20" />
+          </button>
+          <button on:click={refresh}>
+            <Icon icon="zondicons:reload" width="20" height="20" />
+          </button>
+        </div>
       </div>
     </div>
 
