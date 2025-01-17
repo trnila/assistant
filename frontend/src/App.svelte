@@ -111,6 +111,10 @@
           || searchText === "")
   }
 
+  function shallHighlight(meal, searchText) {
+    return (normalizeString(meal).includes(normalizeString(searchText)) && searchText !== "");
+  }
+
   let promise = load();
 </script>
 
@@ -177,7 +181,7 @@
 
         <ul>
           {#each restaurant.soups || [] as soup}
-            <li>
+            <li class:search_highlight={shallHighlight(soup.name, normalizedSearchText)}>
               {#if soup.photo}
                 <img src="{soup.photo}">
               {/if}
@@ -191,7 +195,7 @@
 
         <ul>
           {#each restaurant.lunches || [] as lunch}
-            <li class:ondras={lunch.name.toLowerCase().includes('ondráš')}>
+            <li class:ondras={lunch.name.toLowerCase().includes('ondráš')} class:search_highlight={shallHighlight(lunch.name, normalizedSearchText)}>
               {#if lunch.photo}
                 <img src="{lunch.photo}">
                 <div class="photo-zoom">
