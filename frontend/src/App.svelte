@@ -7,7 +7,6 @@
   import Fireworks from "./Fireworks.svelte";
   import LocationFilter from "./LocationFilter.svelte";
   import { writable } from "svelte/store";
-  import FocusKey from "svelte-focus-key";
 
   let showStats = false;
   let searchText = "";
@@ -121,6 +120,15 @@
     return (normalizeString(meal).includes(normalizeString(searchText)) && searchText !== "");
   }
 
+  function onKeyDown(event) {
+    // Filter / and CTRL+F keys
+    if ((event.key === '/') || (event.ctrlKey && event.key === 'f')) {
+      searchElement.focus();
+      // Block browser default event
+      event.preventDefault();
+    }
+  }
+
   let promise = load();
 </script>
 
@@ -134,7 +142,6 @@
       <div class="settings">
         <div class="settings-search">
           <input type="search" placeholder="Search (press '/' to focus)" bind:value={searchText} bind:this={searchElement} />
-          <FocusKey element={searchElement} />
         </div>
         <div class="settings-buttons">
           <LocationFilter
@@ -246,6 +253,8 @@
     <p>{error}</p>
   {/await}
 </div>
+
+<svelte:window on:keydown={onKeyDown} />
 
 <style>
   h2 {

@@ -395,11 +395,6 @@ source-map-js@^1.0.1, source-map-js@^1.2.0:
   resolved "https://registry.yarnpkg.com/source-map-js/-/source-map-js-1.2.0.tgz#16b809c162517b5b8c3e7dcd315a2a5c2612b2af"
   integrity sha512-itJW8lvSA0TXEphiRoawsCksnlf8SyvmFzIhltqAHluXd88pkCd+cXJVHTDwdCr0IzwptSm035IHQktUu1QUMg==
 
-svelte-focus-key@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/svelte-focus-key/-/svelte-focus-key-1.0.0.tgz#5d98de7a7cf621b9e00e4d5b91300f438fff228c"
-  integrity sha512-3MfnB7B1ObH2Myje1GRd6VPGkYNTRk6nB3E2czdbbXtvXbv5Ma9oR4g4vPbhB6fFUBpd59cxfwayqRhZK44E9Q==
-
 svelte-hmr@^0.15.3:
   version "0.15.3"
   resolved "https://registry.yarnpkg.com/svelte-hmr/-/svelte-hmr-0.15.3.tgz#df54ccde9be3f091bf5f18fc4ef7b8eb6405fbe6"
