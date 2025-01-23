@@ -3,18 +3,7 @@ name: Validation
 on:
     workflow_dispatch:
     push:
-      branches:
-        - 'master'
-      paths:
-        - '**.py'
-        - '.github/workflows/validation.yml'
     pull_request:
-      types: [ opened, synchronize, reopened ]
-      branches:
-        - 'master'
-      paths:
-        - '**.py'
-        - '.github/workflows/validation.yml'
 
 env:
   POETRY_NO_INTERACTION: 1
