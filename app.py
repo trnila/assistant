@@ -6,6 +6,7 @@ import pickle
 import redis.asyncio as redis
 from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
+from starlette.responses import FileResponse
 
 # from werkzeug.middleware.proxy_fix import ProxyFix
 # from flask_redis import FlaskRedis
@@ -16,6 +17,11 @@ app = FastAPI(debug=True)
 templates = Jinja2Templates(directory="templates")
 # app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
 redis_client = redis.Redis()
+
+
+@app.get("/")
+def index():
+    return FileResponse("index.html")
 
 
 @app.get("/public_transport")
