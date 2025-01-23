@@ -23,6 +23,7 @@ class Location(str, Enum):
     Poruba = ("Poruba",)
     Dubina = ("Dubina",)
     Zabreh = ("Zábřeh",)
+    Centrum = ("Centrum",)
     Olomouc = ("Olomouc",)
 
 
@@ -536,6 +537,41 @@ def paulus(dom):
         lunch_table = day_dom.css("table")[1].css("span") + day_dom.css("table")[2].css("span")
         for lunch, price in zip(lunch_table[::2], lunch_table[1::2]):
             yield Lunch(lunch.text(strip=True), price=price.text(strip=True))
+
+
+@restaurant("Slezska P.U.O.R", "https://www.menicka.cz/api/iframe/?id=1406", Location.Centrum)
+def srub(dom):
+    yield from menicka_parser(dom)
+
+
+@restaurant("Frankie's Pub", "https://www.menicka.cz/api/iframe/?id=7080", Location.Centrum)
+def srub(dom):
+    yield from menicka_parser(dom)
+
+
+@restaurant("Ostrawica Lokál", "https://www.menicka.cz/api/iframe/?id=8648", Location.Centrum)
+def srub(dom):
+    yield from menicka_parser(dom)
+
+
+@restaurant("Kanteen", "https://www.menicka.cz/api/iframe/?id=8684", Location.Centrum)
+def srub(dom):
+    yield from menicka_parser(dom)
+
+
+@restaurant("Pizza Coloseum Karolina", "https://www.menicka.cz/api/iframe/?id=517", Location.Centrum)
+def srub(dom):
+    yield from menicka_parser(dom)
+
+
+@restaurant("IQ Restaurant", "https://www.menicka.cz/api/iframe/?id=1401", Location.Centrum)
+def srub(dom):
+    yield from menicka_parser(dom)
+
+
+@restaurant("2 Promile", "https://www.menicka.cz/api/iframe/?id=3486", Location.Centrum)
+def srub(dom):
+    yield from menicka_parser(dom)
 
 
 def fix_price(price):
