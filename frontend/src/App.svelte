@@ -64,6 +64,12 @@
             distance: 1500,
             location: "Zábřeh",
           },
+          {
+            lat: 49.8322447,
+            lon: 18.2874353,
+            distance: 1500,
+            location: "Centrum",
+          },
         ];
         for (const place of places) {
           const d = distance(lat, lon, place.lat, place.lon);
