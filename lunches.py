@@ -76,7 +76,7 @@ def menicka_parser(dom):
 
         for food in day_dom.css(".main"):
             match = re.search(r"\((?P<ingredients>.*)\)", food.css_first(".food").text())
-            ingredients = match.group("ingredients") if match else None
+            ingredients = match.group("ingredients") if match and len(match.group("ingredients")) > 6 else None
 
             yield Lunch(
                 num=food.css_first(".no").text().strip(" ."),
