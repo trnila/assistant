@@ -599,6 +599,8 @@ async def gather_restaurants(allowed_restaurants=None):
         (re.compile(r"<[^<]+?>"), ""),
         # grammage
         (re.compile(r"\d+\s*(g|ml|l|ks)( |,)"), ""),
+        # remove leftover alergen 'A:1,2,3'
+        (re.compile(r"A:\s*\d(\s*,\s*\d+,)*"), ""),
         # alergens pattern 'Al ('
         (re.compile(r"\s*A?l?\.?\s*\("), "("),
         # alergens as a numbers: 1, 2, 3
