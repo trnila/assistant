@@ -5,108 +5,27 @@ on:
     push:
     pull_request:
 
-env:
-  POETRY_NO_INTERACTION: 1
-  POETRY_VIRTUALENVS_IN_PROJECT: 1
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
-  cancel-in-progress: true
-
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Cache Poetry install
-        uses: actions/cache@v4
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
         with:
-          path: ~/.cache/pypoetry
-          key: poetry
-
-      - name: Install Poetry
-        run: |
-          pipx install poetry
-
-      - name: Setup Python
-        id: setup_python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: 'poetry'
-          cache-dependency-path: 'poetry.lock'
-
-      - name: Cache venv
-        uses: actions/cache@v4
-        id: cache-venv
-        with:
-            path: ./.venv/
-            key: ${{ runner.os }}-${{ steps.setup_python.outputs.python-version }}-app-${{ hashFiles('./poetry.lock') }}
-
-      - name: Install App dependencies
-        run: |
-          poetry install --no-interaction --no-root
-        if: steps.cache-venv.outputs.cache-hit != 'true'
-
-      - name: Install App
-        run: |
-          poetry install --no-interaction
-
+          enable-cache: true
       - name: Ruff format
-        run: |
-          poetry run ruff format --check .
-
+        run: uv run ruff format --check .
       - name: Ruff lint
         if: success() || failure()
-        run: |
-          poetry run ruff check . --output-format github
+        run: uv run ruff check . --output-format github
 
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get install -y poppler-utils tesseract-ocr-ces
-
-      - name: Cache Poetry install
-        uses: actions/cache@v4
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
         with:
-          path: ~/.cache/pypoetry
-          key: poetry
-
-      - name: Install Poetry
-        run: |
-          pipx install poetry
-
-      - name: Setup Python
-        id: setup_python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: 'poetry'
-          cache-dependency-path: 'poetry.lock'
-
-      - name: Cache venv
-        uses: actions/cache@v4
-        id: cache-venv
-        with:
-            path: ./.venv/
-            key: ${{ runner.os }}-${{ steps.setup_python.outputs.python-version }}-app-${{ hashFiles('./poetry.lock') }}
-
-      - name: Install App dependencies
-        run: |
-          poetry install --no-interaction --no-root
-        if: steps.cache-venv.outputs.cache-hit != 'true'
-
-      - name: Install App
-        run: |
-          poetry install --no-interaction
-
+          enable-cache: true
+      - run: sudo apt update && sudo apt install -y poppler-utils tesseract-ocr
       - name: Run tests
-        run: |
-          poetry run ./lunches.py
+        run: uv run ./lunches.py

@@ -1,6 +1,6 @@
 #!/bin/sh
 set -ex
-pre-commit install --install-hooks --overwrite
-poetry install --no-interaction
+uv sync
+uv run pre-commit install --install-hooks --overwrite
 cd frontend
 yarn install --frozen-lockfile

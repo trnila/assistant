@@ -33,7 +33,7 @@
         {
             "label": "Run Backend",
             "type": "shell",
-            "command": "poetry run fastapi dev",
+            "command": "uv run fastapi dev",
             "group": {
                 "kind": "build",
                 "isDefault": true
