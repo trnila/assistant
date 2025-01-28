@@ -304,7 +304,7 @@ def ellas(dom):
 
 @restaurant("Saloon Pub", "http://www.saloon-pub.cz/cs/denni-nabidka/", Location.Poruba)
 def saloon_pub(dom):
-    day = dom.css_first(f'#{datetime.datetime.strftime(datetime.datetime.now(), "%Y-%m-%d")} + section')
+    day = dom.css_first(f"#{datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d')} + section")
     if not day:
         return
     yield Soup(name=day.css_first(".category-info").text())

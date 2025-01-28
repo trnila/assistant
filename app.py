@@ -43,7 +43,7 @@ async def public_transport(request: Request):
 @app.post("/lunch.json")
 async def lunch(request: Request):
     now = int(datetime.datetime.now().timestamp())
-    key = f'restaurants.{datetime.date.today().strftime("%d-%m-%Y")}'
+    key = f"restaurants.{datetime.date.today().strftime('%d-%m-%Y')}"
     result_str = await redis_client.get(key)
     if not result_str or request.method == "POST":
         throttle_key = f"{key}.throttle"
