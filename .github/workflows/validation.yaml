@@ -3,7 +3,6 @@ name: Validation
 on:
     workflow_dispatch:
     push:
-    pull_request:
 
 jobs:
   lint:
