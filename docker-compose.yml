@@ -2,14 +2,9 @@ services:
   redis:
     container_name: lunchmenu-redis
     image: redis:alpine
-    restart: unless-stopped
-    ports:
-      - "6379:6379"
     command: "redis-server --save 20 1 --loglevel warning"
     volumes:
       - "redis_data:/data"
-    extra_hosts:
-      - host.docker.internal:host-gateway
 
   lunchmenu:
     container_name: lunchmenu
@@ -18,11 +13,10 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
-    restart: unless-stopped
+    environment:
+      REDIS_HOST: redis
     ports:
-      - "443:443"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - "8000:8000"
 
 volumes:
   redis_data:
