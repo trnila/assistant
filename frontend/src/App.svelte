@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import Date from "./Date.svelte";
   import Loader from "./Loader.svelte";
   import Nextbikes from "./Nextbikes.svelte";
@@ -8,12 +10,11 @@
   import LocationFilter from "./LocationFilter.svelte";
   import { writable } from "svelte/store";
 
-  let showStats = false;
-  let searchText = "";
-  let normalizedSearchText = "";
-  let searchElement;
+  let showStats = $state(false);
+  let searchText = $state("");
+  let normalizedSearchText = $state("");
+  let searchElement = $state();
 
-  $: search(searchText);
 
   const selected_location_key = "location";
   const selected_location = writable(
@@ -129,13 +130,16 @@
     }
   }
 
-  let promise = load();
+  let promise = $state(load());
+  run(() => {
+    search(searchText);
+  });
 </script>
 
 <div>
   {#await promise}
     <Loader />
-  {:then { restaurants, last_fetch, fetch_count, first_access, access_count }}
+  {:then {restaurants, last_fetch, fetch_count, first_access, access_count }}
     <div class="header">
       <Date />
 
@@ -152,13 +156,13 @@
           <a href="https://github.com/trnila/assistant">
             <Icon icon="bi:github" width="20" height="20" />
           </a>
-          <button on:click={toggleDarkMode}>
+          <button onclick={toggleDarkMode}>
             <Icon icon="ic:baseline-dark-mode" width="20" height="20" />
           </button>
-          <button on:click={() => (showStats = !showStats)}>
+          <button onclick={() => (showStats = !showStats)}>
             <Icon icon="bi:bar-chart-line-fill" width="20" height="20" />
           </button>
-          <button on:click={refresh}>
+          <button onclick={refresh}>
             <Icon icon="zondicons:reload" width="20" height="20" />
           </button>
         </div>
@@ -254,7 +258,7 @@
   {/await}
 </div>
 
-<svelte:window on:keydown={onKeyDown} />
+<svelte:window onkeydown={onKeyDown} />
 
 <style>
   h2 {

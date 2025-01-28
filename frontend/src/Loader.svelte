@@ -1,7 +1,7 @@
 <script>
   import Icon from "@iconify/svelte";
 
-  let show = false;
+  let show = $state(false);
   setTimeout(() => (show = true), 300);
 </script>
 

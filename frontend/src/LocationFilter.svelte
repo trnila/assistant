@@ -1,15 +1,21 @@
 <script>
     import Icon from "@iconify/svelte";
 
-    export let locations;
-    export let selected_location = null;
+    /**
+     * @typedef {Object} Props
+     * @property {any} locations
+     * @property {any} [selected_location]
+     */
+
+    /** @type {Props} */
+    let { locations, selected_location = $bindable(null) } = $props();
 </script>
 
 <div>
     <Icon icon="mdi:location" width="20" height="20" />
     {#each locations as location}
         <button
-            on:click={() => (selected_location = location)}
+            onclick={() => (selected_location = location)}
             class:selected={selected_location === location}>{location}</button
         >
     {/each}

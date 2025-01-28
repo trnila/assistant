@@ -2,7 +2,7 @@
     import { onMount, onDestroy } from "svelte";
     import { Fireworks } from "fireworks-js";
 
-    let container;
+    let container = $state();
     let fireworks;
     let stopTimer;
 
@@ -24,9 +24,9 @@
     }
 </script>
 
-<svelte:window on:keydown={(evt) => evt.key == 'Escape' && cancel()} on:click={cancel} />
+<svelte:window onkeydown={(evt) => evt.key == 'Escape' && cancel()} onclick={cancel} />
 
-<div bind:this={container} />
+<div bind:this={container}></div>
 
 <style>
     div {

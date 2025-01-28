@@ -1,9 +1,11 @@
 <script>
-    export let data;
-    export let last_fetch;
-    export let fetch_count;
-    export let first_access;
-    export let access_count;
+    let {
+        data,
+        last_fetch,
+        fetch_count,
+        first_access,
+        access_count
+    } = $props();
 
     let max = Math.max(...data.map((r) => r.elapsed));
 </script>

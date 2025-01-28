@@ -18,7 +18,7 @@
 
     let date = new Date();
     let day = days[date.getDay()];
-    let counter = null;
+    let counter = $state(null);
 
     function remainingMillis() {
         const target = new Date();
@@ -60,7 +60,7 @@
     }, 21);
 
 
-    let alarm;
+    let alarm = $state();
     if(remainingMillis() > 0) {
         setTimeout(function() {
             alarm.volume = 0.3;
