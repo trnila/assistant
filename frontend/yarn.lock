@@ -120,10 +120,10 @@
   resolved "https://registry.yarnpkg.com/@esbuild/win32-x64/-/win32-x64-0.18.20.tgz#786c5f41f043b07afb1af37683d7c33668858f6d"
   integrity sha512-kTdfRcSiDfQca/y9QIkng02avJ+NCaQvrMejlsB3RRv5sE9rRoeBPISaZpKxHELzRxZyLvNts1P27W3wV+8geQ==
 
-"@iconify/svelte@^3.0.0":
-  version "3.1.6"
-  resolved "https://registry.yarnpkg.com/@iconify/svelte/-/svelte-3.1.6.tgz#060821ecae5dd92e9c1f0420a674eda5bc060086"
-  integrity sha512-yLSrlkOx5J6xXU5GDLPBV/MdVBVEZhd36onfqSbxQobp1XBoWQbMPLNZyCAmTKCPnmzXSowGy79agl8FQ3kj6A==
+"@iconify/svelte@^4.0.0":
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/@iconify/svelte/-/svelte-4.2.0.tgz#94f718f06ccee465d02360a68191a55ad89d7b0e"
+  integrity sha512-fEl0T7SAPonK7xk6xUlRPDmFDZVDe2Z7ZstlqeDS/sS8ve2uyU+Qa8rTWbIqzZJlRvONkK5kVXiUf9nIc+6OOQ==
   dependencies:
     "@iconify/types" "^2.0.0"
 
