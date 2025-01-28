@@ -19,6 +19,7 @@ jobs:
         with:
           platforms: linux/aarch64,linux/amd64
           tags: ghcr.io/trnila/assistant:latest,ghcr.io/trnila/assistant:${{ github.sha }}
+          pull: true
           push: true
 
   deploy:
