@@ -3,10 +3,11 @@ COPY frontend /frontend
 RUN cd frontend && yarn install && yarn run build
 
 FROM alpine:edge AS build-backend
-RUN apk --no-cache add python3 uv poppler-utils tesseract-ocr tesseract-ocr-data-ces
+RUN apk --no-cache add python3 uv poppler-utils tesseract-ocr tesseract-ocr-data-ces tzdata
 COPY pyproject.toml uv.lock *.py README.md /app/
 COPY templates /app/templates/
 RUN cd /app && uv sync --no-cache --no-dev
 COPY --from=build-frontend /frontend/dist/index.html /app/index.html
+ENV TZ=Europe/Prague
 WORKDIR "/app"
 ENTRYPOINT ["uv", "run", "--no-sync", "fastapi", "run"]
