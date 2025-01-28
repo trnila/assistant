@@ -18,6 +18,13 @@ jobs:
         if: success() || failure()
         run: uv run ruff check . --output-format github
 
+  build_frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cd frontend && yarn install && yarn run build
+
+
   test:
     runs-on: ubuntu-latest
     steps:
