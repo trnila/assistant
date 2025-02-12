@@ -259,7 +259,7 @@ def ellas(dom):
         yield Soup(name=foods[0].text())
 
         for food in foods[1:]:
-            if food.text():
+            if food.text().strip():
                 parsed = re.match(
                     r"\s*(?P<num>[0-9]+)\s*\.\s*(?P<name>.*?)\s*(\([0-9 ,]+\))?\s*(?P<price>[0-9]+),-",  # noqa: E501
                     food.text(),
