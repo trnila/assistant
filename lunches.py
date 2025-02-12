@@ -166,44 +166,14 @@ def globus(dom):
         yield t(spans[1].text(), price=price)
 
 
-@restaurant("Jacks Burger", "https://www.zomato.com/cs/widgets/daily_menu.php?entity_id=16525845", Location.Poruba)
+@restaurant("Jacks Burger", "https://www.jacksburgerbar.cz/", Location.Poruba)
 def jacks_burger(dom):
-    started = False
-    full_name = ""
-    num = None
-    price = None
-    for el in dom.css(".main-body > div"):
-        if el.css_matches(".line-wider"):
-            break
-        name = el.css_first(".item-name")
-        if name is None:
-            continue
-        name = name.text(strip=True)
-        if "ROZVOZ PŘES" in name.upper() or "---------" in name or "JBB OSTRAVA" in name.upper():
-            continue
-
-        if re.match(r"^[0-9]+\..+", name):
-            if full_name:
-                yield Lunch(name=full_name, price=price, num=num)
-                full_name = ""
-                price = None
-            num = name.split(".")[0]
-
-        full_name += name
-        if not started:
-            if full_name != "Polévka dle denní nabídky":
-                yield Soup(name=full_name)
-            full_name = ""
-            started = True
-        else:
-            price = el.css_first(".item-price")
-            if price:
-                price = price.text(strip=True)
-                if price:
-                    yield Lunch(name=full_name, price=price, num=num)
-                    full_name = ""
-                    price = None
-                    num = None
+    for row in dom.css("#dennimenu table:first-of-type tr"):
+        category, name, price = (td.text() for td in row.css("td"))
+        if category.lower() == "polévka":
+            yield Soup(name)
+        elif category.isdigit():
+            yield Lunch(name, num=category, price=price)
 
 
 @restaurant("Poklad", "https://dkpoklad.cz/restaurace/", Location.Poruba)
