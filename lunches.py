@@ -331,9 +331,22 @@ def rusty_bell_pub(dom):
         yield food
 
 
-@restaurant("Viktorka", "https://www.menicka.cz/api/iframe/?id=6603", Location.Poruba)
+@restaurant("Viktorka", "https://www.viktorkaostrava.cz/denni-menu/", Location.Poruba)
 def viktorka(dom):
-    yield from menicka_parser(dom)
+    soups, lunches = dom.css(".elementor-widget-price-list")
+    day_nth = datetime.datetime.today().weekday()
+
+    for item in soups.css(".elementor-price-list-title"):
+        name = item.text(strip=True)
+        if days[day_nth] in name:
+            yield Soup(name.split("-", 2)[1])
+
+    ignore_day_stems = [day[:-1].lower() for idx, day in enumerate(days) if idx != day_nth]
+    for item in lunches.css(".elementor-price-list-item"):
+        name = item.css_first(".elementor-price-list-title").text(strip=True)
+        price = item.css_first(".elementor-price-list-price").text(strip=True)
+        if not any(stem in name.lower() for stem in ignore_day_stems):
+            yield Lunch(name, price=price)
 
 
 @restaurant("Futrovna", "https://www.menicka.cz/api/iframe/?id=7200", Location.Poruba)
