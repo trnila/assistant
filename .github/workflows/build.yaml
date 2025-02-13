@@ -19,8 +19,9 @@ jobs:
         with:
           platforms: linux/aarch64,linux/amd64
           tags: ghcr.io/trnila/assistant:latest,ghcr.io/trnila/assistant:${{ github.sha }}
-          pull: true
           push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   deploy:
     if: github.repository == 'trnila/assistant'
