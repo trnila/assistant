@@ -529,9 +529,9 @@ to-regex-range@^5.0.1:
     is-number "^7.0.0"
 
 vite-plugin-singlefile@^2.0.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/vite-plugin-singlefile/-/vite-plugin-singlefile-2.1.0.tgz#b22da5b005da05fd2742a3145e70c9a4ef7b5960"
-  integrity sha512-7tJo+UgZABlKpY/nubth/wxJ4+pUGREPnEwNOknxwl2MM0zTvF14KTU4Ln1lc140gjLLV5mjDrvuoquU7OZqCg==
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/vite-plugin-singlefile/-/vite-plugin-singlefile-2.2.0.tgz#0ae8604d8e7845e8d4b036e58b15456b989e98de"
+  integrity sha512-Ik1wXmJaGzeQtUeIV7JprDUqqy6DlLzXAY27Blei5peE4c9VJF+Kp9xWDJeuX0RJUZmFbIAuw1/RAh06A+Ql7w==
   dependencies:
     micromatch "^4.0.8"
 
