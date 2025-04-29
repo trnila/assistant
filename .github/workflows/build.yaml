@@ -27,5 +27,6 @@ jobs:
     if: github.repository == 'trnila/assistant'
     runs-on: ubuntu-latest
     needs: build
+    concurrency: deploy
     steps:
       - run: 'curl -X POST --fail -s -H"Authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}" https://trnila.eu/hooks/assistant'
