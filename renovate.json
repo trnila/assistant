@@ -3,5 +3,7 @@
   "extends": [
     "config:recommended",
     ":disableDependencyDashboard"
-  ]
+  ],
+  "automerge": true,
+  "automergeType": "branch"
 }
