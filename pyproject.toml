@@ -10,7 +10,7 @@ dependencies = [
     "selectolax>=0.3.21,<0.4",
     "fastapi[standard]>=0.115.7,<0.116",
     "uvicorn[standard]>=0.34,<0.35",
-    "redis[hiredis]>=5.0.7,<6",
+    "redis[hiredis]>=6,<7",
 ]
 
 [dependency-groups]
