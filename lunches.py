@@ -93,7 +93,10 @@ async def subprocess_check_output(cmd, input):
 
 @restaurant("Bistro IN", "https://bistroin.choiceqr.com/delivery", Location.Poruba)
 def bistroin(dom):
-    data = json.loads(dom.css_first("#__NEXT_DATA__").text())
+    elem = dom.css_first("#__NEXT_DATA__")
+    if not elem:
+        return
+    data = json.loads(elem.text())
 
     for item in data["props"]["app"]["menu"]:
         ingredients = re.sub(r"Al\. \(.+", "", item["description"])
@@ -369,8 +372,12 @@ def kurniksopa(dom):
 @restaurant("Sbeerka", "https://sbeerka.cz/denni-nabidka", Location.Poruba)
 async def sbeerka(dom, http):
     REGEXP = re.compile(r"(?P<name>.*?)\s*(/[0-9,\s*]+/)?\s*(?P<price>[0-9]+\s*,-)")
+    elem = dom.css_first(".wysiwyg")
+    if not elem:
+        return
+
     t = None
-    for line in dom.css_first(".wysiwyg").text().splitlines():
+    for line in elem.text().splitlines():
         line = line.strip()
         if "Polévky" in line:
             t = Soup
