@@ -369,7 +369,7 @@ def kurniksopa(dom):
         )
 
 
-@restaurant("Sbeerka", "https://sbeerka.cz/denni-nabidka", Location.Poruba)
+@restaurant("Sbeerka", "https://sbeerka.cz/tydenni-menu", Location.Poruba)
 async def sbeerka(dom, http):
     REGEXP = re.compile(r"(?P<name>.*?)\s*(/[0-9,\s*]+/)?\s*(?P<price>[0-9]+\s*,-)")
     elem = dom.css_first(".wysiwyg")
@@ -379,7 +379,7 @@ async def sbeerka(dom, http):
     t = None
     for line in elem.text().splitlines():
         line = line.strip()
-        if "Polévky" in line:
+        if "Polévk" in line:
             t = Soup
         elif "Hlavní chody" in line:
             t = Lunch
