@@ -236,6 +236,27 @@ def trebovicky_mlyn(dom):
             )
 
 
+@restaurant("Trebovicka role", "https://trebovickarole.cz/denni-menu/", Location.Poruba)
+def trebovicka_role(dom):
+    MENU_REGEXP = re.compile(r"Menu (?P<num>[0-9])\s*:\s*(?P<name>.+)")
+
+    day_nth = datetime.datetime.today().weekday()
+    for h4 in dom.css("h4"):
+        if days[day_nth] in h4.text():
+            table = h4.next
+            while table.tag != "table":
+                table = table.next
+            for row in table.css("tr"):
+                name = row.css("td")[0].text(strip=True)
+                price = row.css("td")[1].text(strip=True)
+
+                if "Polévka" in name:
+                    yield Soup(name.split(":")[1])
+                else:
+                    m = re.match(MENU_REGEXP, name)
+                    yield Lunch(price=price, **m.groupdict())
+
+
 @restaurant("La Strada", "https://www.lastrada.cz/cz/?tpl=plugins/DailyMenu/print&week_shift=", Location.Poruba)
 def lastrada(dom):
     day_nth = datetime.datetime.today().weekday()
