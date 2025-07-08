@@ -5,18 +5,13 @@ on:
     push:
 
 jobs:
-  lint:
+  precommit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
-        with:
-          enable-cache: true
-      - name: Ruff format
-        run: uv run ruff format --check .
-      - name: Ruff lint
-        if: success() || failure()
-        run: uv run ruff check . --output-format github
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v2
+    - run: pip install pre-commit
+    - run: pre-commit run --show-diff-on-failure --color=always --all-files
 
   build_frontend:
     runs-on: ubuntu-latest
