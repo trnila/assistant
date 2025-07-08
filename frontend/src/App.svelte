@@ -213,7 +213,7 @@
         <ul>
           {#each restaurant.lunches || [] as lunch}
             <li class:ondras={lunch.name.toLowerCase().includes('ondráš')} class:search_highlight={shallHighlight(lunch.name, normalizedSearchText)}>
-              {#if lunch.photo}
+              {#if lunch.photo && !window.matchMedia("(max-width: 768px)").matches}
                 <img src="{lunch.photo}">
                 <div class="photo-zoom">
                   <div>
