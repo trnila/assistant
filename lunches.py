@@ -428,7 +428,10 @@ async def menza(http):
     for lunch in g[1]["rows"]:
         lunch = lunch["item"]
         if lunch["price"] != 0:
-            yield Lunch(lunch["mealName"], price=lunch["price"])
+            photo = None
+            if lunch["imageId"]:
+                photo = f'https://stravovani.vsb.cz/webkredit/Api/Ordering/Image?id={lunch["imageId"]}'
+            yield Lunch(lunch["mealName"], price=lunch["price"], photo=photo)
 
 
 @restaurant("La Futura", "https://lafuturaostrava.cz/", Location.Dubina)
