@@ -430,7 +430,7 @@ async def menza(http):
         if lunch["price"] != 0:
             photo = None
             if lunch["imageId"]:
-                photo = f'https://stravovani.vsb.cz/webkredit/Api/Ordering/Image?id={lunch["imageId"]}'
+                photo = f"https://stravovani.vsb.cz/webkredit/Api/Ordering/Image?id={lunch['imageId']}"
             yield Lunch(lunch["mealName"], price=lunch["price"], photo=photo)
 
 
