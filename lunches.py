@@ -201,7 +201,6 @@ async def poklad(dom, http):
                 for s in line.split(" I "):
                     yield Soup(s)
             else:
-                print(line)
                 m = re.match(r"^\s*(?P<num>([0-9]+|BUSINESS))\s*\.?\s*(?P<name>.*?) (?P<price>[0-9]+) Kč", line)
                 if m:
                     if item:
