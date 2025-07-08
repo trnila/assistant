@@ -275,25 +275,18 @@ def lastrada(dom):
 @restaurant("Ellas", "https://www.restauraceellas.cz/", Location.Poruba)
 def ellas(dom):
     day_nth = datetime.datetime.today().weekday()
+    lunch_pattern = re.compile(r"(?P<name>.*?)\s*(\(([^)]+)\))?\s*–\s*(?P<price>[0-9]+),-")
 
     for div in dom.css(".moduletable .custom"):
         if div.css_first("h3").text(strip=True) != days[day_nth]:
             continue
-        foods = div.css("p")
-        yield Soup(name=foods[0].text())
 
-        for food in foods[1:]:
-            if food.text().strip():
-                parsed = re.match(
-                    r"\s*(?P<num>[0-9]+)\s*\.\s*(?P<name>.*?)\s*(\([0-9 ,]+\))?\s*(?P<price>[0-9]+),-",  # noqa: E501
-                    food.text(),
-                ).groupdict()
+        yield Soup(name=div.css_first("p").text())
 
-                m = re.match(r"^(?P<name>[A-Z -]+)\s+(?P<ingredients>.*?)$", parsed["name"])
-                if m:
-                    parsed.update(m.groupdict())
-
-                yield Lunch(**parsed)
+        for ol in div.css("ol"):
+            num = ol.attrs.get("start", 1)
+            parsed = re.match(lunch_pattern, ol.text(strip=True))
+            yield Lunch(num=num, **parsed.groupdict())
 
 
 @restaurant("Saloon Pub", "http://www.saloon-pub.cz/cs/denni-nabidka/", Location.Poruba)
