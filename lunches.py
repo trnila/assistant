@@ -252,7 +252,7 @@ def trebovicka_role(dom):
 
                 if "Polévka" in name:
                     yield Soup(name.split(":")[1])
-                else:
+                elif name.strip():
                     m = re.match(MENU_REGEXP, name)
                     yield Lunch(price=price, **m.groupdict())
 
