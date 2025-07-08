@@ -22,7 +22,3 @@ repos:
       - id: ruff-format
       - id: ruff
         args: [ --fix ]
-  - repo: https://github.com/codespell-project/codespell
-    rev: v2.3.0
-    hooks:
-      - id: codespell
