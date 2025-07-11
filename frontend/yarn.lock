@@ -291,9 +291,9 @@
     debug "^4.3.7"
 
 "@sveltejs/vite-plugin-svelte@^5.0.0":
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/@sveltejs/vite-plugin-svelte/-/vite-plugin-svelte-5.1.0.tgz#5c1df403a23a7bfc5b856621c3234de3e8946121"
-  integrity sha512-wojIS/7GYnJDYIg1higWj2ROA6sSRWvcR1PO/bqEyFr/5UZah26c8Cz4u0NaqjPeVltzsVpt2Tm8d2io0V+4Tw==
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/@sveltejs/vite-plugin-svelte/-/vite-plugin-svelte-5.1.1.tgz#4db3b0475190a7148ad8740259ad57081bcfccbc"
+  integrity sha512-Y1Cs7hhTc+a5E9Va/xwKlAJoariQyHY+5zBgCZg4PFWNYQ1nMN9sjK1zhw1gK69DuqVP++sht/1GZg1aRwmAXQ==
   dependencies:
     "@sveltejs/vite-plugin-svelte-inspector" "^4.0.1"
     debug "^4.4.1"
@@ -574,9 +574,9 @@ vite@^7.0.0:
     fsevents "~2.3.3"
 
 vitefu@^1.0.6:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/vitefu/-/vitefu-1.0.6.tgz#3d2534621ea95081e6fbf4c0d8db9a292357a41b"
-  integrity sha512-+Rex1GlappUyNN6UfwbVZne/9cYC4+R2XDk9xkNXBKMw6HQagdX9PgZ8V2v1WUSK1wfBLp7qbI1+XSNIlB1xmA==
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/vitefu/-/vitefu-1.1.1.tgz#c39b7e4c91bf2f6c590fb96e0758f394dff5795b"
+  integrity sha512-B/Fegf3i8zh0yFbpzZ21amWzHmuNlLlmJT6n7bu5e+pCHUKQIfXSYokrqOBGEMMe9UG2sostKQF9mml/vYaWJQ==
 
 zimmerframe@^1.1.2:
   version "1.1.2"
