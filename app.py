@@ -7,17 +7,28 @@ import pickle
 import redis.asyncio as redis
 from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel
 from starlette.responses import FileResponse, HTMLResponse
 
 # from werkzeug.middleware.proxy_fix import ProxyFix
 # from flask_redis import FlaskRedis
-from lunches import gather_restaurants
+from lunches import RestaurantMenu, gather_restaurants
 from public_transport import public_transport_connections
 
 app = FastAPI(debug=True)
 templates = Jinja2Templates(directory="templates")
 # app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
 redis_client = redis.Redis(host=os.getenv("REDIS_HOST", None))
+
+
+class ErrorResponse(BaseModel):
+    error: str
+
+
+class LunchResponse(BaseModel):
+    last_fetch: int
+    fetch_count: int
+    restaurants: list[RestaurantMenu]
 
 
 @app.get("/")
@@ -41,21 +52,21 @@ async def public_transport(request: Request) -> HTMLResponse:
 
 @app.get("/lunch.json")
 @app.post("/lunch.json")
-async def lunch(request: Request) -> dict[str, str]:
+async def lunch(request: Request) -> LunchResponse | ErrorResponse:
     now = int(datetime.datetime.now().timestamp())
     key = f"restaurants.{datetime.date.today().strftime('%d-%m-%Y')}"
     result_str = await redis_client.get(key)
     if not result_str or request.method == "POST":
         throttle_key = f"{key}.throttle"
         if await redis_client.incr(throttle_key) != 1:
-            return {"error": "Fetch limit reached. Try again later."}
+            return ErrorResponse(error="Fetch limit reached. Try again later.")
         await redis_client.expire(throttle_key, 60 * 3)
 
-        result = {
-            "last_fetch": now,
-            "fetch_count": await redis_client.incr(f"{key}.fetch_count"),
-            "restaurants": list(await gather_restaurants()),
-        }
+        result = LunchResponse(
+            last_fetch=now,
+            fetch_count=await redis_client.incr(f"{key}.fetch_count"),
+            restaurants=list(await gather_restaurants()),
+        )
         await redis_client.set(key, pickle.dumps(result))
     else:
         result = pickle.loads(result_str)
@@ -77,9 +88,9 @@ async def lunch(request: Request) -> dict[str, str]:
     async def get(k: str) -> None:
         val = await redis_client.get(f"{key}.{k}")
         if val:
-            result[k] = int(val)
+            setattr(result, k, int(val))
         else:
-            result[k] = 0
+            setattr(result, k, 0)
 
     await get("access_count")
     await get("first_access")
