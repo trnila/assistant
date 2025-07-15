@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 import asyncio
 import datetime
-import inspect
 import json
 import logging
 import re
 import string
 import time
 import traceback
-from collections.abc import Generator
-from dataclasses import dataclass
+import types
+from collections.abc import AsyncGenerator, Callable, Generator, Iterable
+from dataclasses import dataclass, field
 from enum import Enum
 from html import unescape
+from typing import Any
 
 import httpx
 from selectolax.parser import HTMLParser, Node, Selector
@@ -28,40 +29,64 @@ class Location(str, Enum):
     Olomouc = ("Olomouc",)
 
 
-def restaurant(title, url=None, location: Location = None):
-    def wrapper(fn):
-        def wrap(*args, **kwargs):
-            return fn(*args, **kwargs)
-
-        wrap.restaurant_parser = {
-            "name": fn.__name__,
-            "title": title,
-            "url": url,
-            "location": location,
-            "args": fn.__code__.co_varnames[: fn.__code__.co_argcount],
-        }
-        return wrap
-
-    return wrapper
-
-
 @dataclass
 class Soup:
     name: str
-    price: int = None
-    photo: str = None
+    price: int | str | None = None
+    photo: str | None = None
 
 
 @dataclass
 class Lunch:
     name: str
-    num: int = None
-    price: int = None
-    ingredients: str = None
-    photo: str = None
+    num: int | str | None = None
+    price: int | str | None = None
+    ingredients: str | None = None
+    photo: str | None = None
 
 
-Foods = Generator[Soup | Lunch, None, None]
+@dataclass
+class RestaurantMenu:
+    name: str
+    url: str
+    location: Location
+    elapsed: float = 0
+    elapsed_html_request: float = 0
+    elapsed_parsing: float = 0
+    soups: list[Soup] = field(default_factory=list)
+    lunches: list[Lunch] = field(default_factory=list)
+    error: str | None = None
+
+
+Foods = Generator[Soup | Lunch, None, None] | AsyncGenerator[Soup | Lunch]
+ParserFn = Callable[..., Foods]
+
+
+@dataclass
+class RestaurantParser:
+    name: str
+    title: str
+    url: str
+    location: Location
+    args: tuple[str, ...]
+    parse_fn: ParserFn
+
+
+def restaurant(title: str, url: str, location: Location) -> Callable[..., RestaurantParser]:
+    def wrapper(fn: ParserFn) -> RestaurantParser:
+        def wrap(*args: Any, **kwargs: Any) -> Foods:
+            return fn(*args, **kwargs)
+
+        return RestaurantParser(
+            name=fn.__name__,
+            title=title,
+            url=url,
+            location=location,
+            args=fn.__code__.co_varnames[: fn.__code__.co_argcount],
+            parse_fn=wrap,
+        )
+
+    return wrapper
 
 
 def menicka_parser(dom: Node) -> Foods:
@@ -90,7 +115,7 @@ def menicka_parser(dom: Node) -> Foods:
             )
 
 
-async def subprocess_check_output(cmd, input):
+async def subprocess_check_output(cmd: list[str], input: bytes) -> str:
     p = await asyncio.create_subprocess_exec(*cmd, stdin=asyncio.subprocess.PIPE, stdout=asyncio.subprocess.PIPE)
     return (await p.communicate(input))[0].decode("utf-8")
 
@@ -584,7 +609,7 @@ def two_promile(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
-def fix_price(price):
+def fix_price(price: int | str | None) -> int | None:
     if not price:
         return None
     if not isinstance(price, str):
@@ -598,7 +623,7 @@ def fix_price(price):
     return None
 
 
-async def gather_restaurants(allowed_restaurants=None):
+async def gather_restaurants(allowed_restaurants: list[str] | None = None) -> list[RestaurantMenu]:
     replacements = [
         (re.compile(r"^\s*(Polévka|BUSINESS MENU|business|SALÁT TÝDNE|tip týdne)", re.IGNORECASE), ""),
         (re.compile(r"k menu\s*$"), ""),
@@ -622,15 +647,15 @@ async def gather_restaurants(allowed_restaurants=None):
     ]
     UPPER_REGEXP = re.compile(r"[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ]")
 
-    def detect_encoding(text):
+    def detect_encoding(text: bytes) -> str:
         if b"windows-1250" in text:
             return "windows-1250"
         return "utf-8"
 
     client = httpx.AsyncClient(default_encoding=detect_encoding, headers={"User-Agent": USER_AGENT}, timeout=15)
 
-    def cleanup(restaurant):
-        def fix_name(name):
+    def cleanup(menu: RestaurantMenu) -> None:
+        def fix_name(name: str) -> str:
             name = unescape(name)
             for pattern, replacement in replacements:
                 name = pattern.sub(replacement, name)
@@ -641,87 +666,79 @@ async def gather_restaurants(allowed_restaurants=None):
                 name = name.capitalize()
             return name
 
-        for t in ["lunches", "soups"]:
-            num = 0
-            for food in restaurant.get(t, []):
-                food.price = fix_price(food.price)
-                food.name = fix_name(food.name)
-                if t == "lunches":
-                    if food.ingredients:
-                        food.ingredients = fix_name(food.ingredients)
+        for soup in menu.soups:
+            soup.price = fix_price(soup.price)
+            soup.name = fix_name(soup.name)
 
-                    if isinstance(food.num, str):
-                        try:
-                            food.num = int(food.num.replace(".", ""))
-                        except ValueError:
-                            logging.warning("Failed to parse lunch position: %s", food.num)
-                            food.num = None
-                    if not food.num:
-                        food.num = num + 1
-                    num = food.num
-        return restaurant
+        num = 0
+        for food in menu.lunches:
+            food.price = fix_price(food.price)
+            food.name = fix_name(food.name)
+            if food.ingredients:
+                food.ingredients = fix_name(food.ingredients)
 
-    async def collect(parser):
+            if isinstance(food.num, str):
+                try:
+                    food.num = int(food.num.replace(".", ""))
+                except ValueError:
+                    logging.warning("Failed to parse lunch position: %s", food.num)
+                    food.num = None
+            if not food.num:
+                food.num = num + 1
+            num = food.num
+
+    async def collect(parser: RestaurantParser) -> RestaurantMenu:
         start = time.time()
-        parser_info = parser.restaurant_parser
-        res = {
-            "name": parser_info["title"],
-            "url": parser_info["url"],
-            "location": parser_info["location"],
-        }
+        res = RestaurantMenu(
+            name=parser.title,
+            url=parser.url,
+            location=parser.location,
+        )
         try:
-            lunches = []
-            soups = []
-
-            args = {}
-            arg_names = parser_info["args"]
-            if "res" in arg_names or "dom" in arg_names:
-                response = await client.get(parser_info["url"])
-                if "res" in arg_names:
+            args: dict[str, Node | httpx.AsyncClient | str] = {}
+            if "res" in parser.args or "dom" in parser.args:
+                response = await client.get(parser.url)
+                if "res" in parser.args:
                     args["res"] = response.text
-                elif "dom" in arg_names:
-                    args["dom"] = HTMLParser(response.text)
-            if "http" in arg_names:
+                elif "dom" in parser.args:
+                    dom = HTMLParser(response.text)
+                    if dom.root:
+                        args["dom"] = dom.root
+            if "http" in parser.args:
                 args["http"] = client
             html_request_time = time.time() - start
             start = time.time()
-            parsed = parser(**args)
-            if inspect.isasyncgen(parsed):
-                parsed = [i async for i in parsed]
-            for item in parsed or []:
+
+            async def materialize() -> list[Soup | Lunch]:
+                parsed = parser.parse_fn(**args)
+                if isinstance(parsed, types.AsyncGeneratorType):
+                    return [i async for i in parsed]
+                elif isinstance(parsed, Iterable):
+                    return list(parsed)
+                return []
+
+            for item in await materialize() or []:
                 if isinstance(item, Soup):
-                    soups.append(item)
+                    res.soups.append(item)
                 elif isinstance(item, Lunch):
-                    lunches.append(item)
+                    res.lunches.append(item)
                 else:
-                    raise "Unsupported item"
+                    raise NotImplementedError("Unsupported item")
             match_time = time.time() - start
-            return cleanup(
-                {
-                    **res,
-                    "lunches": lunches,
-                    "soups": soups,
-                    "elapsed": html_request_time + match_time,
-                    "elapsed_html_request": html_request_time,
-                    "elapsed_parsing": match_time,
-                }
-            )
+            res.elapsed = html_request_time + match_time
+            res.elapsed_html_request = html_request_time
+            res.elapsed_parsing = match_time
+            cleanup(res)
         except:  # noqa: E722
-            return {
-                **res,
-                "error": traceback.format_exc(),
-                "elapsed": time.time() - start,
-                "elapsed_html_request": 0,
-                "elapsed_parsing": 0,
-            }
+            res.error = traceback.format_exc()
+            res.elapsed = time.time() - start
+        return res
 
-    restaurants = [obj for _, obj in globals().items() if hasattr(obj, "restaurant_parser")]
+    restaurants = [obj for _, obj in globals().items() if isinstance(obj, RestaurantParser)]
     if not allowed_restaurants:
-        allowed_restaurants = [r.restaurant_parser["name"] for r in restaurants]
+        allowed_restaurants = [r.name for r in restaurants]
 
-    return await asyncio.gather(
-        *[collect(r) for r in restaurants if r.restaurant_parser["name"] in allowed_restaurants]
-    )
+    return await asyncio.gather(*[collect(r) for r in restaurants if r.name in allowed_restaurants])
 
 
 if __name__ == "__main__":
@@ -737,21 +754,21 @@ if __name__ == "__main__":
     restaurants = asyncio.run(gather_restaurants(args.restaurant))
 
     sorters = {
-        "time": lambda r: r["elapsed"],
-        "error": lambda r: ("error" in r, len(r.get("lunches", [])) == 0),
+        "time": lambda r: r.elapsed,
+        "error": lambda r: (r.error, len(r.lunches) == 0),
     }
 
     exit_code = 0
-    for restaurant in sorted(restaurants, key=sorters[args.sort]):
+    for rest in sorted(restaurants, key=sorters[args.sort]):
         print()
-        print(restaurant["name"], f"({restaurant['elapsed']:.3}s)")
-        if "error" in restaurant:
+        print(rest.name, f"({rest.elapsed:.3}s)")
+        if rest.error:
             exit_code = 1
-            print(restaurant["error"])
+            print(rest.error)
         else:
-            for soup in restaurant["soups"]:
+            for soup in rest.soups:
                 print(" ", soup)
-            for lunch in restaurant["lunches"]:
+            for lunch in rest.lunches:
                 print(" ", lunch)
 
     exit(exit_code)
