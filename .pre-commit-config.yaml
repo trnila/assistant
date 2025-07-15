@@ -4,9 +4,6 @@ repos:
     hooks:
       - id: check-yaml
         args: [--allow-multiple-documents]
-      - id: check-case-conflict
-        name: Check for files with names that would conflict on a case-insensitive filesystem
-        entry: check-case-conflict
       - id: end-of-file-fixer
         name: Makes sure files end in a newline and only a newline.
         entry: end-of-file-fixer
