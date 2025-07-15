@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
-    - run: pip install pre-commit
+    - run: pip install pre-commit uv
     - run: pre-commit run --show-diff-on-failure --color=always --all-files
 
   build_frontend:

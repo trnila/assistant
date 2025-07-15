@@ -19,3 +19,10 @@ repos:
       - id: ruff-format
       - id: ruff
         args: [ --fix ]
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy static analyser
+        entry: "uv run mypy --follow-untyped-imports --non-interactive --install-types --no-warn-no-return"
+        types: [python]
+        language: system
