@@ -670,7 +670,7 @@ async def gather_restaurants(allowed_restaurants: list[str] | None = None) -> li
             name = unescape(name)
             for pattern, replacement in replacements:
                 name = pattern.sub(replacement, name)
-            name = name.strip(string.punctuation + string.whitespace + string.digits + "–—\xa0")
+            name = name.strip(string.punctuation + string.whitespace + string.digits + "„–—\xa0")
             uppers = len(UPPER_REGEXP.findall(name))
             if uppers > len(name) / 2:
                 name = name.lower()
