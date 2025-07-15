@@ -5,11 +5,28 @@ import itertools
 from time import time
 
 import httpx
-from selectolax.parser import HTMLParser
+from pydantic import BaseModel
+from selectolax.parser import HTMLParser, Node
 
 
-async def public_transport_connections(sources, destinations):
-    async def fetch(http, source, destination):
+class Station(BaseModel):
+    time: datetime.datetime
+    station: str
+
+
+class Connection(BaseModel):
+    link: str
+    from_: Station
+    to: Station
+
+
+class Link(BaseModel):
+    total: int
+    connections: list[Connection]
+
+
+async def public_transport_connections(sources: list[str], destinations: list[str]) -> list[Link]:
+    async def fetch(http: httpx.AsyncClient, source: str, destination: str) -> list[Link]:
         url = f"https://idos.cz/odis/spojeni/vysledky/?f={source}&fc=303003&t={destination}&tc=303003"
         start = time()
         links = []
@@ -18,36 +35,33 @@ async def public_transport_connections(sources, destinations):
         dom = HTMLParser(resp.text)
 
         for node in dom.css(".connection.box"):
-            link = {
-                "connections": [],
-            }
             total = node.css(".total strong")[0].text()
             if "hod" in total:
                 continue
 
-            link["total"] = int(total.split(" ")[0])
+            connections = []
             for a in node.css(".outside-of-popup"):
 
-                def to_datetime(s):
+                def to_datetime(s: str) -> datetime.datetime:
                     date = datetime.datetime.now()
                     hour, minute = s.split(":")
                     return date.replace(hour=int(hour), minute=int(minute), second=0)
 
-                def p(node):
-                    return {
-                        "time": to_datetime(node.css_first(".time").text()),
-                        "station": node.css_first(".station strong").text(),
-                    }
+                def p(node: Node) -> Station:
+                    return Station(
+                        time=to_datetime(node.css_first(".time").text()),
+                        station=node.css_first(".station strong").text(),
+                    )
 
-                link["connections"].append(
-                    {
-                        "link": a.css_first(".line-title h3").text(),
-                        "from": p(a.css_first(".stations .item")),
-                        "to": p(a.css(".stations .item")[1]),
-                    }
+                connections.append(
+                    Connection(
+                        link=a.css_first(".line-title h3").text(),
+                        from_=p(a.css_first(".stations .item")),
+                        to=p(a.css(".stations .item")[1]),
+                    )
                 )
 
-            links.append(link)
+            links.append(Link(total=int(total.split(" ")[0]), connections=connections))
         return links
 
     searches = list(itertools.product(sources, destinations))
@@ -55,15 +69,7 @@ async def public_transport_connections(sources, destinations):
         results = await asyncio.gather(*[fetch(http, *s) for s in searches])
         all_links = list(itertools.chain(*results))
 
-    def time_to_num(t):
-        return t
-        p = t.split(":")
-        p[0] = int(p[0])
-        p[1] = int(p[1])
-
-        return p[0] * 60 + p[1]
-
-    all_links.sort(key=lambda i: (time_to_num(i["connections"][-1]["to"]["time"]), i["total"]))
+    all_links.sort(key=lambda i: (i.connections[-1].to.time, i.total))
     return all_links
 
 

@@ -10,10 +10,10 @@
     </style>
 
     {% for connection in connections %}
-      <h3>{{ connection.total }} min, <span data-time="{{ connection.connections[0].from.time.timestamp() }}"></span></h3>
+      <h3>{{ connection.total }} min, <span data-time="{{ connection.connections[0].from_.time.timestamp() }}"></span></h3>
       {% for link in connection.connections %}
         <strong>{{ link.link }}</strong><br>
-        &nbsp;&nbsp;&nbsp;{{ link.from.time.strftime("%H:%M") }} {{ link.from.station }}<br>
+        &nbsp;&nbsp;&nbsp;{{ link.from_.time.strftime("%H:%M") }} {{ link.from_.station }}<br>
         &nbsp;&nbsp;&nbsp;{{ link.to.time.strftime("%H:%M") }} {{ link.to.station }}<br>
       {% endfor %}
       <hr>
