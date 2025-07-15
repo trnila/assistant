@@ -8,12 +8,13 @@ import re
 import string
 import time
 import traceback
+from collections.abc import Generator
 from dataclasses import dataclass
 from enum import Enum
 from html import unescape
 
 import httpx
-from selectolax.parser import HTMLParser, Selector
+from selectolax.parser import HTMLParser, Node, Selector
 
 days = ["Pondělí", "Úterý", "Středa", "Čtvrtek", "Pátek", "Sobota", "Neděle"]
 USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36"
@@ -60,7 +61,10 @@ class Lunch:
     photo: str = None
 
 
-def menicka_parser(dom):
+Foods = Generator[Soup | Lunch, None, None]
+
+
+def menicka_parser(dom: Node) -> Foods:
     current_day = datetime.datetime.now().strftime("%-d.%-m.%Y")
     for day_dom in dom.css(".content"):
         day = day_dom.css_first("h2").text(strip=True).split(" ", 2)[1]
@@ -92,7 +96,7 @@ async def subprocess_check_output(cmd, input):
 
 
 @restaurant("Bistro IN", "https://bistroin.choiceqr.com/delivery", Location.Poruba)
-def bistroin(dom):
+def bistroin(dom: Node) -> Foods:
     elem = dom.css_first("#__NEXT_DATA__")
     if not elem:
         return
@@ -110,7 +114,7 @@ def bistroin(dom):
 
 
 @restaurant("U jarosu", "https://www.ujarosu.cz/cz/denni-menu/", Location.Poruba)
-def u_jarosu(dom):
+def u_jarosu(dom: Node) -> Foods:
     today = datetime.datetime.strftime(datetime.datetime.now(), "%d. %m. %Y")
     for row in dom.css(".celyden"):
         parsed_day = row.css_first(".datum").text()
@@ -126,7 +130,7 @@ def u_jarosu(dom):
 
 
 @restaurant("U zlateho lva", "http://www.zlatylev.com/menu_zlaty_lev.html", Location.Poruba)
-def u_zlateho_lva(dom):
+def u_zlateho_lva(dom: Node) -> Foods:
     day_nth = datetime.datetime.today().weekday()
     text = dom.css_first(".xr_txt.xr_s0").text()
 
@@ -161,7 +165,7 @@ def u_zlateho_lva(dom):
 
 
 @restaurant("Globus", "https://www.globus.cz/ostrava/sluzby-a-produkty/restaurace", Location.Poruba)
-def globus(dom):
+def globus(dom: Node) -> Foods:
     for row in dom.css(".space-y-2 .flex"):
         spans = row.css("* > span")
         price = fix_price(spans[2].text())
@@ -170,7 +174,7 @@ def globus(dom):
 
 
 @restaurant("Jacks Burger", "https://www.jacksburgerbar.cz/", Location.Poruba)
-def jacks_burger(dom):
+def jacks_burger(dom: Node) -> Foods:
     for row in dom.css("#dennimenu table:first-of-type tr"):
         category, name, price = (td.text() for td in row.css("td"))
         if category.lower() == "polévka":
@@ -180,7 +184,7 @@ def jacks_burger(dom):
 
 
 @restaurant("Poklad", "https://dkpoklad.cz/restaurace/", Location.Poruba)
-async def poklad(dom, http):
+async def poklad(dom, http) -> Foods:
     pdf_url = dom.css_first(".restaurace-box .wp-block-file a").attributes["href"]
     pdf = (await http.get(pdf_url)).content
     text = await subprocess_check_output(["pdftotext", "-layout", "-", "-"], pdf)
@@ -218,7 +222,7 @@ async def poklad(dom, http):
 
 
 @restaurant("Trebovicky mlyn", "https://www.trebovickymlyn.cz/denni-menu/", Location.Poruba)
-def trebovicky_mlyn(dom):
+def trebovicky_mlyn(dom: Node) -> Foods:
     el = dom.css_first(".soup h2")
     if not el:
         return
@@ -236,7 +240,7 @@ def trebovicky_mlyn(dom):
 
 
 @restaurant("Trebovicka role", "https://trebovickarole.cz/denni-menu/", Location.Poruba)
-def trebovicka_role(dom):
+def trebovicka_role(dom: Node) -> Foods:
     MENU_REGEXP = re.compile(r"Menu (?P<num>[0-9])\s*:\s*(?P<name>.+)")
 
     day_nth = datetime.datetime.today().weekday()
@@ -257,7 +261,7 @@ def trebovicka_role(dom):
 
 
 @restaurant("La Strada", "https://www.lastrada.cz/cz/?tpl=plugins/DailyMenu/print&week_shift=", Location.Poruba)
-def lastrada(dom):
+def lastrada(dom: Node) -> Foods:
     day_nth = datetime.datetime.today().weekday()
 
     capturing = False
@@ -272,7 +276,7 @@ def lastrada(dom):
 
 
 @restaurant("Ellas", "https://www.restauraceellas.cz/", Location.Poruba)
-def ellas(dom):
+def ellas(dom: Node) -> Foods:
     day_nth = datetime.datetime.today().weekday()
     lunch_pattern = re.compile(r"(?P<name>.*?)\s*(\(([^)]+)\))?\s*–\s*(?P<price>[0-9]+),-")
 
@@ -289,7 +293,7 @@ def ellas(dom):
 
 
 @restaurant("Saloon Pub", "http://www.saloon-pub.cz/cs/denni-nabidka/", Location.Poruba)
-def saloon_pub(dom):
+def saloon_pub(dom: Node) -> Foods:
     day = dom.css_first(f"#{datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d')} + section")
     if not day:
         return
@@ -299,7 +303,7 @@ def saloon_pub(dom):
 
 
 @restaurant("Parlament", "https://www.restauraceparlament.cz/", Location.Poruba)  # codespell:ignore
-def parlament(dom):  # codespell:ignore
+def parlament(dom: Node) -> Foods:  # codespell:ignore
     day_nth = datetime.datetime.today().weekday()
     day = Selector(dom.css_first(".txt"), "div div").text_contains(days[day_nth])
     if day:
@@ -312,7 +316,7 @@ def parlament(dom):  # codespell:ignore
 
 
 @restaurant("Plzenka aura", "https://www.plzenkaaura.cz/denni-menu", Location.Poruba)
-def plzenka(dom):
+def plzenka(dom: Node) -> Foods:
     food_type = None
     for el in dom.css(".list-items > *"):
         if el.tag == "h5":
@@ -332,12 +336,12 @@ def plzenka(dom):
 
 
 @restaurant("El Amigo Muerto", "https://www.menicka.cz/api/iframe/?id=5560", Location.Poruba)
-def el_amigo_muerto(dom):
+def el_amigo_muerto(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
 @restaurant("Rusty Bell Pub", "https://www.menicka.cz/api/iframe/?id=1547", Location.Poruba)
-def rusty_bell_pub(dom):
+def rusty_bell_pub(dom: Node) -> Foods:
     foods = list(menicka_parser(dom))
     if not foods:
         return
@@ -348,7 +352,7 @@ def rusty_bell_pub(dom):
 
 
 @restaurant("Viktorka", "https://www.viktorkaostrava.cz/denni-menu/", Location.Poruba)
-def viktorka(dom):
+def viktorka(dom: Node) -> Foods:
     soups, lunches = dom.css(".elementor-widget-price-list")
     day_nth = datetime.datetime.today().weekday()
 
@@ -366,12 +370,12 @@ def viktorka(dom):
 
 
 @restaurant("Futrovna", "https://www.menicka.cz/api/iframe/?id=7200", Location.Poruba)
-def futrovna(dom):
+def futrovna(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
 @restaurant("Kurnik sopa", "https://www.kurniksopahospoda.cz", Location.Poruba)
-def kurniksopa(dom):
+def kurniksopa(dom: Node) -> Foods:
     for pivo in dom.css("#naCepu-list tr"):
         name = pivo.css_first(".nazev").text()
         deg = pivo.css_first(".stupne").text()
@@ -435,7 +439,7 @@ async def menza(http):
 
 
 @restaurant("La Futura", "https://lafuturaostrava.cz/", Location.Dubina)
-def lafutura(dom):
+def lafutura(dom: Node) -> Foods:
     container = dom.css_first(".jet-listing-dynamic-repeater__items")
     if not container:
         return
@@ -448,12 +452,12 @@ def lafutura(dom):
 
 
 @restaurant("Srub", "https://www.menicka.cz/api/iframe/?id=5568", Location.Dubina)
-def srub(dom):
+def srub(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
 @restaurant("U formana", "https://www.menicka.cz/api/iframe/?id=4405", Location.Dubina)
-def uformana(dom):
+def uformana(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
@@ -484,52 +488,52 @@ async def maston(dom, http):
 
 
 @restaurant("Kozlovna U Ježka", "https://www.menicka.cz/api/iframe/?id=5122", Location.Dubina)
-def kozlovna(dom):
+def kozlovna(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
 @restaurant("Fontána", "https://www.menicka.cz/api/iframe/?id=1456", Location.Dubina)
-def fontana(dom):
+def fontana(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
 @restaurant("Burger & Beer Brothers", "https://www.menicka.cz/api/iframe/?id=7863", Location.Olomouc)
-def bbbrothers(dom):
+def bbbrothers(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
 @restaurant("Café Restaurant Caesar", "https://www.menicka.cz/api/iframe/?id=5293", Location.Olomouc)
-def caesar(dom):
+def caesar(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
 @restaurant("Morgans restaurant", "https://www.menicka.cz/api/iframe/?id=5294", Location.Olomouc)
-def morgans(dom):
+def morgans(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
 @restaurant("U Mořice", "https://www.menicka.cz/api/iframe/?id=5299", Location.Olomouc)
-def moric(dom):
+def moric(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
 @restaurant("Kikiriki", "https://www.menicka.cz/api/iframe/?id=5309", Location.Olomouc)
-def kikiriki(dom):
+def kikiriki(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
 @restaurant("U Kristýna", "https://www.menicka.cz/api/iframe/?id=5471", Location.Olomouc)
-def kristyn(dom):
+def kristyn(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
 @restaurant("Assen", "https://www.menicka.cz/api/iframe/?id=8767", Location.Zabreh)
-def assen(dom):
+def assen(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
 @restaurant("Bistro Paulus", "https://www.bistro-paulus.cz/poledni-menu/", Location.Olomouc)
-def paulus(dom):
+def paulus(dom: Node) -> Foods:
     current_day = datetime.datetime.now().strftime("%-d.%-m.%Y")
     for day_dom in dom.css(".section-day"):
         day = "".join(day_dom.css_first("h3").text(strip=True).split()[1:])
@@ -546,37 +550,37 @@ def paulus(dom):
 
 
 @restaurant("Slezska P.U.O.R", "https://www.menicka.cz/api/iframe/?id=1406", Location.Centrum)
-def puor(dom):
+def puor(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
 @restaurant("Frankie's Pub", "https://www.menicka.cz/api/iframe/?id=7080", Location.Centrum)
-def frankies_pub(dom):
+def frankies_pub(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
 @restaurant("Ostrawica Lokál", "https://www.menicka.cz/api/iframe/?id=8648", Location.Centrum)
-def ostravica_lokal(dom):
+def ostravica_lokal(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
 @restaurant("Kanteen", "https://www.menicka.cz/api/iframe/?id=8684", Location.Centrum)
-def kanteen(dom):
+def kanteen(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
 @restaurant("Pizza Coloseum Karolina", "https://www.menicka.cz/api/iframe/?id=517", Location.Centrum)
-def coloseum(dom):
+def coloseum(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
 @restaurant("IQ Restaurant", "https://www.menicka.cz/api/iframe/?id=1401", Location.Centrum)
-def iq(dom):
+def iq(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
 @restaurant("2 Promile", "https://www.menicka.cz/api/iframe/?id=3486", Location.Centrum)
-def two_promile(dom):
+def two_promile(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
