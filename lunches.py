@@ -32,7 +32,7 @@ def restaurant(title, url=None, location: Location = None):
         def wrap(*args, **kwargs):
             return fn(*args, **kwargs)
 
-        wrap.parser = {
+        wrap.restaurant_parser = {
             "name": fn.__name__,
             "title": title,
             "url": url,
@@ -659,19 +659,20 @@ async def gather_restaurants(allowed_restaurants=None):
 
     async def collect(parser):
         start = time.time()
+        parser_info = parser.restaurant_parser
         res = {
-            "name": parser.parser["title"],
-            "url": parser.parser["url"],
-            "location": parser.parser["location"],
+            "name": parser_info["title"],
+            "url": parser_info["url"],
+            "location": parser_info["location"],
         }
         try:
             lunches = []
             soups = []
 
             args = {}
-            arg_names = parser.parser["args"]
+            arg_names = parser_info["args"]
             if "res" in arg_names or "dom" in arg_names:
-                response = await client.get(parser.parser["url"])
+                response = await client.get(parser_info["url"])
                 if "res" in arg_names:
                     args["res"] = response.text
                 elif "dom" in arg_names:
@@ -710,11 +711,13 @@ async def gather_restaurants(allowed_restaurants=None):
                 "elapsed_parsing": 0,
             }
 
-    restaurants = [obj for _, obj in globals().items() if hasattr(obj, "parser")]
+    restaurants = [obj for _, obj in globals().items() if hasattr(obj, "restaurant_parser")]
     if not allowed_restaurants:
-        allowed_restaurants = [r.parser["name"] for r in restaurants]
+        allowed_restaurants = [r.restaurant_parser["name"] for r in restaurants]
 
-    return await asyncio.gather(*[collect(r) for r in restaurants if r.parser["name"] in allowed_restaurants])
+    return await asyncio.gather(
+        *[collect(r) for r in restaurants if r.restaurant_parser["name"] in allowed_restaurants]
+    )
 
 
 if __name__ == "__main__":
