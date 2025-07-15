@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import asyncio
 import datetime
 import ipaddress
 import os
@@ -28,6 +29,8 @@ class ErrorResponse(BaseModel):
 class LunchResponse(BaseModel):
     last_fetch: int
     fetch_count: int
+    access_count: int = 0
+    first_access: int = 0
     restaurants: list[RestaurantMenu]
 
 
@@ -82,16 +85,17 @@ async def lunch(request: Request) -> LunchResponse | ErrorResponse:
     if request.client:
         visitor_addr = ipaddress.ip_address(request.client.host)
         if not any(net for net in disallow_nets if visitor_addr in net):
-            await redis_client.incr(f"{key}.access_count")
-            await redis_client.setnx(f"{key}.first_access", now)
+            await asyncio.gather(
+                redis_client.incr(f"{key}.access_count"), redis_client.setnx(f"{key}.first_access", now)
+            )
 
-    async def get(k: str) -> None:
+    async def get_stat(k: str) -> int:
         val = await redis_client.get(f"{key}.{k}")
         if val:
-            setattr(result, k, int(val))
+            return int(val)
         else:
-            setattr(result, k, 0)
+            return 0
 
-    await get("access_count")
-    await get("first_access")
+    result.access_count, result.first_access = await asyncio.gather(get_stat("access_count"), get_stat("first_Access"))
+
     return result
