@@ -7,7 +7,7 @@ import pickle
 import redis.asyncio as redis
 from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
-from starlette.responses import FileResponse
+from starlette.responses import FileResponse, HTMLResponse
 
 # from werkzeug.middleware.proxy_fix import ProxyFix
 # from flask_redis import FlaskRedis
@@ -21,12 +21,12 @@ redis_client = redis.Redis(host=os.getenv("REDIS_HOST", None))
 
 
 @app.get("/")
-def index():
+def index() -> FileResponse:
     return FileResponse("index.html")
 
 
 @app.get("/public_transport")
-async def public_transport(request: Request):
+async def public_transport(request: Request) -> HTMLResponse:
     srcs = ["Václava Jiřikovského"]
     dsts = ["Hlavní třída", "Rektorát VŠB", "Pustkovecká", "Poruba,Studentské koleje"]
     if datetime.datetime.now().hour >= 12:
@@ -41,7 +41,7 @@ async def public_transport(request: Request):
 
 @app.get("/lunch.json")
 @app.post("/lunch.json")
-async def lunch(request: Request):
+async def lunch(request: Request) -> dict[str, str]:
     now = int(datetime.datetime.now().timestamp())
     key = f"restaurants.{datetime.date.today().strftime('%d-%m-%Y')}"
     result_str = await redis_client.get(key)
@@ -68,12 +68,13 @@ async def lunch(request: Request):
         if net.version == 4:
             disallow_nets.append(ipaddress.ip_network(f"::ffff:{net.network_address}/{96 + net.prefixlen}"))
 
-    visitor_addr = ipaddress.ip_address(request.client.host)
-    if not any([net for net in disallow_nets if visitor_addr in net]):  # noqa: C419
-        await redis_client.incr(f"{key}.access_count")
-        await redis_client.setnx(f"{key}.first_access", now)
+    if request.client:
+        visitor_addr = ipaddress.ip_address(request.client.host)
+        if not any(net for net in disallow_nets if visitor_addr in net):
+            await redis_client.incr(f"{key}.access_count")
+            await redis_client.setnx(f"{key}.first_access", now)
 
-    async def get(k):
+    async def get(k: str) -> None:
         val = await redis_client.get(f"{key}.{k}")
         if val:
             result[k] = int(val)
