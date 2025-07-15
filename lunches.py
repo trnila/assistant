@@ -89,7 +89,7 @@ def restaurant(title: str, url: str, location: Location) -> Callable[..., Restau
     return wrapper
 
 
-def menicka_parser(dom: Node) -> Foods:
+def menicka_parser(dom: Node) -> Generator[Soup | Lunch, None, None]:
     current_day = datetime.datetime.now().strftime("%-d.%-m.%Y")
     for day_dom in dom.css(".content"):
         day = day_dom.css_first("h2").text(strip=True).split(" ", 2)[1]
@@ -124,7 +124,7 @@ async def subprocess_check_output(cmd: list[str], input: bytes) -> str:
 def bistroin(dom: Node) -> Foods:
     elem = dom.css_first("#__NEXT_DATA__")
     if not elem:
-        return
+        return None
     data = json.loads(elem.text())
 
     for item in data["props"]["app"]["menu"]:
@@ -144,14 +144,14 @@ def u_jarosu(dom: Node) -> Foods:
     for row in dom.css(".celyden"):
         parsed_day = row.css_first(".datum").text()
         if parsed_day == today:
-            records = row.css(".tabulka p")
-            records = [r.text().strip() for r in records]
-            records = [records[i : i + 3] for i in range(0, len(records), 3)]
-            for first, name, price in records:
-                if first == "Polévka":
+            p = row.css(".tabulka p")
+            records = [r.text().strip() for r in p]
+            for first, name_node, price in [p[i : i + 3] for i in range(0, len(records), 3)]:
+                name = name_node.text()
+                if first.text(strip=True) == "Polévka":
                     yield Soup(name)
                 else:
-                    yield Lunch(name, price=price, num=first.split(".")[0])
+                    yield Lunch(name, price=price.text(), num=first.text().split(".")[0])
 
 
 @restaurant("U zlateho lva", "http://www.zlatylev.com/menu_zlaty_lev.html", Location.Poruba)
@@ -194,7 +194,7 @@ def globus(dom: Node) -> Foods:
     for row in dom.css(".space-y-2 .flex"):
         spans = row.css("* > span")
         price = fix_price(spans[2].text())
-        t = Soup if price < 50 else Lunch
+        t = Soup if price is not None and price < 50 else Lunch
         yield t(spans[1].text(), price=price)
 
 
@@ -209,8 +209,11 @@ def jacks_burger(dom: Node) -> Foods:
 
 
 @restaurant("Poklad", "https://dkpoklad.cz/restaurace/", Location.Poruba)
-async def poklad(dom, http) -> Foods:
+async def poklad(dom: Node, http: httpx.AsyncClient) -> Foods:
     pdf_url = dom.css_first(".restaurace-box .wp-block-file a").attributes["href"]
+    if not pdf_url:
+        return
+
     pdf = (await http.get(pdf_url)).content
     text = await subprocess_check_output(["pdftotext", "-layout", "-", "-"], pdf)
 
@@ -250,7 +253,7 @@ async def poklad(dom, http) -> Foods:
 def trebovicky_mlyn(dom: Node) -> Foods:
     el = dom.css_first(".soup h2")
     if not el:
-        return
+        return None
     yield Soup(el.text())
 
     for lunch in dom.css_first(".owl-carousel").css(".menu-post"):
@@ -272,8 +275,11 @@ def trebovicka_role(dom: Node) -> Foods:
     for h4 in dom.css("h4"):
         if days[day_nth] in h4.text():
             table = h4.next
-            while table.tag != "table":
+            while table and table.tag != "table":
                 table = table.next
+            if not table:
+                return None
+
             for row in table.css("tr"):
                 name = row.css("td")[0].text(strip=True)
                 price = row.css("td")[1].text(strip=True)
@@ -282,7 +288,8 @@ def trebovicka_role(dom: Node) -> Foods:
                     yield Soup(name.split(":")[1])
                 elif name.strip():
                     m = re.match(MENU_REGEXP, name)
-                    yield Lunch(price=price, **m.groupdict())
+                    if m:
+                        yield Lunch(price=price, **m.groupdict())
 
 
 @restaurant("La Strada", "https://www.lastrada.cz/cz/?tpl=plugins/DailyMenu/print&week_shift=", Location.Poruba)
@@ -314,14 +321,15 @@ def ellas(dom: Node) -> Foods:
         for ol in div.css("ol"):
             num = ol.attrs.get("start", 1)
             parsed = re.match(lunch_pattern, ol.text(strip=True))
-            yield Lunch(num=num, **parsed.groupdict())
+            if parsed:
+                yield Lunch(num=num, **parsed.groupdict())
 
 
 @restaurant("Saloon Pub", "http://www.saloon-pub.cz/cs/denni-nabidka/", Location.Poruba)
 def saloon_pub(dom: Node) -> Foods:
     day = dom.css_first(f"#{datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d')} + section")
     if not day:
-        return
+        return None
     yield Soup(name=day.css_first(".category-info").text())
     for tr in day.css(".main-meal-info"):
         yield Lunch(name=tr.css_first(".meal-name").text(), price=tr.css_first(".meal-price").text())
@@ -332,9 +340,9 @@ def parlament(dom: Node) -> Foods:  # codespell:ignore
     day_nth = datetime.datetime.today().weekday()
     day = Selector(dom.css_first(".txt"), "div div").text_contains(days[day_nth])
     if day:
-        day = day.matches[0]
-        yield Soup(day.css_first("* + dt").text())
-        for line in day.css_first("* + dt + p").text().splitlines():
+        day_node = day.matches[0]
+        yield Soup(day_node.css_first("* + dt").text())
+        for line in day_node.css_first("* + dt + p").text().splitlines():
             m = re.match(r"(?P<num>\d+)\.\s*(?P<name>.*?)(?P<price>\d+),-Kč", line)
             if m:
                 yield Lunch(**m.groupdict())
@@ -369,10 +377,11 @@ def el_amigo_muerto(dom: Node) -> Foods:
 def rusty_bell_pub(dom: Node) -> Foods:
     foods = list(menicka_parser(dom))
     if not foods:
-        return
+        return None
     yield Soup(foods[1].name)
     for food in foods[2:]:
-        food.num = None
+        if isinstance(food, Lunch):
+            food.num = None
         yield food
 
 
@@ -412,13 +421,13 @@ def kurniksopa(dom: Node) -> Foods:
 
 
 @restaurant("Sbeerka", "https://sbeerka.cz/tydenni-menu", Location.Poruba)
-async def sbeerka(dom, http):
+async def sbeerka(dom: Node, http: httpx.AsyncClient) -> Foods:
     REGEXP = re.compile(r"(?P<name>.*?)\s*(/[0-9,\s*]+/)?\s*(?P<price>[0-9]+\s*,-)")
     elem = dom.css_first(".wysiwyg")
     if not elem:
         return
 
-    t = None
+    t: type[Lunch] | type[Soup] | None = None
     for line in elem.text().splitlines():
         line = line.strip()
         if "Polévk" in line:
@@ -432,8 +441,8 @@ async def sbeerka(dom, http):
 
     PRICE_REGEXP = re.compile(r"([0-9]+)\s*,-")
     response = await http.get("https://sbeerka.cz/aktualne-na-cepu", headers={"User-Agent": USER_AGENT})
-    dom = HTMLParser(response.text)
-    for beer in dom.css(".wysiwyg li"):
+    dom2 = HTMLParser(response.text)
+    for beer in dom2.css(".wysiwyg li"):
         price = None
         m = PRICE_REGEXP.search(beer.text())
         if m:
@@ -442,7 +451,7 @@ async def sbeerka(dom, http):
 
 
 @restaurant("Menza", "https://stravovani.vsb.cz/webkredit", Location.Poruba)
-async def menza(http):
+async def menza(http: httpx.AsyncClient) -> Foods:
     date = datetime.datetime.now().replace(hour=22, minute=0, second=0, microsecond=0)
     fdate = date.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]
 
@@ -467,7 +476,7 @@ async def menza(http):
 def lafutura(dom: Node) -> Foods:
     container = dom.css_first(".jet-listing-dynamic-repeater__items")
     if not container:
-        return
+        return None
     for item in container.css(".jet-listing-dynamic-repeater__item"):
         tds = item.css("td")
         if "POLÉVKA" in tds[0].text(strip=True).upper():
@@ -487,8 +496,10 @@ def uformana(dom: Node) -> Foods:
 
 
 @restaurant("Maston", "https://maston.cz/jidelni-listek/", Location.Dubina)
-async def maston(dom, http):
+async def maston(dom: Node, http: httpx.AsyncClient) -> Foods:
     srcs = dom.css_first(".attachment-large").attrs["srcset"]
+    if not srcs:
+        return
     img_url = srcs.split(",")[-1].strip().split(" ")[0]
 
     img = (await http.get(img_url)).content
