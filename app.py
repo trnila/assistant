@@ -96,6 +96,6 @@ async def lunch(request: Request) -> LunchResponse | ErrorResponse:
         else:
             return 0
 
-    result.access_count, result.first_access = await asyncio.gather(get_stat("access_count"), get_stat("first_Access"))
+    result.access_count, result.first_access = await asyncio.gather(get_stat("access_count"), get_stat("first_access"))
 
     return result
