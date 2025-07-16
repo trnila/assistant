@@ -757,7 +757,7 @@ if __name__ == "__main__":
 
     p = argparse.ArgumentParser()
     p.add_argument("restaurant", nargs="*")
-    p.add_argument("--sort", "-s", choices=["error", "time"], default="error")
+    p.add_argument("--sort", "-s", choices=["error", "time", "alphabet"], default="error")
     args = p.parse_args()
 
     logging.basicConfig(format="[%(asctime)s] %(levelname)s %(name)s - %(message)s", level=logging.INFO)
@@ -767,6 +767,7 @@ if __name__ == "__main__":
     sorters = {
         "time": lambda r: r.elapsed,
         "error": lambda r: (r.error, len(r.lunches) == 0),
+        "alphabet": lambda r: r.name,
     }
 
     exit_code = 0
