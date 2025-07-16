@@ -1,4 +1,4 @@
-FROM node:23-alpine3.20 AS build-frontend
+FROM node:24-alpine3.20 AS build-frontend
 COPY frontend /frontend
 RUN cd frontend && yarn install && yarn run build
 
