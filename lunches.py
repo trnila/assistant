@@ -313,7 +313,8 @@ def ellas(dom: Node) -> Foods:
     lunch_pattern = re.compile(r"(?P<name>.*?)\s*(\(([^)]+)\))?\s*–\s*(?P<price>[0-9]+),-")
 
     for div in dom.css(".moduletable .custom"):
-        if div.css_first("h2").text(strip=True) != days[day_nth]:
+        h2 = div.css_first("h2")
+        if h2 and h2.text(strip=True) != days[day_nth]:
             continue
 
         yield Soup(name=div.css_first("p").text())
