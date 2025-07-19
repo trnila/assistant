@@ -766,7 +766,7 @@ if __name__ == "__main__":
 
     sorters = {
         "time": lambda r: r.elapsed,
-        "error": lambda r: (r.error, len(r.lunches) == 0),
+        "error": lambda r: (r.error is not None, len(r.lunches) == 0),
         "alphabet": lambda r: r.name,
     }
 
