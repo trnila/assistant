@@ -518,9 +518,9 @@ source-map-js@^1.2.1:
   integrity sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==
 
 svelte@^5.0.0:
-  version "5.36.13"
-  resolved "https://registry.yarnpkg.com/svelte/-/svelte-5.36.13.tgz#23b1ad0562158db96715e44d958cbd3192c6f0b3"
-  integrity sha512-LnSywHHQM/nJekC65d84T1Yo85IeCYN4AryWYPhTokSvcEAFdYFCfbMhX1mc0zHizT736QQj0nalUk+SXaWrEQ==
+  version "5.36.14"
+  resolved "https://registry.yarnpkg.com/svelte/-/svelte-5.36.14.tgz#5c16f0d64fa99a177f0e5cf65414a047f8fe4f20"
+  integrity sha512-okgNwfVa4FfDGOgd0ndooKjQz1LknUFDGfEJp6QNjYP6B4hDG0KktOP+Pta3ZtE8s+JELsYP+7nqMrJzQLkf5A==
   dependencies:
     "@ampproject/remapping" "^2.3.0"
     "@jridgewell/sourcemap-codec" "^1.5.0"
