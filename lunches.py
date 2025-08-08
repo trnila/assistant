@@ -210,7 +210,10 @@ def jacks_burger(dom: Node) -> Foods:
 
 @restaurant("Poklad", "https://dkpoklad.cz/restaurace/", Location.Poruba)
 async def poklad(dom: Node, http: httpx.AsyncClient) -> Foods:
-    pdf_url = dom.css_first(".restaurace-box .wp-block-file a").attributes["href"]
+    pdf_el = dom.css_first(".restaurace-box .wp-block-file a")
+    if not pdf_el:
+        return
+    pdf_url = pdf_el.attributes["href"]
     if not pdf_url:
         return
 
