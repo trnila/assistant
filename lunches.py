@@ -517,7 +517,7 @@ async def maston(dom: Node, http: httpx.AsyncClient) -> Foods:
         if txt.endswith(today):
             capturing = True
         elif capturing:
-            if "SAMOSTATN" in txt.upper() or tomorrow in txt:
+            if "samostatn" in txt.lower() or "maston" in txt.lower() or tomorrow in txt:
                 break
             if "POLÉVKA" in line:
                 yield Soup(line.split(":", 1)[1])
