@@ -200,7 +200,7 @@
           {#each restaurant.soups || [] as soup}
             <li class:search_highlight={shallHighlight(soup.name, normalizedSearchText)}>
               {#if soup.photo}
-                <img src="{soup.photo}">
+                <img src="{soup.photo}" alt="{soup.name}">
               {/if}
               <div>
                 <strong>{soup.name}</strong>
@@ -214,10 +214,10 @@
           {#each restaurant.lunches || [] as lunch}
             <li class:ondras={lunch.name.toLowerCase().includes('ondráš')} class:search_highlight={shallHighlight(lunch.name, normalizedSearchText)}>
               {#if lunch.photo && !window.matchMedia("(max-width: 768px)").matches}
-                <img src="{lunch.photo}">
+                <img src="{lunch.photo}" alt="{lunch.name}">
                 <div class="photo-zoom">
                   <div>
-                    <img src="{lunch.photo}">
+                    <img src="{lunch.photo}" alt="{lunch.name}">
                     <div>
                       <strong>
                         {lunch.num}.
