@@ -667,7 +667,10 @@ async def gather_restaurants(allowed_restaurants: list[str] | None = None) -> li
             return "windows-1250"
         return "utf-8"
 
-    client = httpx.AsyncClient(default_encoding=detect_encoding, headers={"User-Agent": USER_AGENT}, timeout=15)
+    transport = httpx.AsyncHTTPTransport(retries=3)
+    client = httpx.AsyncClient(
+        default_encoding=detect_encoding, headers={"User-Agent": USER_AGENT}, timeout=30, transport=transport
+    )
 
     def cleanup(menu: RestaurantMenu) -> None:
         def fix_name(name: str) -> str:
