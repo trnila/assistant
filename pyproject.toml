@@ -9,7 +9,7 @@ dependencies = [
     "httpx>=0.28.1,<0.29",
     "selectolax>=0.3.21,<0.4",
     "fastapi[standard]>=0.116,<0.117",
-    "uvicorn[standard]>=0.35,<0.36",
+    "uvicorn[standard]>=0.36,<0.37",
     "redis[hiredis]>=6,<7",
 ]
 
