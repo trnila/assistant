@@ -22,6 +22,11 @@ jobs:
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
+      - uses: actions/delete-package-versions@v5
+        with:
+          package-name: assistant
+          package-type: container
+          min-versions-to-keep: 10
 
   deploy:
     if: github.repository == 'trnila/assistant'
