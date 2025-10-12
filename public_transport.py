@@ -49,14 +49,14 @@ async def public_transport_connections(sources: list[str], destinations: list[st
 
                 def p(node: Node) -> Station:
                     return Station(
-                        time=to_datetime(node.css_first(".time").text()),
-                        station=node.css_first(".station strong").text(),
+                        time=to_datetime(node.css(".time")[0].text()),
+                        station=node.css(".station strong")[0].text(),
                     )
 
                 connections.append(
                     Connection(
-                        link=a.css_first(".line-title h3").text(),
-                        from_=p(a.css_first(".stations .item")),
+                        link=a.css(".line-title h3")[0].text(),
+                        from_=p(a.css(".stations .item")[0]),
                         to=p(a.css(".stations .item")[1]),
                     )
                 )
