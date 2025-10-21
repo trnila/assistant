@@ -649,7 +649,7 @@ def fix_price(price: int | str | None) -> int | None:
 async def gather_restaurants(allowed_restaurants: list[str] | None = None) -> list[RestaurantMenu]:
     replacements = [
         (re.compile(r"^\s*(Polévka|BUSINESS MENU|business|SALÁT TÝDNE|tip týdne)", re.IGNORECASE), ""),
-        (re.compile(r"k menu\s*$"), ""),
+        (re.compile(r"(k menu|K POLEDNÍMU MENU ZDARMA)\s*$"), ""),
         (re.compile(r"(s|š|S|Š)vestk"), "Trnk"),
         # ugly space before comma or colon
         (re.compile(r"\s*(,|:)\s*"), "\\1 "),
