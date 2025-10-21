@@ -203,7 +203,8 @@ def jacks_burger(dom: Node) -> Foods:
     for row in dom.css("#dennimenu table:first-of-type tr"):
         category, name, price = (td.text() for td in row.css("td"))
         if category.lower() == "polévka":
-            yield Soup(name)
+            if "facebook" not in name.lower():
+                yield Soup(name)
         elif category.isdigit():
             yield Lunch(name, num=category, price=price)
 
