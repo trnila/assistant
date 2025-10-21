@@ -313,20 +313,28 @@ def lastrada(dom: Node) -> Foods:
 @restaurant("Ellas", "https://www.restauraceellas.cz/", Location.Poruba)
 def ellas(dom: Node) -> Foods:
     day_nth = datetime.datetime.today().weekday()
-    lunch_pattern = re.compile(r"(?P<name>.*?)\s*(\(([^)]+)\))?\s*–\s*(?P<price>[0-9]+),-")
+    lunch_pattern = re.compile(r"(?P<name>.*?)\s*(\(([^)]+)\))?\s*(–|-)\s*(?P<price>[0-9]+),-")
 
+    capturing = False
+    found_soup = False
     for div in dom.css(".moduletable .custom"):
-        h2 = div.css_first("h2")
-        if h2 and h2.text(strip=True) != days[day_nth]:
-            continue
-
-        yield Soup(name=div.css("p")[0].text())
-
-        for ol in div.css("ol"):
-            num = ol.attrs.get("start", 1)
-            parsed = re.match(lunch_pattern, ol.text(strip=True))
-            if parsed:
-                yield Lunch(num=num, **parsed.groupdict())
+        for line in div.text().splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            print(capturing, found_soup, line)
+            if line == days[day_nth]:
+                capturing = True
+            elif line == days[day_nth + 1]:
+                capturing = False
+            elif capturing:
+                if not found_soup:
+                    found_soup = True
+                    yield Soup(line)
+                else:
+                    parsed = re.match(lunch_pattern, line)
+                    if parsed:
+                        yield Lunch(**parsed.groupdict())
 
 
 @restaurant("Saloon Pub", "http://www.saloon-pub.cz/cs/denni-nabidka/", Location.Poruba)
