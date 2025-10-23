@@ -323,7 +323,6 @@ def ellas(dom: Node) -> Foods:
             line = line.strip()
             if not line:
                 continue
-            print(capturing, found_soup, line)
             if line == days[day_nth]:
                 capturing = True
             elif line == days[day_nth + 1]:
