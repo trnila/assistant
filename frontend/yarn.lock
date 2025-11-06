@@ -133,9 +133,9 @@
   integrity sha512-alJC0uCZpTFrSL0CCDjcgleBXPnCrEAhTBILpeAp7M/OFgoqtAetfBzX0xM00MUsVVPpVjlPuMbREqnZCXaTnA==
 
 "@iconify/svelte@^5.0.0":
-  version "5.0.2"
-  resolved "https://registry.yarnpkg.com/@iconify/svelte/-/svelte-5.0.2.tgz#ac8f6af03c8b2d1e756b81929fc7f9e9a12cb5a1"
-  integrity sha512-1iWUT+1veS/QOAzKDG0NPgBtJYGoJqEPwF97voTm8jw6PQ6yU0hL73lEwFoTGMrZmatLvh9cjRBmeSHHaltmrg==
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/@iconify/svelte/-/svelte-5.1.0.tgz#7e1cbc3274a07bcbc743768002ad7da1a7935236"
+  integrity sha512-I14nSqo0pNXO5OKsT61ZO3XIPF4yRHA2ErgPsaZ1sPJdKXn80o7o8jOe1xpWphbb9FihdX6by9zlKKBss61mFw==
   dependencies:
     "@iconify/types" "^2.0.0"
 
@@ -531,9 +531,9 @@ source-map-js@^1.2.1:
   integrity sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==
 
 svelte@^5.0.0:
-  version "5.43.2"
-  resolved "https://registry.yarnpkg.com/svelte/-/svelte-5.43.2.tgz#79a9d228a8a4f2f26b60df6b4b41df7575e490d6"
-  integrity sha512-ro1umEzX8rT5JpCmlf0PPv7ncD8MdVob9e18bhwqTKNoLjS8kDvhVpaoYVPc+qMwDAOfcwJtyY7ZFSDbOaNPgA==
+  version "5.43.4"
+  resolved "https://registry.yarnpkg.com/svelte/-/svelte-5.43.4.tgz#b21b2ec598f3565e69c3d95dec0cee518e5940f4"
+  integrity sha512-tPNp21nDWB0PSHE+VrTvEy9cFtDp2Q+ATxQoFomISEVdikZ1QZ69UqBPz/LlT+Oc8/LYS/COYwDQZrmZEUr+JQ==
   dependencies:
     "@jridgewell/remapping" "^2.3.4"
     "@jridgewell/sourcemap-codec" "^1.5.0"
