@@ -289,9 +289,9 @@
   integrity sha512-TAcgQh2sSkykPRWLrdyy2AiceMckNf5loITqXxFI5VuQjS5tSuw3WlwdN8qv8vzjLAUTvYaH/mVjSFpbkFbpTg==
 
 "@sveltejs/acorn-typescript@^1.0.5":
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/@sveltejs/acorn-typescript/-/acorn-typescript-1.0.6.tgz#ca236a97d895869138091c6fba100114951daa97"
-  integrity sha512-4awhxtMh4cx9blePWl10HRHj8Iivtqj+2QdDCSMDzxG+XKa9+VCNupQuCuvzEhYPzZSrX+0gC+0lHA/0fFKKQQ==
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/@sveltejs/acorn-typescript/-/acorn-typescript-1.0.7.tgz#ee92cb27a5084761a76b7cf65cf997cda156f507"
+  integrity sha512-znp1A/Y1Jj4l/Zy7PX5DZKBE0ZNY+5QBngiE21NJkfSTyzzC5iKNWOtwFXKtIrn7MXEFBck4jD95iBNkGjK92Q==
 
 "@sveltejs/vite-plugin-svelte-inspector@^5.0.0":
   version "5.0.1"
@@ -393,9 +393,9 @@ esm-env@^1.2.1:
   integrity sha512-Epxrv+Nr/CaL4ZcFGPJIYLWFom+YeV1DqMLHJoEd9SYRxNbaFruBwfEX/kkHUJf55j2+TUbmDcmuilbP1TmXHA==
 
 esrap@^2.1.0:
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/esrap/-/esrap-2.1.2.tgz#7dcdec9d4157054dcd3e7a2b515a4664a5c4783d"
-  integrity sha512-DgvlIQeowRNyvLPWW4PT7Gu13WznY288Du086E751mwwbsgr29ytBiYeLzAGIo0qk3Ujob0SDk8TiSaM5WQzNg==
+  version "2.1.3"
+  resolved "https://registry.yarnpkg.com/esrap/-/esrap-2.1.3.tgz#4edcf806db7dcfd42286cdb6cc2accf373fdd0af"
+  integrity sha512-T/Dhhv/QH+yYmiaLz9SA3PW+YyenlnRKDNdtlYJrSOBmNsH4nvPux+mTwx7p+wAedlJrGoZtXNI0a0MjQ2QkVg==
   dependencies:
     "@jridgewell/sourcemap-codec" "^1.4.15"
 
@@ -531,9 +531,9 @@ source-map-js@^1.2.1:
   integrity sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==
 
 svelte@^5.0.0:
-  version "5.43.6"
-  resolved "https://registry.yarnpkg.com/svelte/-/svelte-5.43.6.tgz#2260d18c2cc5be0f44d9bddeaabf1a936eb44345"
-  integrity sha512-RnyO9VXI85Bmsf4b8AuQFBKFYL3LKUl+ZrifOjvlrQoboAROj5IITVLK1yOXBjwUWUn2BI5cfmurktgCzuZ5QA==
+  version "5.43.10"
+  resolved "https://registry.yarnpkg.com/svelte/-/svelte-5.43.10.tgz#5c8dcc628e9339372d1ef8aa77cd2d2819b4bf71"
+  integrity sha512-7mkxF1xU+9VRowZA+6fY6qy2kVnS2U3gDtHV2V+aoqZaIagiXXuUR0WHzblw/GwQVXnTNXSvfh2/s5dNNv4AQw==
   dependencies:
     "@jridgewell/remapping" "^2.3.4"
     "@jridgewell/sourcemap-codec" "^1.5.0"
