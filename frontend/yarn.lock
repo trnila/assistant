@@ -133,9 +133,9 @@
   integrity sha512-d5X6RMYv6taIymSk8JBP+nxv8DQAMY6A51GPgusqLdK9wBz5wWIXy1KjTck6HnjE9hqJzJRdk+1p/t5soSbCtw==
 
 "@iconify/svelte@^5.0.0":
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/@iconify/svelte/-/svelte-5.1.0.tgz#7e1cbc3274a07bcbc743768002ad7da1a7935236"
-  integrity sha512-I14nSqo0pNXO5OKsT61ZO3XIPF4yRHA2ErgPsaZ1sPJdKXn80o7o8jOe1xpWphbb9FihdX6by9zlKKBss61mFw==
+  version "5.2.1"
+  resolved "https://registry.yarnpkg.com/@iconify/svelte/-/svelte-5.2.1.tgz#238ba16d0ae1e4697a0561af346cc5ecfbdef23e"
+  integrity sha512-zHmsIPmnIhGd5gc95bNN5FL+GifwMZv7M2rlZEpa7IXYGFJm/XGHdWf6PWQa6OBoC+R69WyiPO9NAj5wjfjbow==
   dependencies:
     "@iconify/types" "^2.0.0"
 
