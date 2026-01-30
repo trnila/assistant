@@ -451,16 +451,6 @@ async def sbeerka(dom: Node, http: httpx.AsyncClient) -> Foods:
             if m:
                 yield t(**m.groupdict())
 
-    PRICE_REGEXP = re.compile(r"([0-9]+)\s*,-")
-    response = await http.get("https://sbeerka.cz/aktualne-na-cepu", headers={"User-Agent": USER_AGENT})
-    dom2 = HTMLParser(response.text)
-    for beer in dom2.css(".wysiwyg li"):
-        price = None
-        m = PRICE_REGEXP.search(beer.text())
-        if m:
-            price = m.group(0)
-        yield Lunch(name=beer.text(), price=price)
-
 
 @restaurant("Menza", "https://stravovani.vsb.cz/webkredit", Location.Poruba)
 async def menza(http: httpx.AsyncClient) -> Foods:
