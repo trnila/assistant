@@ -454,7 +454,7 @@ async def sbeerka(dom: Node, http: httpx.AsyncClient) -> Foods:
 
 @restaurant("Menza", "https://stravovani.vsb.cz/webkredit", Location.Poruba)
 async def menza(http: httpx.AsyncClient) -> Foods:
-    date = datetime.datetime.now().replace(hour=22, minute=0, second=0, microsecond=0)
+    date = datetime.datetime.now().replace(hour=23, minute=0, second=0, microsecond=0) - datetime.timedelta(days=1)
     fdate = date.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]
 
     res = await http.get(f"https://stravovani.vsb.cz/webkredit/Api/Ordering/Menu?Dates={fdate}Z&CanteenId=1")
