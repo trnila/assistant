@@ -189,7 +189,7 @@ def u_zlateho_lva(dom: Node) -> Foods:
                         state = "num"
 
 
-@restaurant("Globus", "https://www.globus.cz/ostrava/sluzby-a-produkty/restaurace", Location.Poruba)
+@restaurant("Globus", "https://www.globus.cz/ostrava/sluzby/restaurace", Location.Poruba)
 def globus(dom: Node) -> Foods:
     for row in dom.css(".space-y-2 .flex"):
         spans = row.css("* > span")
