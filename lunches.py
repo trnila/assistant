@@ -432,21 +432,21 @@ def kurniksopa(dom: Node) -> Foods:
         )
 
 
-@restaurant("Sbeerka", "https://sbeerka.cz/tydenni-menu", Location.Poruba)
+@restaurant("Sbeerka", "https://sbeerka.cz/tydenni-menu/", Location.Poruba)
 async def sbeerka(dom: Node, http: httpx.AsyncClient) -> Foods:
     REGEXP = re.compile(r"(?P<name>.*?)\s*(/[0-9,\s*]+/)?\s*(?P<price>[0-9]+\s*,-)")
-    elem = dom.css_first(".wysiwyg")
+    elem = dom.css_first(".et_section_specialty .et_pb_column_inner_6")
     if not elem:
         return
 
     t: type[Lunch] | type[Soup] | None = None
     for line in elem.text().splitlines():
         line = line.strip()
-        if "Polévk" in line:
+        if "polévk" in line.lower():
             t = Soup
-        elif "Hlavní chody" in line:
+        elif "hlavní chody" in line.lower():
             t = Lunch
-        elif t and "Záloha" not in line:
+        elif t and "záloha" not in line.lower():
             m = REGEXP.search(line)
             if m:
                 yield t(**m.groupdict())
