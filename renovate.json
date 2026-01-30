@@ -5,5 +5,8 @@
     ":disableDependencyDashboard"
   ],
   "automerge": true,
-  "automergeType": "branch"
+  "automergeType": "branch",
+  "pre-commit": {
+    "enabled": true
+  }
 }
