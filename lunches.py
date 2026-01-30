@@ -641,6 +641,8 @@ async def gather_restaurants(allowed_restaurants: list[str] | None = None) -> li
         (re.compile(r"^\s*(Polévka|BUSINESS MENU|business|SALÁT TÝDNE|tip týdne)", re.IGNORECASE), ""),
         (re.compile(r"(k menu|K POLEDNÍMU MENU ZDARMA)\s*$"), ""),
         (re.compile(r"(s|š|S|Š)vestk"), "Trnk"),
+        # remove price
+        (re.compile(r"(\d+)\s*kč", re.IGNORECASE), ""),
         # remove multiple commas
         (re.compile(r"(\s*,)+"), ","),
         # ugly space before comma or colon
