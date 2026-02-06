@@ -10,7 +10,7 @@ import traceback
 import types
 from collections.abc import AsyncGenerator, Callable, Generator, Iterable
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from html import unescape
 from typing import Any
 
@@ -21,7 +21,7 @@ days = ["Pondělí", "Úterý", "Středa", "Čtvrtek", "Pátek", "Sobota", "Ned�
 USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36"
 
 
-class Location(str, Enum):
+class Location(StrEnum):
     Poruba = ("Poruba",)
     Dubina = ("Dubina",)
     Zabreh = ("Zábřeh",)
@@ -368,7 +368,7 @@ def plzenka(dom: Node) -> Foods:
             food_type = {
                 "POLÉVKA": Soup,
                 "HLAVNÍ JÍDLO": Lunch,
-            }.get(el.text(strip=True), None)
+            }.get(el.text(strip=True))
         elif food_type:
             if food_type == Soup:
                 yield Soup(el.css(".modify_item")[0].text())
