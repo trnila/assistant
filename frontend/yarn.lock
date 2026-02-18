@@ -368,10 +368,10 @@ deepmerge@^4.3.1:
   resolved "https://registry.yarnpkg.com/deepmerge/-/deepmerge-4.3.1.tgz#44b5f2147cd3b00d4b56137685966f26fd25dd4a"
   integrity sha512-3sUqbMEc77XqpdNO7FRyRog+eW3ph+GYCbj+rK+uYyRMuwsVy0rMiVtPn+QJlKFvWP/1PYpapqYn0Me2knFn+A==
 
-devalue@^5.6.2:
-  version "5.6.2"
-  resolved "https://registry.yarnpkg.com/devalue/-/devalue-5.6.2.tgz#931e2bb1cc2b299e0f0fb9e4e5be8ebf521a25b8"
-  integrity sha512-nPRkjWzzDQlsejL1WVifk5rvcFi/y1onBRxjaFMjZeR9mFpqu2gmAZ9xUB9/IEanEP/vBtGeGganC/GO1fmufg==
+devalue@^5.6.3:
+  version "5.6.3"
+  resolved "https://registry.yarnpkg.com/devalue/-/devalue-5.6.3.tgz#fee7b50bf072f4a4cdf18d1f27de3ce92131f699"
+  integrity sha512-nc7XjUU/2Lb+SvEFVGcWLiKkzfw8+qHI7zn8WYXKkLMgfGSHbgCEaR6bJpev8Cm6Rmrb19Gfd/tZvGqx9is3wg==
 
 esbuild@^0.27.0:
   version "0.27.3"
@@ -545,9 +545,9 @@ source-map-js@^1.2.1:
   integrity sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==
 
 svelte@^5.0.0:
-  version "5.51.3"
-  resolved "https://registry.yarnpkg.com/svelte/-/svelte-5.51.3.tgz#62b4803480239daf80a988727020cc6a0818035c"
-  integrity sha512-3+ni7BMjiEQeMCa1fDQzHy2ESAebgQDVOTuE4jlj2/QOAB2grRta8ew80p95miWE+ZmimpL7B3t9SSO4rv0aqQ==
+  version "5.51.5"
+  resolved "https://registry.yarnpkg.com/svelte/-/svelte-5.51.5.tgz#42d03a54d848783df769a88752ae6cd7e1b7d037"
+  integrity sha512-/4tR5cLsWOgH3wnNRXnFoWaJlwPGbJanZPSKSD6nHM2y01dvXeEF4Nx7jevoZ+UpJpkIHh6mY2tqDncuI4GHng==
   dependencies:
     "@jridgewell/remapping" "^2.3.4"
     "@jridgewell/sourcemap-codec" "^1.5.0"
@@ -558,7 +558,7 @@ svelte@^5.0.0:
     aria-query "^5.3.1"
     axobject-query "^4.1.0"
     clsx "^2.1.1"
-    devalue "^5.6.2"
+    devalue "^5.6.3"
     esm-env "^1.2.1"
     esrap "^2.2.2"
     is-reference "^3.0.3"
