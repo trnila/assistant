@@ -11,8 +11,7 @@
 Install and start redis server for caching.
 
 ```sh
-$ pip install pre-commit uv
-$ pre-commit install
+$ uv run prek install
 
 # parse restaurant from CLI
 $ uv run lunches.py bistroin
