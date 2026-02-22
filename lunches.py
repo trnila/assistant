@@ -325,7 +325,7 @@ def ellas(dom: Node) -> Foods:
                 continue
             if line == days[day_nth]:
                 capturing = True
-            elif line == days[day_nth + 1]:
+            elif day_nth + 1 < len(days) and line == days[day_nth + 1]:
                 capturing = False
             elif capturing:
                 if not found_soup:
