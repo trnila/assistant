@@ -98,8 +98,8 @@ def menicka_parser(dom: Node) -> Generator[Soup | Lunch]:
 
         soup_el = day_dom.css_first(".soup .food")
         if soup_el:
-            soup_name = soup_el.text()
-            if "Pro tento den nebylo zadáno menu" in soup_name:
+            soup_name = soup_el.text(strip=True)
+            if soup_name in ("Pro tento den nebylo zadáno menu.", "Restaurace má tento den zavřeno."):
                 break
             yield Soup(soup_name, day_dom.css(".soup .prize")[0].text())
 
