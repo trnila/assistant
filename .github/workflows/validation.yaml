@@ -37,4 +37,11 @@ jobs:
       - run: docker-compose up -d --build
       - run: npm install -D @playwright/test@latest
       - run: npx playwright install --with-deps
-      - run: npx playwright test
+      - run: npx playwright test --reporter=html
+      - uses: actions/upload-artifact@v6
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
