@@ -38,6 +38,8 @@ jobs:
       - run: npm install -D @playwright/test@latest
       - run: npx playwright install --with-deps
       - run: npx playwright test --reporter=html
+      - run: docker-compose logs
+        if: ${{ !cancelled() }}
       - uses: actions/upload-artifact@v6
         if: ${{ !cancelled() }}
         with:
