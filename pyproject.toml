@@ -8,7 +8,7 @@ readme = "README.md"
 dependencies = [
     "httpx>=0.28.1,<0.29",
     "selectolax>=0.4,<0.5",
-    "fastapi[standard]>=0.131,<0.132",
+    "fastapi[standard]>=0.133,<0.134",
     "uvicorn[standard]>=0.41,<0.42",
     "redis[hiredis]>=7,<8",
 ]
