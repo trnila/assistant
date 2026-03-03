@@ -59,12 +59,6 @@
             location: "Olomouc",
           },
           {
-            lat: 49.8051033,
-            lon: 18.2361661,
-            distance: 1500,
-            location: "Zábřeh",
-          },
-          {
             lat: 49.8322447,
             lon: 18.2874353,
             distance: 1500,

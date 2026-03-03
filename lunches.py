@@ -24,7 +24,6 @@ USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Ge
 class Location(StrEnum):
     Poruba = ("Poruba",)
     Dubina = ("Dubina",)
-    Zabreh = ("Zábřeh",)
     Centrum = ("Centrum",)
     Olomouc = ("Olomouc",)
 
