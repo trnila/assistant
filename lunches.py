@@ -535,6 +535,21 @@ def fontana(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
+@restaurant("U Vojty", "https://www.menicka.cz/api/iframe/?id=7857", Location.Vitkovice)
+def u_vojty(dom: Node) -> Foods:
+    yield from menicka_parser(dom)
+
+
+@restaurant("U Prokopa", "https://www.menicka.cz/api/iframe/?id=1506", Location.Vitkovice)
+def u_prokopa(dom: Node) -> Foods:
+    yield from menicka_parser(dom)
+
+
+@restaurant("Veronika", "https://www.menicka.cz/api/iframe/?id=2232", Location.Vitkovice)
+def veronika(dom: Node) -> Foods:
+    yield from menicka_parser(dom)
+
+
 @restaurant("Burger & Beer Brothers", "https://www.menicka.cz/api/iframe/?id=7863", Location.Olomouc)
 def bbbrothers(dom: Node) -> Foods:
     yield from menicka_parser(dom)
