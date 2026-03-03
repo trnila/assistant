@@ -565,11 +565,6 @@ def kristyn(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
-@restaurant("Assen", "https://www.menicka.cz/api/iframe/?id=8767", Location.Zabreh)
-def assen(dom: Node) -> Foods:
-    yield from menicka_parser(dom)
-
-
 @restaurant("Bistro Paulus", "https://www.bistro-paulus.cz/poledni-menu/", Location.Olomouc)
 def paulus(dom: Node) -> Foods:
     current_day = datetime.datetime.now().strftime("%-d.%-m.%Y")
