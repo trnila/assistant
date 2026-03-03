@@ -25,6 +25,7 @@ class Location(StrEnum):
     Poruba = ("Poruba",)
     Dubina = ("Dubina",)
     Centrum = ("Centrum",)
+    Vitkovice = ("Vítkovice",)
     Olomouc = ("Olomouc",)
 
 

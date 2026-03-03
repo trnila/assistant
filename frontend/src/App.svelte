@@ -59,6 +59,12 @@
             location: "Olomouc",
           },
           {
+            lat: 49.8120949,
+            lon: 18.2675897,
+            distance: 1500,
+            location: "Vítkovice",
+          },
+          {
             lat: 49.8322447,
             lon: 18.2874353,
             distance: 1500,
