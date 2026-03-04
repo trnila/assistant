@@ -545,6 +545,17 @@ def u_prokopa(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
+@restaurant("Gulliver", "https://www.gastropetr.cz/index.php?go=TydenniMenu", Location.Vitkovice)
+def gulliver(dom: Node) -> Foods:
+    soup = dom.css_first(".entry .entry p")
+    if soup:
+        yield Soup(soup.text().replace("Polévka:", ""))
+
+    for tr in dom.css(".entry .entry table tr"):
+        tds = tr.css("td")
+        yield Lunch(tds[0].text(), price=tds[1].text())
+
+
 @restaurant("Veronika", "https://www.menicka.cz/api/iframe/?id=2232", Location.Vitkovice)
 def veronika(dom: Node) -> Foods:
     yield from menicka_parser(dom)
