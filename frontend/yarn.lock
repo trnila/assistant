@@ -497,9 +497,9 @@ tslib@^2.4.0:
   integrity sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==
 
 vite-plugin-singlefile@^2.0.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/vite-plugin-singlefile/-/vite-plugin-singlefile-2.3.0.tgz#71f7d8f8958cc019295e159355284ca3ecca97f1"
-  integrity sha512-DAcHzYypM0CasNLSz/WG0VdKOCxGHErfrjOoyIPiNxTPTGmO6rRD/te93n1YL/s+miXq66ipF1brMBikf99c6A==
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/vite-plugin-singlefile/-/vite-plugin-singlefile-2.3.2.tgz#e0ff9e146fa3a63fecd53eade9ed33bd08d20da0"
+  integrity sha512-b8SxCi/gG7K298oJDcKOuZeU6gf6wIcCJAaEqUmmZXdjfuONlkyNyWZC3tEbN6QockRCNUd3it9eGTtpHGoYmg==
   dependencies:
     micromatch "^4.0.8"
 
