@@ -209,48 +209,9 @@ def jacks_burger(dom: Node) -> Foods:
             yield Lunch(name, num=category, price=price)
 
 
-@restaurant("Poklad", "https://dkpoklad.cz/restaurace/", Location.Poruba)
-async def poklad(dom: Node, http: httpx.AsyncClient) -> Foods:
-    pdf_el = dom.css_first(".restaurace-box .wp-block-file a")
-    if not pdf_el:
-        return
-    pdf_url = pdf_el.attributes["href"]
-    if not pdf_url:
-        return
-
-    pdf = (await http.get(pdf_url)).content
-    text = await subprocess_check_output(["pdftotext", "-layout", "-", "-"], pdf)
-
-    today = datetime.datetime.strftime(datetime.datetime.now(), "%-d I %-m")
-    tomorrow = datetime.datetime.strftime(datetime.datetime.now() + datetime.timedelta(days=1), "%-d I %-m")
-    capturing = False
-    soup = True
-    item = None
-    for line in text.splitlines():
-        if today in line:
-            capturing = True
-        elif capturing:
-            if tomorrow in line or "NABÍDKA NÁPOJŮ" in line:
-                break
-            if soup:
-                soup = False
-                for s in line.split(" I "):
-                    yield Soup(s)
-            else:
-                m = re.match(r"^\s*(?P<num>([0-9]+|BUSINESS))\s*\.?\s*(?P<name>.*?) (?P<price>[0-9]+) Kč", line)
-                if m:
-                    if item:
-                        yield Lunch(**item)
-                    item = m.groupdict()
-                elif item:
-                    if not line:
-                        yield Lunch(**item)
-                        item = None
-                    else:
-                        item["name"] += line
-
-    if item:
-        yield Lunch(**item)
+@restaurant("Poklad", "https://www.menicka.cz/api/iframe/?id=8217", Location.Poruba)
+def poklad(dom: Node) -> Foods:
+    yield from menicka_parser(dom)
 
 
 @restaurant("Trebovicky mlyn", "https://www.trebovickymlyn.cz/denni-menu/", Location.Poruba)
@@ -663,7 +624,7 @@ def burfi(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
-@restaurant("Makalu", "https://www.nepalska-restaurace-makalu.cz/ostrava/weekly", Location.Centrum)
+@restaurant("Makalu", "https://www.nepalska-restaurace-makalu.cz/MAKALU/PAGES/OSTRAVA/Weekly.php", Location.Centrum)
 def namaste_ostrava(dom: Node) -> Foods:
     day_nth = datetime.datetime.today().weekday()
     if day_nth > 4:  # Skip Sat/Sun
