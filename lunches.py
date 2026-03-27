@@ -666,23 +666,23 @@ def burfi(dom: Node) -> Foods:
 @restaurant("Makalu", "https://www.nepalska-restaurace-makalu.cz/ostrava/weekly", Location.Centrum)
 def namaste_ostrava(dom: Node) -> Foods:
     day_nth = datetime.datetime.today().weekday()
-    if day_nth > 4: # Skip Sat/Sun
-        return
+    if day_nth > 4:  # Skip Sat/Sun
+        return None
 
     target_day = days[day_nth]
     day_container = None
-    
+
     # Find the container for the current day
     for cont in dom.css(".weeklyDayCont"):
         day_header = cont.css_first(".weeklyDay")
         if day_header and day_header.text(strip=True) == target_day:
             day_container = cont
             break
-            
-    if not day_container:
-        return
 
-    # They are in the first table.mealContainer of the day block
+    if not day_container:
+        return None
+
+    # 1. Parse Soups
     soup_table = day_container.css_first("table.mealContainer")
     if soup_table:
         for td in soup_table.css("tr.menuPageMealName td"):
@@ -690,27 +690,27 @@ def namaste_ostrava(dom: Node) -> Foods:
             if "polévka" in text.lower():
                 yield Soup(name=text)
 
-    # Main Courses
+    # 2. Parse Main Courses
     for meal_table in day_container.css("table.mealContainer"):
         name_row = meal_table.css_first("tr.menuPageMealName")
         if not name_row:
             continue
-            
+
         tds = name_row.css("td")
         if len(tds) < 4:
             continue
-            
+
         # Verify this is a numbered meal (1. / 2. / etc)
         num_str = tds[0].text(strip=True).replace(".", "")
         if not num_str.isdigit():
             continue
-            
+
         name = tds[2].text(strip=True)
-        
+
         # PRICE LOGIC: "162/ 184Kč" -> We take "162" - NO SOUP
         price_raw = tds[3].text(strip=True)
         price = price_raw.split("/")[0] if "/" in price_raw else price_raw
-        
+
         # Description is in the 'mobileSize' row below the name
         desc_row = meal_table.css_first("tr.mobileSize")
         ingredients = None
@@ -719,12 +719,7 @@ def namaste_ostrava(dom: Node) -> Foods:
             if len(desc_tds) >= 3:
                 ingredients = desc_tds[2].text(strip=True)
 
-        yield Lunch(
-            num=num_str,
-            name=name,
-            price=price,
-            ingredients=ingredients
-        )
+        yield Lunch(num=num_str, name=name, price=price, ingredients=ingredients)
 
 
 @restaurant("Frankie's Pub", "https://www.menicka.cz/api/iframe/?id=7080", Location.Centrum)
