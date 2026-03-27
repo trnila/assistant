@@ -613,16 +613,6 @@ def puor(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
-@restaurant("Frankie's Pub", "https://www.menicka.cz/api/iframe/?id=7080", Location.Centrum)
-def frankies_pub(dom: Node) -> Foods:
-    yield from menicka_parser(dom)
-
-
-@restaurant("Ostrawica Lokál", "https://www.menicka.cz/api/iframe/?id=8648", Location.Centrum)
-def ostravica_lokal(dom: Node) -> Foods:
-    yield from menicka_parser(dom)
-
-
 @restaurant("Kanteen", "https://www.menicka.cz/api/iframe/?id=8684", Location.Centrum)
 def kanteen(dom: Node) -> Foods:
     yield from menicka_parser(dom)
@@ -633,13 +623,112 @@ def coloseum(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
+@restaurant("Eatnam", "https://www.menicka.cz/api/iframe/?id=9416", Location.Centrum)
+def eatnam(dom: Node) -> Foods:
+    yield from menicka_parser(dom)
+
+
+@restaurant("Restaurace Platan", "https://www.menicka.cz/api/iframe/?id=1421", Location.Centrum)
+def platan(dom: Node) -> Foods:
+    yield from menicka_parser(dom)
+
+
 @restaurant("IQ Restaurant", "https://www.menicka.cz/api/iframe/?id=1401", Location.Centrum)
 def iq(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
-@restaurant("2 Promile", "https://www.menicka.cz/api/iframe/?id=3486", Location.Centrum)
-def two_promile(dom: Node) -> Foods:
+@restaurant("Mustang", "https://www.menicka.cz/api/iframe/?id=6389", Location.Centrum)
+def mustang(dom: Node) -> Foods:
+    yield from menicka_parser(dom)
+
+
+@restaurant("Coal&Fire", "https://www.menicka.cz/api/iframe/?id=3486", Location.Centrum)
+def coalandfire(dom: Node) -> Foods:
+    yield from menicka_parser(dom)
+
+
+@restaurant("Ostrawica Lokál", "https://www.menicka.cz/api/iframe/?id=8648", Location.Centrum)
+def ostravica_lokal(dom: Node) -> Foods:
+    yield from menicka_parser(dom)
+
+
+@restaurant("4 z Tanku", "https://www.menicka.cz/api/iframe/?id=8855", Location.Centrum)
+def ztanku(dom: Node) -> Foods:
+    yield from menicka_parser(dom)
+
+
+@restaurant("Burfi", "https://www.menicka.cz/api/iframe/?id=4134", Location.Centrum)
+def burfi(dom: Node) -> Foods:
+    yield from menicka_parser(dom)
+
+
+@restaurant("Makalu", "https://www.nepalska-restaurace-makalu.cz/ostrava/weekly", Location.Centrum)
+def namaste_ostrava(dom: Node) -> Foods:
+    day_nth = datetime.datetime.today().weekday()
+    if day_nth > 4: # Skip Sat/Sun
+        return
+
+    target_day = days[day_nth]
+    day_container = None
+    
+    # Find the container for the current day
+    for cont in dom.css(".weeklyDayCont"):
+        day_header = cont.css_first(".weeklyDay")
+        if day_header and day_header.text(strip=True) == target_day:
+            day_container = cont
+            break
+            
+    if not day_container:
+        return
+
+    # They are in the first table.mealContainer of the day block
+    soup_table = day_container.css_first("table.mealContainer")
+    if soup_table:
+        for td in soup_table.css("tr.menuPageMealName td"):
+            text = td.text(strip=True)
+            if "polévka" in text.lower():
+                yield Soup(name=text)
+
+    # Main Courses
+    for meal_table in day_container.css("table.mealContainer"):
+        name_row = meal_table.css_first("tr.menuPageMealName")
+        if not name_row:
+            continue
+            
+        tds = name_row.css("td")
+        if len(tds) < 4:
+            continue
+            
+        # Verify this is a numbered meal (1. / 2. / etc)
+        num_str = tds[0].text(strip=True).replace(".", "")
+        if not num_str.isdigit():
+            continue
+            
+        name = tds[2].text(strip=True)
+        
+        # PRICE LOGIC: "162/ 184Kč" -> We take "162" - NO SOUP
+        price_raw = tds[3].text(strip=True)
+        price = price_raw.split("/")[0] if "/" in price_raw else price_raw
+        
+        # Description is in the 'mobileSize' row below the name
+        desc_row = meal_table.css_first("tr.mobileSize")
+        ingredients = None
+        if desc_row:
+            desc_tds = desc_row.css("td")
+            if len(desc_tds) >= 3:
+                ingredients = desc_tds[2].text(strip=True)
+
+        yield Lunch(
+            num=num_str,
+            name=name,
+            price=price,
+            ingredients=ingredients
+        )
+
+
+@restaurant("Frankie's Pub", "https://www.menicka.cz/api/iframe/?id=7080", Location.Centrum)
+def frankies_pub(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
