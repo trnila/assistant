@@ -175,9 +175,9 @@
   integrity sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==
 
 "@typescript-eslint/types@^8.2.0":
-  version "8.57.2"
-  resolved "https://registry.yarnpkg.com/@typescript-eslint/types/-/types-8.57.2.tgz#efe0da4c28b505ed458f113aa960dce2c5c671f4"
-  integrity sha512-/iZM6FnM4tnx9csuTxspMW4BOSegshwX5oBDznJ7S4WggL7Vczz5d2W11ecc4vRrQMQHXRSxzrCsyG5EsPPTbA==
+  version "8.58.1"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/types/-/types-8.58.1.tgz#9dfb4723fcd2b13737d8b03d941354cf73190313"
+  integrity sha512-io/dV5Aw5ezwzfPBBWLoT+5QfVtP8O7q4Kftjn5azJ88bYyp/ZMCsyW1lpKK46EXJcaYMZ1JtYj+s/7TdzmQMw==
 
 acorn@^8.12.1:
   version "8.16.0"
@@ -217,9 +217,9 @@ detect-libc@^2.0.3:
   integrity sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==
 
 devalue@^5.6.4:
-  version "5.6.4"
-  resolved "https://registry.yarnpkg.com/devalue/-/devalue-5.6.4.tgz#aec6cdba0e4109543b40c94d46e2b87bf8af8de5"
-  integrity sha512-Gp6rDldRsFh/7XuouDbxMH3Mx8GMCcgzIb1pDTvNyn8pZGQ22u+Wa+lGV9dQCltFQ7uVw0MhRyb8XDskNFOReA==
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/devalue/-/devalue-5.7.0.tgz#44cf49d479e2769a04c6bf44168592de688f584b"
+  integrity sha512-qCvc8m7cImp1QDCsiY+C2EdSBWSj7Ucfoq87scSdYboDiIKdvMtFbH1U2VReBls6WMhMaUOoK3ZJEDNG/7zm3w==
 
 esm-env@^1.2.1:
   version "1.2.2"
@@ -426,9 +426,9 @@ source-map-js@^1.2.1:
   integrity sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==
 
 svelte@^5.0.0:
-  version "5.55.1"
-  resolved "https://registry.yarnpkg.com/svelte/-/svelte-5.55.1.tgz#04df5384b4f542815d7145e8de26a5e8aeaffa22"
-  integrity sha512-QjvU7EFemf6mRzdMGlAFttMWtAAVXrax61SZYHdkD6yoVGQ89VeyKfZD4H1JrV1WLmJBxWhFch9H6ig/87VGjw==
+  version "5.55.2"
+  resolved "https://registry.yarnpkg.com/svelte/-/svelte-5.55.2.tgz#83cde28cf26446d162bea9deed1b3161992073e1"
+  integrity sha512-z41M/hi0ZPTzrwVKLvB/R1/Oo08gL1uIib8HZ+FncqxxtY9MLb01emg2fqk+WLZ/lNrrtNDFh7BZLDxAHvMgLw==
   dependencies:
     "@jridgewell/remapping" "^2.3.4"
     "@jridgewell/sourcemap-codec" "^1.5.0"
