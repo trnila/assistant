@@ -172,9 +172,9 @@
   integrity sha512-4WfKk68eTih+MiJD4fSbxN7E8kVBmTMPWHUPYjvl2N0rMs53YLTT8/YjKU5Dtnz5LqDjl7LEw4U7lXR2W3J5WA==
 
 "@sveltejs/vite-plugin-svelte@^7.0.0":
-  version "7.1.0"
-  resolved "https://registry.yarnpkg.com/@sveltejs/vite-plugin-svelte/-/vite-plugin-svelte-7.1.0.tgz#eadb33a07960054aacfce7b0c4c8bc666029583a"
-  integrity sha512-atk0ZbHXKvUOpn8eG3kE0BvRcWvMubOYLLMvyLFYpf+IpLj7lfEaykMa/2Yy8o7PJ/qvxXO4SXruq8coIjq1yw==
+  version "7.1.2"
+  resolved "https://registry.yarnpkg.com/@sveltejs/vite-plugin-svelte/-/vite-plugin-svelte-7.1.2.tgz#23f513f7d65449f88276d27b36f3281a4a0049b5"
+  integrity sha512-DrUBA2UXRfDmUX/ZTiEopd3X40yavsJF1FX2RygcuIScHL7o5YX1fMvoYnDhjeJQC4weCOklirpNWlcb2NiSeA==
   dependencies:
     deepmerge "^4.3.1"
     magic-string "^0.30.21"
