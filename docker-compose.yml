@@ -15,6 +15,7 @@ services:
       dockerfile: ./Dockerfile
     environment:
       REDIS_HOST: redis
+      LOG_LEVEL: ${LOG_LEVEL:-WARNING}
     ports:
       - "8000:8000"
 

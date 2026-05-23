@@ -35,7 +35,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - run: sudo apt-get update && sudo apt-get install -y docker-compose
-      - run: docker-compose up -d --build
+      - run: LOG_LEVEL=debug docker-compose up -d --build
       - run: npm install -D @playwright/test@latest
       - run: npx playwright install --with-deps
       - run: npx playwright test --reporter=html
