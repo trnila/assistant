@@ -2,6 +2,7 @@
 import asyncio
 import datetime
 import ipaddress
+import logging
 import os
 import pickle
 
@@ -15,6 +16,10 @@ from starlette.responses import FileResponse, HTMLResponse
 # from flask_redis import FlaskRedis
 from lunches import RestaurantMenu, gather_restaurants
 from public_transport import public_transport_connections
+
+LOG_LEVEL = os.getenv("LOG_LEVEL", "WARNING").upper()
+
+logging.basicConfig(level=LOG_LEVEL)
 
 app = FastAPI(debug=True)
 templates = Jinja2Templates(directory="templates")
