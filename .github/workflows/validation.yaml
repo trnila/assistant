@@ -8,6 +8,7 @@ on:
 jobs:
   precommit:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
     - uses: actions/checkout@v6
     - uses: astral-sh/setup-uv@v8.1.0
@@ -15,12 +16,14 @@ jobs:
 
   build_frontend:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
       - uses: actions/checkout@v6
       - run: cd frontend && yarn install && yarn run build
 
   test_cli:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
       - uses: actions/checkout@v6
       - uses: astral-sh/setup-uv@v8.1.0
@@ -32,6 +35,7 @@ jobs:
 
   test_fullstack:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
       - uses: actions/checkout@v6
       - run: sudo apt-get update && sudo apt-get install -y docker-compose
