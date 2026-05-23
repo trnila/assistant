@@ -41,6 +41,8 @@ jobs:
       - run: npx playwright test --reporter=html
       - run: docker-compose logs
         if: ${{ !cancelled() }}
+      - run: curl http://localhost:8000/lunch.json
+        if: ${{ !cancelled() }}
       - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
         with:
