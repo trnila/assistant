@@ -191,8 +191,8 @@ def u_zlateho_lva(dom: Node) -> Foods:
 
 @restaurant("Globus", "https://www.globus.cz/ostrava/sluzby/restaurace", Location.Poruba)
 def globus(dom: Node) -> Foods:
-    for row in dom.css(".space-y-2 .flex"):
-        spans = row.css("* > span")
+    for row in dom.css("#dnesni-nabidka .space-y-2 .flex.gap-2"):
+        spans = list(row.iter())
         price = fix_price(spans[2].text())
         t = Soup if price is not None and price < 50 else Lunch
         yield t(spans[1].text(), price=price)
