@@ -14,8 +14,8 @@ from starlette.responses import FileResponse, HTMLResponse
 
 # from werkzeug.middleware.proxy_fix import ProxyFix
 # from flask_redis import FlaskRedis
-from lunches import RestaurantMenu, gather_restaurants
-from public_transport import public_transport_connections
+from .lunches import RestaurantMenu, gather_restaurants
+from .public_transport import public_transport_connections
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "WARNING").upper()
 

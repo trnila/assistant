@@ -3,3 +3,5 @@
 /__pycache__
 tesseract_opencl_profile_devices.dat
 dump.rdb
+/backend/__pycache__
+/result
