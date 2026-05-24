@@ -65,7 +65,6 @@ let
 
     runtimeInputs = [
       pkgs.redis
-      backend
       pkgs.netcat
     ];
 
@@ -99,7 +98,9 @@ let
 
       export REDIS_URL="redis://127.0.0.1:$REDIS_PORT"
 
-      exec uvicorn backend.app:app \
+      cd ${runtime}
+
+      exec ${runtime}/bin/uvicorn backend.app:app \
         --host 0.0.0.0 \
         --port 8000
     '';
