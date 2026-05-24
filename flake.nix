@@ -22,6 +22,8 @@
       inputs.uv2nix.follows = "uv2nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    git-hooks.url = "github:cachix/git-hooks.nix";
   };
 
   outputs =
@@ -32,8 +34,9 @@
       pyproject-nix,
       pyproject-build-systems,
       uv2nix,
+      git-hooks,
       ...
-    }:
+    }@inputs:
     flake-utils.lib.eachDefaultSystem (
       system:
       let
@@ -65,15 +68,44 @@
           program = "${self.packages.${system}.app}/bin/lunchmenu";
         };
 
-        devShells.default = pkgs.mkShell {
-          inputsFrom = [
-            self.packages.${system}.frontend
-            self.packages.${system}.backend
-          ];
-          packages = with pkgs; [
-            git
-            curl
-          ];
+        devShells.default =
+          let
+            inherit (self.checks.${system}.pre-commit-check) shellHook enabledPackages;
+          in
+          pkgs.mkShell {
+            inherit shellHook; # this installs the hooks automatically on `nix develop`
+            nativeBuildInputs = with pkgs; [
+              enabledPackages # the enabled hooks from "checks"
+            ];
+            inputsFrom = [
+              self.packages.${system}.frontend
+              self.packages.${system}.backend
+            ];
+            packages = with pkgs; [
+              git
+              curl
+            ];
+          };
+
+        checks = {
+          pre-commit-check = git-hooks.lib.${system}.run {
+            src = ./.;
+            hooks = {
+              # keep-sorted start
+              check-executables-have-shebangs.enable = true;
+              check-yaml.enable = true;
+              end-of-file-fixer.enable = true;
+              keep-sorted.enable = true;
+              mypy.enable = true;
+              nixfmt.enable = true;
+              ruff-format.enable = true;
+              ruff.enable = true;
+              shellcheck.enable = true;
+              trim-trailing-whitespace.enable = true;
+              # keep-sorted end
+            };
+            package = pkgs.prek;
+          };
         };
       }
     )
