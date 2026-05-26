@@ -346,6 +346,11 @@ def el_amigo_muerto(dom: Node) -> Foods:
     yield from menicka_parser(dom)
 
 
+@restaurant("John’s Ribs Bistro", "https://www.menicka.cz/api/iframe/?id=9398", Location.Poruba)
+def johns_ribs_bistro(dom: Node) -> Foods:
+    yield from menicka_parser(dom)
+
+
 @restaurant("Rusty Bell Pub", "https://www.menicka.cz/api/iframe/?id=1547", Location.Poruba)
 def rusty_bell_pub(dom: Node) -> Foods:
     foods = list(menicka_parser(dom))
