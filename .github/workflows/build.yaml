@@ -35,3 +35,17 @@ jobs:
     concurrency: deploy
     steps:
       - run: 'curl -X POST --fail -s -H"Authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}" https://trnila.eu/hooks/assistant'
+
+  deploy_nix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          repository: trnila/test_infra
+          ref: main
+      - run: git config user.name "Trnila bot"
+      - run: git config user.email "bot@trnila.eu"
+      - run: sed -i -E "s#ghcr.io/trnila/assistant:[^\"]+#ghcr.io/trnila/assistant:${{ github.sha }}#g" configuration.nix
+      - run: git add configuration.nix
+      - run: git commit -m "Update assistant container to ${{ github.sha }}"
+      - run: git push
