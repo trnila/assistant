@@ -35,3 +35,24 @@ jobs:
     concurrency: deploy
     steps:
       - run: 'curl -X POST --fail -s -H"Authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}" https://trnila.eu/hooks/assistant'
+
+  deploy_nix:
+    runs-on: ubuntu-latest
+    env:
+      INFRA_REPO: trnila/nixos_pi
+    steps:
+      - uses: actions/create-github-app-token@v3
+        id: app-token
+        with:
+          client-id: ${{ vars.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          repositories: ${{ env.INFRA_REPO }}
+      - name: Trigger workflow
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          gh workflow run update_flake.yml \
+            --repo ${{ env.INFRA_REPO }} \
+            --ref master \
+            -f input="assistant" \
+            -f rev="github:${{ github.repository }}/${{ github.sha }}"
