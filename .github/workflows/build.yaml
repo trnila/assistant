@@ -8,10 +8,17 @@ jobs:
   deploy_nix:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/create-github-app-token@v3
+        id: app-token
+        with:
+          client-id: ${{ vars.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
       - uses: actions/checkout@v6
         with:
+          token: ${{ steps.app-token.outputs.token }}
           repository: trnila/test_infra
           ref: main
+          persist-credentials: false
       - run: git config user.name "Trnila bot"
       - run: git config user.email "bot@trnila.eu"
       - run: sed -i -E "s#ghcr.io/trnila/assistant:[^\"]+#ghcr.io/trnila/assistant:${{ github.sha }}#g" configuration.nix
