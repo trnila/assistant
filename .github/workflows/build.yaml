@@ -18,8 +18,17 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
           repository: trnila/test_infra
           ref: main
-      - run: git config user.name "Trnila bot"
-      - run: git config user.email "bot@trnila.eu"
+      - name: Get GitHub App User ID
+        id: get-user-id
+        run: echo "user-id=$(gh api "/users/${{ steps.app-token.outputs.app-slug }}[bot]" --jq .id)" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+      - run: |
+          git config --global user.name '${{ steps.app-token.outputs.app-slug }}[bot]'
+          git config --global user.email '${{ steps.get-user-id.outputs.user-id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com'
+          gh auth setup-git
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
       - run: sed -i -E "s#ghcr.io/trnila/assistant:[^\"]+#ghcr.io/trnila/assistant:${{ github.sha }}#g" configuration.nix
       - run: git add configuration.nix
       - run: git commit -m "Update assistant container to ${{ github.sha }}"
