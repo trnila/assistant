@@ -19,6 +19,6 @@ jobs:
         run: |
           gh workflow run update_flake.yml \
             --repo trnila/test_infra \
-            --ref master \
+            --ref main \
             -f input="nixpkgs" \
             -f rev="github:NixOS/nixpkgs/c326d7aede3170da1a92ec9af0be1c3a28c25a64"
