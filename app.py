@@ -5,6 +5,7 @@ import ipaddress
 import logging
 import os
 import pickle
+from typing import cast
 
 import redis.asyncio as redis
 from fastapi import FastAPI, Request
@@ -63,8 +64,8 @@ async def public_transport(request: Request) -> HTMLResponse:
 async def lunch(request: Request) -> LunchResponse | ErrorResponse:
     now = int(datetime.datetime.now().timestamp())
     key = f"restaurants.{datetime.date.today().strftime('%d-%m-%Y')}"
-    result_str = await redis_client.get(key)
-    if not result_str or request.method == "POST":
+    result_raw = await redis_client.get(key)
+    if not result_raw or request.method == "POST":
         throttle_key = f"{key}.throttle"
         if await redis_client.incr(throttle_key) != 1:
             return ErrorResponse(error="Fetch limit reached. Try again later.")
@@ -77,7 +78,7 @@ async def lunch(request: Request) -> LunchResponse | ErrorResponse:
         )
         await redis_client.set(key, pickle.dumps(result))
     else:
-        result = pickle.loads(result_str)
+        result = pickle.loads(cast(bytes, result_raw))
 
     disallow_nets = [
         ipaddress.ip_network(net)
