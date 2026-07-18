@@ -92,7 +92,7 @@ def restaurant(title: str, url: str, location: Location) -> Callable[..., Restau
 def menicka_parser(dom: Node) -> Generator[Soup | Lunch]:
     current_day = datetime.datetime.now().strftime("%-d.%-m.%Y")
     for day_dom in dom.css(".content"):
-        day = day_dom.css("h2")[0].text(strip=True).split(" ", 2)[1]
+        day = day_dom.css("h2")[0].text(strip=True).split(maxsplit=2)[1]
         if current_day not in day:
             continue
 
