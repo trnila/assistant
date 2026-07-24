@@ -3,10 +3,13 @@ import asyncio
 import datetime
 import itertools
 from time import time
+from zoneinfo import ZoneInfo
 
 import httpx
 from pydantic import BaseModel
 from selectolax.parser import HTMLParser, Node
+
+TZ = ZoneInfo("Europe/Prague")
 
 
 class Station(BaseModel):
@@ -43,7 +46,7 @@ async def public_transport_connections(sources: list[str], destinations: list[st
             for a in node.css(".outside-of-popup"):
 
                 def to_datetime(s: str) -> datetime.datetime:
-                    date = datetime.datetime.now()
+                    date = datetime.datetime.now(TZ)
                     hour, minute = s.split(":")
                     return date.replace(hour=int(hour), minute=int(minute), second=0)
 

@@ -14,12 +14,14 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 from html import unescape
 from typing import Any
+from zoneinfo import ZoneInfo
 
 import httpx
 from selectolax.parser import HTMLParser, Node, Selector
 
 days = ["Pondělí", "Úterý", "Středa", "Čtvrtek", "Pátek", "Sobota", "Neděle"]
 USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36"
+TZ = ZoneInfo("Europe/Prague")
 
 
 class Location(StrEnum):
@@ -91,7 +93,7 @@ def restaurant(title: str, url: str, location: Location) -> Callable[..., Restau
 
 
 def menicka_parser(dom: Node) -> Generator[Soup | Lunch]:
-    current_day = datetime.datetime.now().strftime("%-d.%-m.%Y")
+    current_day = datetime.datetime.now(TZ).strftime("%-d.%-m.%Y")
     for day_dom in dom.css(".content"):
         day = day_dom.css("h2")[0].text(strip=True).split(maxsplit=2)[1]
         if current_day not in day:
@@ -141,7 +143,7 @@ def bistroin(dom: Node) -> Foods:
 
 @restaurant("U jarosu", "https://www.ujarosu.cz/cz/denni-menu/", Location.Poruba)
 def u_jarosu(dom: Node) -> Foods:
-    today = datetime.datetime.strftime(datetime.datetime.now(), "%d. %m. %Y")
+    today = datetime.datetime.strftime(datetime.datetime.now(TZ), "%d. %m. %Y")
     for row in dom.css(".celyden"):
         parsed_day = row.css(".datum")[0].text()
         if parsed_day == today:
@@ -157,7 +159,7 @@ def u_jarosu(dom: Node) -> Foods:
 
 @restaurant("U zlateho lva", "http://www.zlatylev.com/menu_zlaty_lev.html", Location.Poruba)
 def u_zlateho_lva(dom: Node) -> Foods:
-    day_nth = datetime.datetime.today().weekday()
+    day_nth = datetime.datetime.now(TZ).weekday()
     text = dom.css(".xr_txt.xr_s0")[0].text()
 
     capturing = False
@@ -237,7 +239,7 @@ def trebovicky_mlyn(dom: Node) -> Foods:
 def trebovicka_role(dom: Node) -> Foods:
     MENU_REGEXP = re.compile(r"Menu (?P<num>[0-9])\s*:\s*(?P<name>.+)")
 
-    day_nth = datetime.datetime.today().weekday()
+    day_nth = datetime.datetime.now(TZ).weekday()
     for h4 in dom.css("h4"):
         if days[day_nth] in h4.text():
             table = h4.next
@@ -260,7 +262,7 @@ def trebovicka_role(dom: Node) -> Foods:
 
 @restaurant("La Strada", "https://www.lastrada.cz/cz/?tpl=plugins/DailyMenu/print&week_shift=", Location.Poruba)
 def lastrada(dom: Node) -> Foods:
-    day_nth = datetime.datetime.today().weekday()
+    day_nth = datetime.datetime.now(TZ).weekday()
 
     capturing = False
     for tr in dom.css("tr"):
@@ -275,7 +277,7 @@ def lastrada(dom: Node) -> Foods:
 
 @restaurant("Ellas", "https://www.restauraceellas.cz/", Location.Poruba)
 def ellas(dom: Node) -> Foods:
-    day_nth = datetime.datetime.today().weekday()
+    day_nth = datetime.datetime.now(TZ).weekday()
     lunch_pattern = re.compile(r"(?P<name>.*?)\s*(\(([^)]+)\))?\s*(–|-)\s*(?P<price>[0-9]+),-")
 
     capturing = False
@@ -301,7 +303,7 @@ def ellas(dom: Node) -> Foods:
 
 @restaurant("Saloon Pub", "http://www.saloon-pub.cz/cs/denni-nabidka/", Location.Poruba)
 def saloon_pub(dom: Node) -> Foods:
-    day = dom.css_first(f"#{datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d')} + section")
+    day = dom.css_first(f"#{datetime.datetime.strftime(datetime.datetime.now(TZ), '%Y-%m-%d')} + section")
     if not day:
         return None
     yield Soup(name=day.css(".category-info")[0].text())
@@ -311,7 +313,7 @@ def saloon_pub(dom: Node) -> Foods:
 
 @restaurant("Parlament", "https://www.restauraceparlament.cz/", Location.Poruba)  # codespell:ignore
 def parlament(dom: Node) -> Foods:  # codespell:ignore
-    day_nth = datetime.datetime.today().weekday()
+    day_nth = datetime.datetime.now(TZ).weekday()
     day = Selector(dom.css(".txt")[0], "div div").text_contains(days[day_nth])
     if day:
         day_node = day.matches[0]
@@ -367,7 +369,7 @@ def rusty_bell_pub(dom: Node) -> Foods:
 @restaurant("Viktorka", "https://www.viktorkaostrava.cz/denni-menu/", Location.Poruba)
 def viktorka(dom: Node) -> Foods:
     soups, lunches = dom.css(".elementor-widget-price-list")
-    day_nth = datetime.datetime.today().weekday()
+    day_nth = datetime.datetime.now(TZ).weekday()
 
     for item in soups.css(".elementor-price-list-title"):
         name = item.text(strip=True)
@@ -421,7 +423,7 @@ async def sbeerka(dom: Node, http: httpx.AsyncClient) -> Foods:
 
 @restaurant("Menza", "https://stravovani.vsb.cz/webkredit", Location.Poruba)
 async def menza(http: httpx.AsyncClient) -> Foods:
-    date = datetime.datetime.now().replace(hour=23, minute=0, second=0, microsecond=0) - datetime.timedelta(days=1)
+    date = datetime.datetime.now(TZ).replace(hour=23, minute=0, second=0, microsecond=0) - datetime.timedelta(days=1)
     fdate = date.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]
 
     res = await http.get(f"https://stravovani.vsb.cz/webkredit/Api/Ordering/Menu?Dates={fdate}Z&CanteenId=1")
@@ -474,8 +476,8 @@ async def maston(dom: Node, http: httpx.AsyncClient) -> Foods:
     img = (await http.get(img_url)).content
     text = await subprocess_check_output(["tesseract", "-l", "ces", "--psm", "4", "-", "-"], img)
 
-    today = datetime.datetime.strftime(datetime.datetime.now(), "%-d%-m")
-    tomorrow = datetime.datetime.strftime(datetime.datetime.now() + datetime.timedelta(days=1), "%-d%-m")
+    today = datetime.datetime.strftime(datetime.datetime.now(TZ), "%-d%-m")
+    tomorrow = datetime.datetime.strftime(datetime.datetime.now(TZ) + datetime.timedelta(days=1), "%-d%-m")
     capturing = False
     for line in text.splitlines():
         txt = line.replace(" ", "").replace(".", "")
@@ -560,7 +562,7 @@ def kristyn(dom: Node) -> Foods:
 
 @restaurant("Bistro Paulus", "https://www.bistro-paulus.cz/poledni-menu/", Location.Olomouc)
 def paulus(dom: Node) -> Foods:
-    current_day = datetime.datetime.now().strftime("%-d.%-m.%Y")
+    current_day = datetime.datetime.now(TZ).strftime("%-d.%-m.%Y")
     for day_dom in dom.css(".section-day"):
         day = "".join(day_dom.css("h3")[0].text(strip=True).split()[1:])
         if current_day not in day:
@@ -632,7 +634,7 @@ def burfi(dom: Node) -> Foods:
 
 @restaurant("Makalu", "https://www.nepalska-restaurace-makalu.cz/MAKALU/PAGES/OSTRAVA/Weekly.php", Location.Centrum)
 def namaste_ostrava(dom: Node) -> Foods:
-    day_nth = datetime.datetime.today().weekday()
+    day_nth = datetime.datetime.now(TZ).weekday()
     if day_nth > 4:  # Skip Sat/Sun
         return None
 
