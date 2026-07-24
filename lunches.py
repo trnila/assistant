@@ -5,6 +5,7 @@ import json
 import logging
 import re
 import string
+import sys
 import time
 import traceback
 import types
@@ -864,4 +865,4 @@ if __name__ == "__main__":
             for lunch in rest.lunches:
                 print(" ", lunch)
 
-    exit(exit_code)
+    sys.exit(exit_code)
