@@ -6,6 +6,7 @@ import logging
 import os
 import pickle
 from typing import cast
+from zoneinfo import ZoneInfo
 
 import redis.asyncio as redis
 from fastapi import FastAPI, Request
@@ -19,6 +20,8 @@ from lunches import RestaurantMenu, gather_restaurants
 from public_transport import public_transport_connections
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "WARNING").upper()
+TZ = ZoneInfo("Europe/Prague")
+
 
 logging.basicConfig(level=LOG_LEVEL)
 
@@ -49,7 +52,7 @@ def index() -> FileResponse:
 async def public_transport(request: Request) -> HTMLResponse:
     srcs = ["Václava Jiřikovského"]
     dsts = ["Hlavní třída", "Rektorát VŠB", "Pustkovecká", "Poruba,Studentské koleje"]
-    if datetime.datetime.now().hour >= 12:
+    if datetime.datetime.now(TZ).hour >= 12:
         srcs, dsts = dsts, srcs
 
     return templates.TemplateResponse(
@@ -62,8 +65,8 @@ async def public_transport(request: Request) -> HTMLResponse:
 @app.get("/lunch.json")
 @app.post("/lunch.json")
 async def lunch(request: Request) -> LunchResponse | ErrorResponse:
-    now = int(datetime.datetime.now().timestamp())
-    key = f"restaurants.{datetime.date.today().strftime('%d-%m-%Y')}"
+    now = int(datetime.datetime.now(TZ).timestamp())
+    key = f"restaurants.{datetime.datetime.now(TZ).strftime('%d-%m-%Y')}"
     result_raw = await redis_client.get(key)
     if not result_raw or request.method == "POST":
         throttle_key = f"{key}.throttle"
