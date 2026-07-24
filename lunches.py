@@ -408,7 +408,7 @@ async def sbeerka(dom: Node, http: httpx.AsyncClient) -> Foods:
     if not elem:
         return
 
-    t: type[Lunch] | type[Soup] | None = None
+    t: type[Lunch | Soup] | None = None
     for line in elem.text().splitlines():
         line = line.strip()
         if "polévk" in line.lower():
