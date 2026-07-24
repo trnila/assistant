@@ -22,6 +22,7 @@ from selectolax.parser import HTMLParser, Node, Selector
 days = ["Pondělí", "Úterý", "Středa", "Čtvrtek", "Pátek", "Sobota", "Neděle"]
 USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36"
 TZ = ZoneInfo("Europe/Prague")
+LOGGER = logging.getLogger(__name__)
 
 
 class Location(StrEnum):
@@ -775,7 +776,7 @@ async def gather_restaurants(allowed_restaurants: list[str] | None = None) -> li
                 try:
                     food.num = int(food.num.replace(".", ""))
                 except ValueError:
-                    logging.warning("Failed to parse lunch position: %s", food.num)
+                    LOGGER.warning("Failed to parse lunch position: %s", food.num)
                     food.num = None
             if not food.num:
                 food.num = num + 1
