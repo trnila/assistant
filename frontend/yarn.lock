@@ -444,9 +444,9 @@ source-map-js@^1.2.1:
   integrity sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==
 
 svelte@^5.0.0:
-  version "5.56.7"
-  resolved "https://registry.yarnpkg.com/svelte/-/svelte-5.56.7.tgz#2ff198f0eac64be2556e84f401aab2af5d87327e"
-  integrity sha512-5qERUZX80oQj6XrDMUmD2Uhd/cIpCPDWWKBK3ZHmyRUC9apPyamWM8xMo31mbWsIQxwG2hVoSnOJ/EcnhVkkzQ==
+  version "5.56.8"
+  resolved "https://registry.yarnpkg.com/svelte/-/svelte-5.56.8.tgz#e8eb5ec8d338943607f93121c8f62f2959938158"
+  integrity sha512-PY8LOw7xP6c8IOiVqdo0sbbZVYhXRSfklOQLAUyGBKqjTX0wx/z4l/9J+PmBpmlLnxzEb1NqltxQ5/wZme/Cmg==
   dependencies:
     "@jridgewell/remapping" "^2.3.4"
     "@jridgewell/sourcemap-codec" "^1.5.0"
