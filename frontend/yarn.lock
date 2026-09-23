@@ -139,9 +139,9 @@
   integrity sha512-wgKggnhZVL9Bfx1OaKKTrYY9BFRk6C8UAkQNUcIv1+llzYrIqy+RZm5HPKzn0NpEBvTVhTqB4kQyllZywsRBRQ==
 
 "@sveltejs/vite-plugin-svelte@^7.0.0":
-  version "7.3.0"
-  resolved "https://registry.yarnpkg.com/@sveltejs/vite-plugin-svelte/-/vite-plugin-svelte-7.3.0.tgz#38bd31ac67ae9cc89509bce0765a2a3c979944ba"
-  integrity sha512-QbRoJyD92e9R0ufeQIWRHrCC0ObcqSv/aBDdrQMoU+sypav3cDx5wytdQ6GLdXjEMO6xjrXGzfkUygng8JMv0A==
+  version "7.3.1"
+  resolved "https://registry.yarnpkg.com/@sveltejs/vite-plugin-svelte/-/vite-plugin-svelte-7.3.1.tgz#93f642883e09ef234325fb043a50821723f7fffc"
+  integrity sha512-ZPsLN8B1e/En+Ak5s4V7srFDT532oS0qieLsQwu63NGKsS+iAjoO2Js1BochlHlglcU+Pt7WAO3C5Ee+4f6gVA==
   dependencies:
     deepmerge "^4.3.1"
     magic-string "^1.0.0"
@@ -328,9 +328,9 @@ magic-string@^0.30.11:
     "@jridgewell/sourcemap-codec" "^1.5.5"
 
 magic-string@^1.0.0:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-1.3.1.tgz#47ce661c2d5ce577a64c9bd6204828b435ecc822"
-  integrity sha512-rm91zr2Ou+XueDTohjQQjdQEcYM6zVi8KVUCG8Ec3vHwUEKrhSdCNyfuIywkA6hcCAteIn0ZOtAHA6eGpiX+Pg==
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-1.4.2.tgz#508aef4aac7319496dc074ec60ea511c49daf138"
+  integrity sha512-vG+rjFRj1PqdIBozIxAGMjPlOhaVe+GXpbttY/iSK7rGcJRMlwNJO7dcUwmUqkymsFLJiNGI06t4D7Fr7yRC9g==
   dependencies:
     "@jridgewell/sourcemap-codec" "^1.6.0"
 
