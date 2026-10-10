@@ -7,7 +7,8 @@ from zoneinfo import ZoneInfo
 
 import httpx
 from pydantic import BaseModel
-from selectolax.parser import HTMLParser, Node
+from selectolax.lexbor import LexborHTMLParser as HTMLParser
+from selectolax.lexbor import LexborNode as Node
 
 TZ = ZoneInfo("Europe/Prague")
 
