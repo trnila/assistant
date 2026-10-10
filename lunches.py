@@ -861,7 +861,8 @@ if __name__ == "__main__":
         print()
         print(rest.name, f"({rest.elapsed:.3}s)")
         if rest.error:
-            if "httpx.ConnectError" not in rest.error and "httpx.ConnectTimeout" not in rest.error:
+            connection_errors = ("httpx.ConnectError", "httpx.ConnectTimeout", "httpx.ReadTimeout")
+            if not any(e in rest.error for e in connection_errors):
                 exit_code = 1
             print(rest.error)
         else:
