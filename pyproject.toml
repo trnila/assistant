@@ -7,7 +7,7 @@ requires-python = "~=3.14.3"
 readme = "README.md"
 dependencies = [
     "httpx>=0.28.1,<0.29",
-    "selectolax>=0.4,<0.5",
+    "selectolax>=1,<1.1",
     "fastapi[standard]>=0.143,<0.144",
     "uvicorn[standard]>=0.54,<0.55",
     "redis[hiredis]>=8,<9",
