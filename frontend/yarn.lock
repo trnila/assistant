@@ -3,9 +3,9 @@
 
 
 "@iconify/svelte@^5.0.0":
-  version "5.2.2"
-  resolved "https://registry.yarnpkg.com/@iconify/svelte/-/svelte-5.2.2.tgz#7c4e7036f88b83ce3fe0c9a125b41ed9dcf927be"
-  integrity sha512-XMXxD3nzH7yB68C3K4sNwzrJ1TBscODR0ZqCeNf0KGuEMCTSuCo0jHNDZ0o0iRXTylO41NSz/DWam/4atLG1yw==
+  version "5.2.3"
+  resolved "https://registry.yarnpkg.com/@iconify/svelte/-/svelte-5.2.3.tgz#438e97a3241353ffcea61be3380059a4f6a67751"
+  integrity sha512-RV08FAHSsUW3/4WJsfoMYGbNt413Eh+4thU864pmX2QGFaem2P7zTcANYwkSOnApGlpYhMXJM813tN1tfk68ug==
   dependencies:
     "@iconify/types" "^2.0.0"
 
