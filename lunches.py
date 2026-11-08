@@ -273,9 +273,8 @@ def lastrada(dom: Node) -> Foods:
             capturing = False
             if days[day_nth] in tr.text() or "Menu na celý týden" in tr.text():
                 capturing = True
-        elif capturing:
-            if tr.css_matches(".highlight"):
-                yield Lunch(name=tr.css("td")[0].text(), price=tr.css(".price")[0].text())
+        elif capturing and tr.css_matches(".highlight"):
+            yield Lunch(name=tr.css("td")[0].text(), price=tr.css(".price")[0].text())
 
 
 @restaurant("Ellas", "https://www.restauraceellas.cz/", Location.Poruba)
